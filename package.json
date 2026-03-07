@@ -1,0 +1,40 @@
+{
+  "name": "psyflow-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "description": "A psyflow-like web runtime and authoring package built on top of jsPsych.",
+  "scripts": {
+    "generate:tasks": "node ./scripts/generate-task-manifest.mjs",
+    "dev": "npm run generate:tasks && vite",
+    "dev:mid": "npm run generate:tasks && vite --open '/?task=H000006-mid'",
+    "build": "npm run build:site",
+    "build:site": "npm run generate:tasks && vite build",
+    "build:pages": "npm run generate:tasks && vite build --mode pages",
+    "build:lib": "npm run generate:tasks && vite build --mode lib",
+    "preview": "vite preview",
+    "typecheck": "npm run generate:tasks && tsc --noEmit",
+    "test": "npm run generate:tasks && vitest run",
+    "test:watch": "npm run generate:tasks && vitest",
+    "test:e2e": "npm run generate:tasks && playwright test"
+  },
+  "dependencies": {
+    "@jspsych/plugin-call-function": "2.1.0",
+    "jspsych": "8.2.3",
+    "yaml": "2.8.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "@types/node": "24.3.0",
+    "jsdom": "27.0.0",
+    "typescript": "5.9.2",
+    "vite": "7.3.1",
+    "vitest": "4.0.18"
+  }
+}
