@@ -33,11 +33,16 @@ psyflow-web/dist
 
 ## GitHub Pages
 
-For repository-hosted GitHub Pages, set the Vite base path before building:
+For repository-hosted GitHub Pages, build the shared runner in Pages mode:
 
 ```powershell
-$env:PSYFLOW_BASE='/TaskBeacon/'
 npm run build:pages
 ```
 
-The included workflow at `.github/workflows/deploy-psyflow-web.yml` does this automatically on GitHub Actions.
+Published runner URL:
+
+```text
+https://taskbeacon.github.io/psyflow-web/?task=H000006-mid
+```
+
+The included workflow at `.github/workflows/pages.yml` fetches public `Hxxxxxx-*` task repos from the `TaskBeacon` org, regenerates the manifest, and deploys the shared runner to GitHub Pages.

@@ -8,8 +8,11 @@ const repoRoot = path.resolve(rootDir, "..");
 
 export default defineConfig(({ mode }) => {
   const buildTarget = mode === "lib" ? "lib" : "site";
+  const base =
+    process.env.PSYFLOW_BASE ??
+    (mode === "pages" ? "/psyflow-web/" : "/");
   return {
-    base: process.env.PSYFLOW_BASE ?? "/",
+    base,
     resolve: {
       alias: {
         "psyflow-web": path.resolve(rootDir, "src/index.ts")
