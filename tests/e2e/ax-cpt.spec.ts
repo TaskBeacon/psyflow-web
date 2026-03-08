@@ -7,11 +7,6 @@ async function waitForUnit(page: Page, unitLabel: string, timeout = 5000): Promi
   return page.locator(`[data-psyflow-unit-label="${unitLabel}"]`).first();
 }
 
-async function getUnitText(page: Page, unitLabel: string, timeout = 5000): Promise<string> {
-  const unit = await waitForUnit(page, unitLabel, timeout);
-  return (await unit.textContent())?.trim() ?? "";
-}
-
 async function waitForProbeResponses(page: Page, totalTrials: number): Promise<string[]> {
   const responses: string[] = [];
   let currentCue = "";

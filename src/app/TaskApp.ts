@@ -59,7 +59,7 @@ function ensureTaskAppStyles(): void {
       padding: 24px;
       background:
         radial-gradient(circle at top left, rgba(34, 211, 238, 0.16), transparent 30%),
-        radial-gradient(circle at top right, rgba(217, 70, 239, 0.14), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(5, 150, 105, 0.12), transparent 25%),
         linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
       color: #0f172a;
       font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
@@ -73,7 +73,7 @@ function ensureTaskAppStyles(): void {
     }
     .psyflow-task-panel {
       border: 1px solid rgba(15, 23, 42, 0.08);
-      background: rgba(255, 255, 255, 0.84);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(16px);
       border-radius: 24px;
       box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
@@ -124,7 +124,7 @@ function ensureTaskAppStyles(): void {
       border-radius: 14px;
       padding: 12px 16px;
       font: inherit;
-      background: #0f172a;
+      background: linear-gradient(135deg, #0f766e, #155e75);
       color: white;
       cursor: pointer;
       transition: transform 120ms ease, box-shadow 120ms ease;
@@ -255,6 +255,7 @@ function createDownloadButton(
 }
 
 function createShell(options: MountTaskAppOptions): TaskAppElements {
+  document.title = `${options.task_name ?? options.task_id} | Preview`;
   const app = document.createElement("div");
   app.className = "psyflow-task-app";
   app.dataset.taskId = options.task_id;
@@ -265,7 +266,7 @@ function createShell(options: MountTaskAppOptions): TaskAppElements {
   header.className = "psyflow-task-panel psyflow-task-header";
   header.innerHTML = `
     <h1>${options.task_name ?? options.task_id}</h1>
-    <p>${options.task_description ?? "A psyflow-web task using the shared browser runtime."}</p>
+    <p>${options.task_description ?? "A browser preview task running on the shared TaskBeacon web runtime."}</p>
   `;
 
   const formPanel = document.createElement("section");

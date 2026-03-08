@@ -22,8 +22,8 @@ function ensureRunnerStyles(): void {
       color-scheme: light;
       font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 32%),
-        radial-gradient(circle at top right, rgba(249, 115, 22, 0.18), transparent 24%),
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(5, 150, 105, 0.12), transparent 30%),
         linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
       color: #0f172a;
     }
@@ -37,28 +37,35 @@ function ensureRunnerStyles(): void {
       box-sizing: border-box;
     }
     .psyflow-runner-shell {
-      width: min(880px, 100%);
+      width: min(920px, 100%);
       margin: 0 auto;
       display: grid;
       gap: 18px;
     }
     .psyflow-runner-card {
-      background: rgba(255, 255, 255, 0.84);
+      background: rgba(255, 255, 255, 0.88);
       border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 24px;
+      border-radius: 28px;
       box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
       backdrop-filter: blur(16px);
-      padding: 22px 24px;
+      padding: 24px;
     }
     .psyflow-runner-card h1,
     .psyflow-runner-card h2,
     .psyflow-runner-card p {
       margin: 0;
     }
+    .psyflow-runner-kicker {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #0f766e;
+    }
     .psyflow-runner-card h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
+      margin-top: 12px;
+      font-size: clamp(2.1rem, 5vw, 3.2rem);
       letter-spacing: -0.06em;
-      margin-bottom: 10px;
     }
     .psyflow-runner-card h2 {
       margin-bottom: 10px;
@@ -67,53 +74,86 @@ function ensureRunnerStyles(): void {
     }
     .psyflow-runner-card p {
       color: #334155;
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .psyflow-runner-form {
       display: grid;
       gap: 12px;
-      margin-top: 16px;
+      margin-top: 18px;
     }
-    .psyflow-runner-form label {
+    .psyflow-runner-field {
       display: grid;
       gap: 6px;
       font-size: 0.92rem;
       color: #334155;
     }
-    .psyflow-runner-form input {
+    .psyflow-runner-input,
+    .psyflow-runner-select {
       appearance: none;
+      width: 100%;
       border: 1px solid rgba(15, 23, 42, 0.12);
       border-radius: 14px;
       padding: 12px 14px;
       font: inherit;
+      background: white;
+      color: #0f172a;
+      box-sizing: border-box;
     }
-    .psyflow-runner-form button,
-    .psyflow-runner-link {
+    .psyflow-runner-button {
       appearance: none;
       border: 1px solid rgba(15, 23, 42, 0.12);
       border-radius: 14px;
       padding: 12px 16px;
       font: inherit;
-      background: #0f172a;
+      background: linear-gradient(135deg, #0f766e, #155e75);
       color: white;
       cursor: pointer;
-      text-decoration: none;
-      text-align: left;
+      font-weight: 600;
+      box-shadow: 0 12px 24px rgba(15, 118, 110, 0.16);
     }
-    .psyflow-runner-catalog {
+    .psyflow-runner-button:hover {
+      filter: brightness(1.03);
+    }
+    .psyflow-runner-meta {
       display: grid;
       gap: 10px;
       margin-top: 18px;
+      padding: 16px 18px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 20px;
+      background: rgba(248, 250, 252, 0.9);
     }
-    .psyflow-runner-task-list {
-      display: grid;
+    .psyflow-runner-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
       gap: 10px;
+      font-size: 0.92rem;
+      color: #334155;
     }
-    .psyflow-runner-link small {
-      display: block;
-      margin-top: 4px;
-      opacity: 0.78;
-      font-size: 0.8rem;
+    .psyflow-runner-meta-row strong {
+      color: #0f172a;
+    }
+    .psyflow-runner-current {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .psyflow-runner-pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 999px;
+      background: white;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .psyflow-runner-empty {
+      font-size: 0.88rem;
+      color: #64748b;
     }
     .psyflow-runner-task {
       min-height: 60vh;
@@ -124,12 +164,38 @@ function ensureRunnerStyles(): void {
       font-size: 0.9rem;
       color: #7f1d1d;
     }
+    @media (min-width: 760px) {
+      .psyflow-runner-form {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) auto;
+        align-items: end;
+      }
+    }
+    @media (max-width: 720px) {
+      .psyflow-runner {
+        padding: 16px;
+      }
+      .psyflow-runner-card {
+        padding: 18px;
+        border-radius: 24px;
+      }
+    }
   `;
   document.head.appendChild(style);
 }
 
 function normalizeTaskKey(taskValue: string): string {
   return taskValue.trim();
+}
+
+function matchesCatalogQuery(entry: RunnerTaskManifestEntry, query: string): boolean {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+  return [entry.directory, entry.id ?? "", entry.slug ?? "", entry.title]
+    .join(" ")
+    .toLowerCase()
+    .includes(normalized);
 }
 
 function resolveManifestEntry(taskValue: string): RunnerTaskManifestEntry | null {
@@ -145,7 +211,9 @@ function resolveManifestEntry(taskValue: string): RunnerTaskManifestEntry | null
   );
 }
 
-function resolveTaskEntry(module: TaskModuleExport): ((root: HTMLElement) => Promise<unknown> | unknown) | null {
+function resolveTaskEntry(
+  module: TaskModuleExport
+): ((root: HTMLElement) => Promise<unknown> | unknown) | null {
   if (typeof module.main === "function") {
     return module.main;
   }
@@ -187,34 +255,66 @@ function mountRunnerShell(root: HTMLElement): {
   return { taskRoot, formCard, errorCard };
 }
 
-function buildTaskCatalog(activeDirectory: string | null): string {
-  if (taskEntries.length === 0) {
-    return `
-      <div class="psyflow-runner-catalog">
-        <h2>Available Tasks</h2>
-        <p>No HTML tasks were discovered in this build.</p>
-      </div>
-    `;
+function populateTaskSelect(
+  select: HTMLSelectElement,
+  filterValue: string,
+  requestedValue: string
+): RunnerTaskManifestEntry[] {
+  const filteredEntries = taskEntries.filter((entry) => matchesCatalogQuery(entry, filterValue));
+  select.innerHTML = "";
+
+  if (filteredEntries.length === 0) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "No matching tasks";
+    option.disabled = true;
+    option.selected = true;
+    select.appendChild(option);
+    return filteredEntries;
   }
 
-  const items = taskEntries
-    .map((entry) => {
-      const activeSuffix = entry.directory === activeDirectory ? " (current)" : "";
-      return `
-        <a class="psyflow-runner-link" href="?task=${encodeURIComponent(entry.directory)}">
-          ${entry.title}${activeSuffix}
-          <small>${entry.directory}${entry.slug ? ` · ${entry.slug}` : ""}</small>
-        </a>
-      `;
-    })
-    .join("");
+  for (const entry of filteredEntries) {
+    const option = document.createElement("option");
+    option.value = entry.directory;
+    option.textContent = `${entry.directory} - ${entry.title}`;
+    select.appendChild(option);
+  }
 
-  return `
-    <div class="psyflow-runner-catalog">
-      <h2>Available Tasks</h2>
-      <div class="psyflow-runner-task-list">${items}</div>
-    </div>
-  `;
+  const resolvedRequested = resolveManifestEntry(requestedValue)?.directory ?? requestedValue;
+  const selectedValue = filteredEntries.some((entry) => entry.directory === resolvedRequested)
+    ? resolvedRequested
+    : filteredEntries[0]?.directory ?? "";
+  select.value = selectedValue;
+
+  return filteredEntries;
+}
+
+function updateLauncherMeta(
+  formCard: HTMLElement,
+  filteredEntries: RunnerTaskManifestEntry[],
+  currentValue: string
+): void {
+  const countNode = formCard.querySelector<HTMLElement>("[data-role='task-count']");
+  const currentNode = formCard.querySelector<HTMLElement>("[data-role='current-task']");
+  if (!countNode || !currentNode) {
+    return;
+  }
+
+  countNode.textContent = `${filteredEntries.length} task${filteredEntries.length === 1 ? "" : "s"} available`;
+  const currentEntry = resolveManifestEntry(currentValue);
+  if (!currentEntry) {
+    currentNode.innerHTML = `<span class="psyflow-runner-empty">Select a task to launch a preview.</span>`;
+    return;
+  }
+
+  currentNode.innerHTML = "";
+  const title = document.createElement("span");
+  title.className = "psyflow-runner-pill";
+  title.textContent = currentEntry.title;
+  const handle = document.createElement("span");
+  handle.className = "psyflow-runner-pill";
+  handle.textContent = currentEntry.directory;
+  currentNode.append(title, handle);
 }
 
 function renderLauncher(
@@ -222,27 +322,60 @@ function renderLauncher(
   taskValue: string,
   activeTask: RunnerTaskManifestEntry | null
 ): void {
-  const activeDirectory = activeTask?.directory ?? null;
+  document.title = activeTask ? `${activeTask.title} | Preview` : "Preview";
+
   formCard.innerHTML = `
-    <h1>psyflow-web</h1>
-    <p>Shared browser runner for TAPS-style HTML tasks.</p>
+    <div class="psyflow-runner-kicker">TaskBeacon preview</div>
+    <h1>Preview</h1>
+    <p>Launch a browser preview for an HTML task companion without scanning a long task list.</p>
     <form class="psyflow-runner-form">
-      <label>
-        Task Directory
-        <input name="task" placeholder="H000006-mid" value="${taskValue}" />
+      <label class="psyflow-runner-field">
+        Filter tasks
+        <input class="psyflow-runner-input" name="catalog" placeholder="Search by handle, ID, slug, or title" />
       </label>
-      <button type="submit">Open Task</button>
+      <label class="psyflow-runner-field">
+        Available tasks
+        <select class="psyflow-runner-select" name="task"></select>
+      </label>
+      <button class="psyflow-runner-button" type="submit">Open preview</button>
     </form>
-    ${buildTaskCatalog(activeDirectory)}
+    <div class="psyflow-runner-meta">
+      <div class="psyflow-runner-meta-row">
+        <span>Catalog</span>
+        <strong data-role="task-count"></strong>
+      </div>
+      <div class="psyflow-runner-meta-row">
+        <span>Current selection</span>
+        <div class="psyflow-runner-current" data-role="current-task"></div>
+      </div>
+    </div>
   `;
+
   const form = formCard.querySelector<HTMLFormElement>(".psyflow-runner-form");
-  if (!form) {
+  const filterInput = formCard.querySelector<HTMLInputElement>('input[name="catalog"]');
+  const select = formCard.querySelector<HTMLSelectElement>('select[name="task"]');
+  if (!form || !filterInput || !select) {
     return;
   }
+  const catalogInput = filterInput;
+  const taskSelect = select;
+
+  const requestedDirectory = activeTask?.directory ?? taskValue;
+
+  function syncCatalog(nextRequested: string): void {
+    const filteredEntries = populateTaskSelect(taskSelect, catalogInput.value, nextRequested);
+    updateLauncherMeta(formCard, filteredEntries, taskSelect.value || nextRequested);
+  }
+
+  syncCatalog(requestedDirectory);
+
+  catalogInput.addEventListener("input", () => {
+    syncCatalog(taskSelect.value || requestedDirectory);
+  });
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const input = form.querySelector<HTMLInputElement>('input[name="task"]');
-    const nextTask = input?.value.trim() ?? "";
+    const nextTask = taskSelect.value.trim();
     const url = new URL(window.location.href);
     if (nextTask) {
       url.searchParams.set("task", nextTask);
