@@ -14,6 +14,7 @@
     "fetch:tasks": "node ./scripts/fetch-html-task-repos.mjs",
     "generate:tasks": "node ./scripts/generate-task-manifest.mjs",
     "dev": "npm run generate:tasks && vite",
+    "dev:ax-cpt": "npm run generate:tasks && vite --open '/?task=H000001-ax-cpt'",
     "dev:mid": "npm run generate:tasks && vite --open '/?task=H000006-mid'",
     "build": "npm run build:site",
     "build:site": "npm run generate:tasks && vite build",

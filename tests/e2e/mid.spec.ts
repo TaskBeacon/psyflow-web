@@ -3,9 +3,8 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 test.setTimeout(120_000);
 
 async function waitForUnit(page: Page, unitLabel: string, timeout = 5000): Promise<Locator> {
-  const locator = page.locator(`[data-psyflow-unit-label="${unitLabel}"]`).first();
-  await expect(locator).toBeVisible({ timeout });
-  return locator;
+  await page.waitForSelector(`[data-psyflow-unit-label="${unitLabel}"]`, { timeout, state: "visible" });
+  return page.locator(`[data-psyflow-unit-label="${unitLabel}"]`).first();
 }
 
 test("MID example runs end-to-end and exports psyflow-style results", async ({ page }) => {

@@ -9,6 +9,13 @@ export interface RunnerTaskManifestEntry {
 }
 
 export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
+  "H000001-ax-cpt": {
+    directory: "H000001-ax-cpt",
+    id: "H000001",
+    slug: "ax-cpt",
+    title: "AX-CPT Task",
+    importTask: () => import("../../../H000001-ax-cpt/main")
+  },
   "H000006-mid": {
     directory: "H000006-mid",
     id: "H000006",
