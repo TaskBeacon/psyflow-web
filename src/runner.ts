@@ -20,16 +20,25 @@ function ensureRunnerStyles(): void {
   style.textContent = `
     :root {
       color-scheme: light;
-      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      font-family: "DM Sans", "Segoe UI", sans-serif;
+      --pf-ink: #25314d;
+      --pf-paper: #f4efe9;
+      --pf-panel: #fffdf9;
+      --pf-sky: #b9dceb;
+      --pf-sky-soft: #d7ebf6;
+      --pf-peach-soft: #ffe9de;
+      --pf-mint: #39d95d;
       background:
-        radial-gradient(circle at top left, rgba(34, 211, 238, 0.16), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(5, 150, 105, 0.12), transparent 30%),
-        linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-      color: #0f172a;
+        radial-gradient(circle at 12% 8%, rgba(245, 193, 181, 0.28), transparent 20%),
+        radial-gradient(circle at 86% 16%, rgba(185, 220, 235, 0.28), transparent 22%),
+        radial-gradient(circle at 80% 82%, rgba(57, 217, 93, 0.1), transparent 20%),
+        linear-gradient(180deg, var(--pf-paper) 0%, #f1ece6 100%);
+      color: var(--pf-ink);
     }
     body {
       margin: 0;
       min-height: 100vh;
+      background: transparent;
     }
     .psyflow-runner {
       min-height: 100vh;
@@ -37,17 +46,16 @@ function ensureRunnerStyles(): void {
       box-sizing: border-box;
     }
     .psyflow-runner-shell {
-      width: min(920px, 100%);
+      width: min(980px, 100%);
       margin: 0 auto;
       display: grid;
       gap: 18px;
     }
     .psyflow-runner-card {
-      background: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 28px;
-      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
-      backdrop-filter: blur(16px);
+      background: var(--pf-panel);
+      border: 2px solid var(--pf-ink);
+      border-radius: 30px;
+      box-shadow: 0 6px 0 var(--pf-ink);
       padding: 24px;
     }
     .psyflow-runner-card h1,
@@ -56,72 +64,86 @@ function ensureRunnerStyles(): void {
       margin: 0;
     }
     .psyflow-runner-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      background: #c9f7b9;
+      padding: 8px 12px;
       font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #0f766e;
+      letter-spacing: 0.06em;
+      color: var(--pf-ink);
     }
     .psyflow-runner-card h1 {
       margin-top: 12px;
       font-size: clamp(2.1rem, 5vw, 3.2rem);
-      letter-spacing: -0.06em;
+      line-height: 0.94;
+      letter-spacing: -0.04em;
+      color: var(--pf-ink);
+      font-family: "Baloo 2", "DM Sans", sans-serif;
     }
     .psyflow-runner-card h2 {
       margin-bottom: 10px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       letter-spacing: -0.03em;
+      color: var(--pf-ink);
+      font-family: "Baloo 2", "DM Sans", sans-serif;
     }
     .psyflow-runner-card p {
-      color: #334155;
+      color: rgba(37, 49, 77, 0.84);
       line-height: 1.6;
     }
     .psyflow-runner-form {
       display: grid;
-      gap: 12px;
-      margin-top: 18px;
+      gap: 14px;
+      margin-top: 20px;
     }
     .psyflow-runner-field {
       display: grid;
       gap: 6px;
       font-size: 0.92rem;
-      color: #334155;
+      color: rgba(37, 49, 77, 0.84);
+      font-weight: 700;
     }
     .psyflow-runner-input,
     .psyflow-runner-select {
       appearance: none;
       width: 100%;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      border-radius: 14px;
+      border: 2px solid var(--pf-ink);
+      border-radius: 18px;
       padding: 12px 14px;
       font: inherit;
       background: white;
-      color: #0f172a;
+      color: var(--pf-ink);
       box-sizing: border-box;
+      box-shadow: 0 4px 0 var(--pf-ink);
     }
     .psyflow-runner-button {
       appearance: none;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      border-radius: 14px;
-      padding: 12px 16px;
+      border: 2px solid var(--pf-ink);
+      border-radius: 18px;
+      padding: 13px 18px;
       font: inherit;
-      background: linear-gradient(135deg, #0f766e, #155e75);
+      background: var(--pf-mint);
       color: white;
       cursor: pointer;
-      font-weight: 600;
-      box-shadow: 0 12px 24px rgba(15, 118, 110, 0.16);
+      font-weight: 700;
+      box-shadow: 0 4px 0 var(--pf-ink);
+      transition: transform 120ms ease;
     }
     .psyflow-runner-button:hover {
-      filter: brightness(1.03);
+      transform: translateY(-1px);
     }
     .psyflow-runner-meta {
       display: grid;
       gap: 10px;
       margin-top: 18px;
       padding: 16px 18px;
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      border-radius: 20px;
-      background: rgba(248, 250, 252, 0.9);
+      border: 2px solid var(--pf-ink);
+      border-radius: 22px;
+      background: #f8fcff;
+      box-shadow: 0 4px 0 var(--pf-ink);
     }
     .psyflow-runner-meta-row {
       display: flex;
@@ -129,10 +151,10 @@ function ensureRunnerStyles(): void {
       justify-content: space-between;
       gap: 10px;
       font-size: 0.92rem;
-      color: #334155;
+      color: rgba(37, 49, 77, 0.84);
     }
     .psyflow-runner-meta-row strong {
-      color: #0f172a;
+      color: var(--pf-ink);
     }
     .psyflow-runner-current {
       display: inline-flex;
@@ -143,17 +165,17 @@ function ensureRunnerStyles(): void {
     .psyflow-runner-pill {
       display: inline-flex;
       align-items: center;
-      border: 1px solid rgba(15, 23, 42, 0.1);
+      border: 2px solid var(--pf-ink);
       border-radius: 999px;
       background: white;
       padding: 6px 10px;
       font-size: 0.78rem;
-      font-weight: 600;
-      color: #0f172a;
+      font-weight: 700;
+      color: var(--pf-ink);
     }
     .psyflow-runner-empty {
       font-size: 0.88rem;
-      color: #64748b;
+      color: rgba(37, 49, 77, 0.66);
     }
     .psyflow-runner-task {
       min-height: 60vh;

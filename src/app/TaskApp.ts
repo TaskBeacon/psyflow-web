@@ -58,11 +58,12 @@ function ensureTaskAppStyles(): void {
       min-height: 100vh;
       padding: 24px;
       background:
-        radial-gradient(circle at top left, rgba(34, 211, 238, 0.16), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(5, 150, 105, 0.12), transparent 25%),
-        linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-      color: #0f172a;
-      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        radial-gradient(circle at 12% 8%, rgba(245, 193, 181, 0.28), transparent 20%),
+        radial-gradient(circle at 86% 16%, rgba(185, 220, 235, 0.28), transparent 22%),
+        radial-gradient(circle at 80% 82%, rgba(57, 217, 93, 0.1), transparent 20%),
+        linear-gradient(180deg, #f4efe9 0%, #f1ece6 100%);
+      color: #25314d;
+      font-family: "DM Sans", "Segoe UI", sans-serif;
       box-sizing: border-box;
     }
     .psyflow-task-shell {
@@ -72,11 +73,10 @@ function ensureTaskAppStyles(): void {
       gap: 18px;
     }
     .psyflow-task-panel {
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(16px);
-      border-radius: 24px;
-      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
+      border: 2px solid #25314d;
+      background: #fffdf9;
+      border-radius: 28px;
+      box-shadow: 0 6px 0 #25314d;
     }
     .psyflow-task-header,
     .psyflow-task-body,
@@ -86,13 +86,16 @@ function ensureTaskAppStyles(): void {
     .psyflow-task-header h1 {
       margin: 0 0 8px;
       font-size: clamp(2rem, 5vw, 3.2rem);
-      letter-spacing: -0.06em;
+      line-height: 0.94;
+      letter-spacing: -0.04em;
+      color: #25314d;
+      font-family: "Baloo 2", "DM Sans", sans-serif;
     }
     .psyflow-task-header p,
     .psyflow-task-preflight p,
     .psyflow-task-result p {
       margin: 0;
-      color: #334155;
+      color: rgba(37, 49, 77, 0.84);
       line-height: 1.5;
     }
     .psyflow-task-preflight {
@@ -109,34 +112,39 @@ function ensureTaskAppStyles(): void {
       font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #64748b;
+      color: rgba(37, 49, 77, 0.7);
     }
     .psyflow-task-preflight dd {
       margin: 4px 0 0;
-      font-weight: 600;
-      color: #0f172a;
+      font-weight: 700;
+      color: #25314d;
     }
     .psyflow-task-button,
     .psyflow-download-button,
     .psyflow-subinfo-form button {
       appearance: none;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      border-radius: 14px;
+      border: 2px solid #25314d;
+      border-radius: 18px;
       padding: 12px 16px;
       font: inherit;
-      background: linear-gradient(135deg, #0f766e, #155e75);
+      background: #39d95d;
       color: white;
       cursor: pointer;
-      transition: transform 120ms ease, box-shadow 120ms ease;
+      font-weight: 700;
+      box-shadow: 0 4px 0 #25314d;
+      transition: transform 120ms ease;
     }
     .psyflow-task-button:hover,
     .psyflow-download-button:hover,
     .psyflow-subinfo-form button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+    }
+    .psyflow-download-button {
+      background: #d7ebf6;
+      color: #25314d;
     }
     .psyflow-task-button[disabled] {
-      opacity: 0.7;
+      opacity: 0.72;
       cursor: progress;
       transform: none;
       box-shadow: none;
@@ -144,6 +152,7 @@ function ensureTaskAppStyles(): void {
     .psyflow-task-runtime {
       min-height: 72vh;
       overflow: hidden;
+      background: #fffdf9;
     }
     .psyflow-task-runtime--hide-cursor,
     .psyflow-task-runtime--hide-cursor * {
@@ -165,6 +174,12 @@ function ensureTaskAppStyles(): void {
       display: grid;
       gap: 10px;
     }
+    .psyflow-task-result-card h2,
+    .psyflow-task-result-card h1 {
+      margin: 0;
+      color: #25314d;
+      font-family: "Baloo 2", "DM Sans", sans-serif;
+    }
     .psyflow-task-result-actions {
       display: flex;
       flex-wrap: wrap;
@@ -174,8 +189,9 @@ function ensureTaskAppStyles(): void {
       margin: 0;
       padding: 18px;
       border-radius: 18px;
-      background: #0f172a;
-      color: #e2e8f0;
+      border: 2px solid #25314d;
+      background: #25314d;
+      color: #f8fafc;
       overflow: auto;
       max-height: 360px;
       font-size: 0.86rem;
@@ -187,6 +203,8 @@ function ensureTaskAppStyles(): void {
     .psyflow-subinfo h1 {
       margin: 0;
       font-size: 1.35rem;
+      color: #25314d;
+      font-family: "Baloo 2", "DM Sans", sans-serif;
     }
     .psyflow-subinfo-form {
       display: grid;
@@ -196,15 +214,17 @@ function ensureTaskAppStyles(): void {
       display: grid;
       gap: 6px;
       font-size: 0.92rem;
-      color: #334155;
+      color: rgba(37, 49, 77, 0.84);
+      font-weight: 700;
     }
     .psyflow-subinfo-field input,
     .psyflow-subinfo-field select {
       appearance: none;
-      border: 1px solid rgba(15, 23, 42, 0.12);
-      border-radius: 14px;
+      border: 2px solid #25314d;
+      border-radius: 18px;
       padding: 12px 14px;
       font: inherit;
+      box-shadow: 0 4px 0 #25314d;
     }
     .psyflow-subinfo-error {
       min-height: 1.25rem;
