@@ -89,7 +89,7 @@ function ensureTaskAppStyles(): void {
       line-height: 0.94;
       letter-spacing: -0.04em;
       color: #25314d;
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      font-family: "Space Grotesk", "DM Sans", sans-serif;
     }
     .psyflow-task-header p,
     .psyflow-task-preflight p,
@@ -178,7 +178,7 @@ function ensureTaskAppStyles(): void {
     .psyflow-task-result-card h1 {
       margin: 0;
       color: #25314d;
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      font-family: "Space Grotesk", "DM Sans", sans-serif;
     }
     .psyflow-task-result-actions {
       display: flex;
@@ -204,7 +204,7 @@ function ensureTaskAppStyles(): void {
       margin: 0;
       font-size: 1.35rem;
       color: #25314d;
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      font-family: "Space Grotesk", "DM Sans", sans-serif;
     }
     .psyflow-subinfo-form {
       display: grid;

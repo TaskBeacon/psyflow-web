@@ -81,14 +81,14 @@ function ensureRunnerStyles(): void {
       line-height: 0.94;
       letter-spacing: -0.04em;
       color: var(--pf-ink);
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      font-family: "Space Grotesk", "DM Sans", sans-serif;
     }
     .psyflow-runner-card h2 {
       margin-bottom: 10px;
       font-size: 1.1rem;
       letter-spacing: -0.03em;
       color: var(--pf-ink);
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      font-family: "Space Grotesk", "DM Sans", sans-serif;
     }
     .psyflow-runner-card p {
       color: rgba(37, 49, 77, 0.84);
