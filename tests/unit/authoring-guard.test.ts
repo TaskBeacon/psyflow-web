@@ -9,7 +9,9 @@ describe("HTML task authoring layer", () => {
     const dirname = path.dirname(fileURLToPath(import.meta.url));
     const taskFiles: Record<string, string[]> = {
       "../../../H000001-ax-cpt": ["main.ts", "src/run_trial.ts"],
-      "../../../H000006-mid": ["main.ts", "src/run_trial.ts", "src/controller.ts", "src/utils.ts"]
+      "../../../H000002-bart": ["main.ts", "src/run_trial.ts", "src/utils.ts"],
+      "../../../H000006-mid": ["main.ts", "src/run_trial.ts", "src/controller.ts", "src/utils.ts"],
+      "../../../H000012-sst": ["main.ts", "src/run_trial.ts", "src/controller.ts", "src/utils.ts"]
     };
 
     for (const [taskDir, files] of Object.entries(taskFiles)) {

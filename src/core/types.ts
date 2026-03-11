@@ -35,7 +35,9 @@ export type StimSpec =
   | CircleStimSpec
   | RectStimSpec
   | PolygonStimSpec
+  | ShapeStimSpec
   | ImageStimSpec
+  | SoundStimSpec
   | SpeechStimSpec;
 
 interface BaseStimSpec {
@@ -85,10 +87,24 @@ export interface PolygonStimSpec extends BaseStimSpec {
   lineColor?: string;
 }
 
+export interface ShapeStimSpec extends BaseStimSpec {
+  type: "shape";
+  vertices: Array<[number, number]>;
+  size: number;
+  fillColor?: string;
+  lineColor?: string;
+}
+
 export interface ImageStimSpec extends BaseStimSpec {
   type: "image";
   image: string;
   size?: [number, number];
+}
+
+export interface SoundStimSpec extends BaseStimSpec {
+  type: "sound";
+  file: string;
+  volume?: number;
 }
 
 export interface SpeechStimSpec extends BaseStimSpec {
@@ -125,6 +141,7 @@ export interface CompiledStage {
   unit_label: string;
   op: "show" | "capture_response" | "wait_and_continue";
   phase?: string | null;
+  when?: Resolvable<boolean>;
   stim_refs: Array<Resolvable<StimRef | StimSpec | null>>;
   duration?: Resolvable<number | number[] | null>;
   response_cfg?: ResponseConfig;

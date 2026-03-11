@@ -2,7 +2,30 @@ import { parse } from "yaml";
 
 import type { ParsedConfig, StimSpec } from "./types";
 
-export function parsePsyflowConfig(yamlText: string): ParsedConfig {
+function isRelativeAssetPath(value: string): boolean {
+  return !/^(?:[a-z]+:|\/|data:)/i.test(value);
+}
+
+function resolveStimSpecAssets(spec: StimSpec, moduleUrl?: string): StimSpec {
+  if (!moduleUrl) {
+    return spec;
+  }
+  if (spec.type === "image" && isRelativeAssetPath(spec.image)) {
+    return {
+      ...spec,
+      image: new URL(spec.image, moduleUrl).href
+    };
+  }
+  if (spec.type === "sound" && isRelativeAssetPath(spec.file)) {
+    return {
+      ...spec,
+      file: new URL(spec.file, moduleUrl).href
+    };
+  }
+  return spec;
+}
+
+export function parsePsyflowConfig(yamlText: string, moduleUrl?: string): ParsedConfig {
   const raw = parse(yamlText) as Record<string, unknown>;
   const taskSections = ["window", "task", "timing"];
   const task_config: Record<string, unknown> = {};
@@ -15,7 +38,11 @@ export function parsePsyflowConfig(yamlText: string): ParsedConfig {
   return {
     raw,
     task_config,
-    stim_config: ((raw.stimuli as Record<string, StimSpec>) ?? {}) as Record<string, StimSpec>,
+    stim_config: Object.fromEntries(
+      Object.entries(((raw.stimuli as Record<string, StimSpec>) ?? {}) as Record<string, StimSpec>).map(
+        ([key, spec]) => [key, resolveStimSpecAssets(spec, moduleUrl)]
+      )
+    ),
     subform_config: {
       subinfo_fields: (raw.subinfo_fields as Array<Record<string, unknown>>) ?? [],
       subinfo_mapping: (raw.subinfo_mapping as Record<string, string>) ?? {}

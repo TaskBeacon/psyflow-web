@@ -5,6 +5,15 @@ export interface RunnerTaskManifestEntry {
   id: string;
   slug: string | null;
   title: string;
+  acquisition: string | null;
+  maturity: string | null;
+  release_tag: string | null;
+  short_description: string;
+  repo_url: string;
+  default_branch: string;
+  download_url: string;
+  run_url: string;
+  last_updated: string;
   importTask: () => Promise<unknown>;
 }
 
@@ -14,14 +23,64 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     id: "H000001",
     slug: "ax-cpt",
     title: "AX-CPT Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of the AX-CPT task built with psyflow-web. The within-trial procedure, task rules, timing, weighted condition generation, and instructio...",
+    repo_url: "https://github.com/TaskBeacon/H000001-ax-cpt",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000001-ax-cpt/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000001-ax-cpt",
+    last_updated: "2026-03-08T22:00:32+08:00",
     importTask: () => import("../../../H000001-ax-cpt/main")
+  },
+  "H000002-bart": {
+    directory: "H000002-bart",
+    id: "H000002",
+    slug: "bart",
+    title: "Balloon Analogue Risk Task (BART)",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of the Balloon Analogue Risk Task built with psyflow-web. The within-trial pump/cash loop, deterministic explosion sampler, risk-conditi...",
+    repo_url: "https://github.com/TaskBeacon/H000002-bart",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000002-bart/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000002-bart",
+    last_updated: "2026-03-11T08:08:00+08:00",
+    importTask: () => import("../../../H000002-bart/main")
   },
   "H000006-mid": {
     directory: "H000006-mid",
     id: "H000006",
     slug: "mid",
     title: "Monetary Incentive Delay (MID) Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of the Monetary Incentive Delay task built with psyflow-web. The within-trial procedure, timing, controller, and instruction text are al...",
+    repo_url: "https://github.com/TaskBeacon/H000006-mid",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000006-mid/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000006-mid",
+    last_updated: "2026-03-07T14:23:22+08:00",
     importTask: () => import("../../../H000006-mid/main")
+  },
+  "H000012-sst": {
+    directory: "H000012-sst",
+    id: "H000012",
+    slug: "sst",
+    title: "Stop-Signal Task (SST)",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of the Stop-Signal Task built with psyflow-web. The within-trial procedure, go/stop condition semantics, instruction text, and adaptive ...",
+    repo_url: "https://github.com/TaskBeacon/H000012-sst",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000012-sst/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000012-sst",
+    last_updated: "2026-03-11T08:08:07+08:00",
+    importTask: () => import("../../../H000012-sst/main")
   },
 };
 

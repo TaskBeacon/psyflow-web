@@ -1,6 +1,6 @@
 import { ParameterType, type JsPsych, type JsPsychPlugin, type TrialType } from "jspsych";
 
-import type { CompiledStage, ResponseConfig, SpeechStimSpec, StimSpec, TrialContextSpec } from "../core/types";
+import type { CompiledStage, ResponseConfig, SoundStimSpec, SpeechStimSpec, StimSpec, TrialContextSpec } from "../core/types";
 import { PSYFLOW_ABORT_EVENT } from "./sessionEvents";
 
 export interface ResolvedStageStimulus {
@@ -14,6 +14,10 @@ export interface ResolvedStageExecution {
   min_wait: number;
   response_cfg?: ResponseConfig;
   stimuli: ResolvedStageStimulus[];
+}
+
+export interface SkippedStageExecution {
+  skip: true;
 }
 
 export interface PsyflowStageResult {
@@ -100,7 +104,11 @@ const KEY_TO_DOM: Record<string, string> = {
   space: " ",
   spacebar: " ",
   return: "enter",
-  esc: "escape"
+  esc: "escape",
+  left: "arrowleft",
+  right: "arrowright",
+  up: "arrowup",
+  down: "arrowdown"
 };
 
 const DOM_TO_PSYFLOW: Record<string, string> = {
@@ -108,7 +116,11 @@ const DOM_TO_PSYFLOW: Record<string, string> = {
   space: "space",
   spacebar: "space",
   enter: "enter",
-  escape: "escape"
+  escape: "escape",
+  arrowleft: "left",
+  arrowright: "right",
+  arrowup: "up",
+  arrowdown: "down"
 };
 
 function ensureStyles(): void {
@@ -178,6 +190,23 @@ function regularPolygonClipPath(edges: number): string {
   return `polygon(${points.join(", ")})`;
 }
 
+function verticesToSvgPoints(vertices: Array<[number, number]>): string {
+  if (vertices.length === 0) {
+    return "";
+  }
+  const xs = vertices.map(([x]) => x);
+  const ys = vertices.map(([, y]) => y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const width = Math.max(maxX - minX, 1e-6);
+  const height = Math.max(maxY - minY, 1e-6);
+  return vertices
+    .map(([x, y]) => `${((x - minX) / width) * 100},${((maxY - y) / height) * 100}`)
+    .join(" ");
+}
+
 function normalizeKeyForListener(key: string): string {
   const normalized = key.toLowerCase();
   return KEY_TO_DOM[normalized] ?? normalized;
@@ -200,6 +229,12 @@ function normalizeKeyboardEvent(event: KeyboardEvent): string {
     return "escape";
   }
   return normalizeRecordedKey(event.key);
+}
+
+function isSkippedStageExecution(
+  execution: ResolvedStageExecution | SkippedStageExecution
+): execution is SkippedStageExecution {
+  return "skip" in execution && execution.skip;
 }
 
 function applyBaseStimStyle(element: HTMLElement, spec: StimSpec): void {
@@ -283,6 +318,26 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       stageRoot.appendChild(element);
       return;
     }
+    case "shape": {
+      const element = document.createElement("div");
+      element.className = "psyflow-stage-stim";
+      applyBaseStimStyle(element, spec);
+      element.style.width = toLength(spec.size, spec.units, spec.size);
+      element.style.height = toLength(spec.size, spec.units, spec.size);
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 100 100");
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      polygon.setAttribute("points", verticesToSvgPoints(spec.vertices));
+      polygon.setAttribute("fill", spec.fillColor ?? "transparent");
+      polygon.setAttribute("stroke", spec.lineColor && spec.lineColor.length > 0 ? spec.lineColor : "transparent");
+      polygon.setAttribute("stroke-width", "2");
+      svg.appendChild(polygon);
+      element.appendChild(svg);
+      stageRoot.appendChild(element);
+      return;
+    }
     case "image": {
       const element = document.createElement("img");
       element.className = "psyflow-stage-stim psyflow-stage-image";
@@ -295,6 +350,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       stageRoot.appendChild(element);
       return;
     }
+    case "sound": {
+      return;
+    }
     case "speech": {
       return;
     }
@@ -303,6 +361,30 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       throw new Error(`Unsupported stimulus type: ${String(exhaustiveCheck)}`);
     }
   }
+}
+
+function playSoundStimuli(specs: StimSpec[]): (() => void) | null {
+  const soundSpecs = specs.filter((spec): spec is SoundStimSpec => spec.type === "sound");
+  if (soundSpecs.length === 0) {
+    return null;
+  }
+  const audios = soundSpecs.map((spec) => {
+    const audio = new Audio(spec.file);
+    audio.preload = "auto";
+    if (typeof spec.volume === "number") {
+      audio.volume = Math.max(0, Math.min(1, spec.volume));
+    }
+    void audio.play().catch(() => {
+      // Audio playback is best-effort in browsers.
+    });
+    return audio;
+  });
+  return () => {
+    for (const audio of audios) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  };
 }
 
 function pickSpeechVoice(spec: SpeechStimSpec): SpeechSynthesisVoice | null {
@@ -375,7 +457,27 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     if (!trial.resolve_stage) {
       throw new Error("psyflow-stage requires a resolve_stage function.");
     }
-    const resolved = trial.resolve_stage() as ResolvedStageExecution;
+    const resolved = trial.resolve_stage() as ResolvedStageExecution | SkippedStageExecution;
+    if (isSkippedStageExecution(resolved)) {
+      return Promise.resolve({
+        onset_time: 0,
+        onset_time_global: Date.now() / 1000,
+        close_time: 0,
+        close_time_global: Date.now() / 1000,
+        duration: 0,
+        response: null,
+        key_press: false,
+        rt: null,
+        response_time: null,
+        response_time_global: null,
+        hit: null,
+        timeout_triggered: false,
+        timeout_time: null,
+        resolved_stim_id: null,
+        resolved_deadline_s: null
+      });
+    }
+    const execution: ResolvedStageExecution = resolved;
 
     display_element.innerHTML = "";
     display_element.tabIndex = 0;
@@ -389,18 +491,19 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     }
     display_element.appendChild(stageRoot);
     display_element.focus();
-    for (const stim of resolved.stimuli) {
+    for (const stim of execution.stimuli) {
       renderStimulus(stageRoot, stim.spec);
     }
-    const stopSpeech = speakStimuli(resolved.stimuli.map((stim) => stim.spec));
+    const stopSpeech = speakStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
+    const stopSounds = playSoundStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
 
     const onsetEpochSeconds = Date.now() / 1000;
     const stageStart = performance.now();
-    const primaryStimId = resolved.context.stim_id ?? resolved.stimuli[0]?.stim_id ?? null;
+    const primaryStimId = execution.context.stim_id ?? execution.stimuli[0]?.stim_id ?? null;
     const deadlineSeconds =
-      resolved.context.deadline_s == null
-        ? resolved.duration
-        : Number(resolved.context.deadline_s);
+      execution.context.deadline_s == null
+        ? execution.duration
+        : Number(execution.context.deadline_s);
 
     return new Promise<PsyflowStageResult>((resolve) => {
       let finished = false;
@@ -411,8 +514,8 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       let timeoutTriggered = false;
       let timeoutTime: number | null = null;
       let keyboardListening = false;
-      const validKeys = (resolved.response_cfg?.keys ?? ["space"]).map((key) => key.toLowerCase());
-      const correctKeys = (resolved.response_cfg?.correct_keys ?? resolved.response_cfg?.keys ?? []).map(
+      const validKeys = (execution.response_cfg?.keys ?? ["space"]).map((key: string) => key.toLowerCase());
+      const correctKeys = (execution.response_cfg?.correct_keys ?? execution.response_cfg?.keys ?? []).map(
         normalizeKeyForListener
       );
 
@@ -432,12 +535,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         response = recordedKey;
         rtSeconds = (performance.now() - stageStart) / 1000;
         if (stage.op === "capture_response") {
-          hit =
-            correctKeys.length > 0
-              ? correctKeys.includes(normalizeKeyForListener(response))
-              : true;
+          hit = correctKeys.length > 0 ? correctKeys.includes(normalizeKeyForListener(response)) : true;
         }
-        if (resolved.response_cfg?.terminate_on_response ?? false) {
+        if (execution.response_cfg?.terminate_on_response ?? false) {
           finish(rtSeconds);
         }
       };
@@ -452,8 +552,11 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         }
         keyboardListening = false;
         stopSpeech?.();
+        stopSounds?.();
         window.removeEventListener("keydown", keydownListener, true);
         document.removeEventListener("keydown", keydownListener, true);
+        display_element.removeEventListener("keydown", keydownListener, true);
+        stageRoot.removeEventListener("keydown", keydownListener, true);
         display_element.removeEventListener(PSYFLOW_ABORT_EVENT, abortListener as EventListener);
       };
 
@@ -468,7 +571,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
             ? elapsedSeconds
             : stage.op === "wait_and_continue"
             ? elapsedSeconds
-            : resolved.duration ?? elapsedSeconds;
+            : execution.duration ?? elapsedSeconds;
         resolve({
           onset_time: 0,
           onset_time_global: onsetEpochSeconds,
@@ -497,15 +600,17 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         keyboardListening = true;
         window.addEventListener("keydown", keydownListener, true);
         document.addEventListener("keydown", keydownListener, true);
+        display_element.addEventListener("keydown", keydownListener, true);
+        stageRoot.addEventListener("keydown", keydownListener, true);
       };
 
       if (stage.op === "show") {
-        timerId = window.setTimeout(() => finish(resolved.duration ?? 0), (resolved.duration ?? 0) * 1000);
+        timerId = window.setTimeout(() => finish(execution.duration ?? 0), (execution.duration ?? 0) * 1000);
         return;
       }
 
       if (stage.op === "wait_and_continue") {
-        const minWaitMs = Math.max(0, resolved.min_wait * 1000);
+        const minWaitMs = Math.max(0, execution.min_wait * 1000);
         if (minWaitMs > 0) {
           timerId = window.setTimeout(() => {
             timerId = null;
@@ -518,15 +623,17 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       }
 
       startKeyboardListener();
-      const timeoutMs = Math.max(0, (resolved.duration ?? 0) * 1000);
-      timerId = window.setTimeout(() => {
-        if (response == null) {
-          timeoutTriggered = true;
-          timeoutTime = resolved.duration ?? null;
-          hit = false;
-        }
-        finish((performance.now() - stageStart) / 1000);
-      }, timeoutMs);
+      if (execution.duration != null) {
+        const timeoutMs = Math.max(0, execution.duration * 1000);
+        timerId = window.setTimeout(() => {
+          if (response == null) {
+            timeoutTriggered = true;
+            timeoutTime = execution.duration ?? null;
+            hit = false;
+          }
+          finish((performance.now() - stageStart) / 1000);
+        }, timeoutMs);
+      }
     });
   }
 }

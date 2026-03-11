@@ -52,7 +52,17 @@ export interface RunPsyflowExperimentOptions {
   onSessionStart?: (session: PsyflowRunSession) => void;
 }
 
+interface ResolvedStageExecutionSkipped {
+  skip: true;
+}
+
 type TimelineTrial = Record<string, unknown>;
+
+function isSkippedStageExecution(
+  execution: ResolvedStageExecution | ResolvedStageExecutionSkipped
+): execution is ResolvedStageExecutionSkipped {
+  return "skip" in execution && execution.skip;
+}
 
 function sampleDuration(value: number | number[] | null | undefined): number | null {
   if (value == null) {
@@ -105,8 +115,11 @@ function resolveStageExecution(
   stage: CompiledStage,
   recorder: ExecutionRecorder,
   stimBank: StimBank
-): ResolvedStageExecution {
+): ResolvedStageExecution | ResolvedStageExecutionSkipped {
   const snapshot = recorder.buildSnapshot(compiledTrial.trial_id);
+  if (stage.when != null && !Boolean(resolveValue(stage.when, snapshot, recorder))) {
+    return { skip: true };
+  }
   const rawDuration = stage.duration == null ? null : resolveValue(stage.duration, snapshot, recorder);
   const sampledDuration = sampleDuration(rawDuration as number | number[] | null);
   const responseCfg = stage.response_cfg ? structuredClone(stage.response_cfg) : undefined;
@@ -242,7 +255,7 @@ function buildTimeline(
   const timeline: TimelineTrial[] = [];
   for (const compiledTrial of trials) {
     for (const stage of compiledTrial.units) {
-      let resolvedStageCache: ResolvedStageExecution | null = null;
+      let resolvedStageCache: ResolvedStageExecution | ResolvedStageExecutionSkipped | null = null;
       timeline.push({
         type: PsyflowStagePlugin,
         stage,
@@ -253,7 +266,12 @@ function buildTimeline(
         on_finish: (data: PsyflowStageResult) => {
           const resolvedStage =
             resolvedStageCache ?? resolveStageExecution(compiledTrial, stage, recorder, stimBank);
-          const { unitState, rawRow } = toUnitState(compiledTrial, stage, resolvedStage, data, recorder);
+          if (isSkippedStageExecution(resolvedStage)) {
+            resolvedStageCache = null;
+            return;
+          }
+          const execution: ResolvedStageExecution = resolvedStage;
+          const { unitState, rawRow } = toUnitState(compiledTrial, stage, execution, data, recorder);
           recorder.storeStageResult(compiledTrial, stage.unit_label, unitState, rawRow, stage.export_to_reduced);
           resolvedStageCache = null;
         }

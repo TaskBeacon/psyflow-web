@@ -37,9 +37,22 @@ export class BlockUnit {
     this.seed = Number(seeds[block_idx] ?? settings.overall_seed ?? 2025);
   }
 
-  generate_conditions(): this {
+  generate_conditions(options: {
+    weights?: number[] | null;
+    func?: (...args: any[]) => string[];
+    args?: any[];
+  } = {}): this {
     const labels = this.settings.conditions.length > 0 ? this.settings.conditions : ["A", "B", "C"];
-    const weights = this.settings.resolve_condition_weights();
+    if (typeof options.func === "function") {
+      this.conditions = options.func(
+        this.n_trials,
+        labels,
+        ...(options.args ?? []),
+        this.seed
+      );
+      return this;
+    }
+    const weights = options.weights ?? this.settings.resolve_condition_weights();
     const rng = makeSeededRandom(this.seed);
     const normalizedWeights = weights ?? new Array(labels.length).fill(1);
     const totalWeight = normalizedWeights.reduce((sum, value) => sum + value, 0);

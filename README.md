@@ -45,4 +45,10 @@ Published runner URL:
 https://taskbeacon.github.io/psyflow-web/?task=H000006-mid
 ```
 
-The included workflow at `.github/workflows/pages.yml` fetches public `Hxxxxxx-*` task repos from the `TaskBeacon` org, regenerates the manifest, and deploys the shared runner to GitHub Pages.
+Public companion manifest:
+
+```text
+https://taskbeacon.github.io/psyflow-web/task-manifest.json
+```
+
+The included workflow at `.github/workflows/pages.yml` fetches public `Hxxxxxx-*` task repos from the `TaskBeacon` org, regenerates both the runtime import manifest and the public companion manifest, and deploys the shared runner to GitHub Pages.

@@ -17,6 +17,7 @@ export class StimUnit {
   private readonly stimRefs: Array<Resolvable<StimRef | StimSpec | null>> = [];
   private readonly pendingContext: TrialContextSpec = {};
   private readonly statePatch: StageStatePatch = {};
+  private enabledWhen?: Resolvable<boolean>;
   private stage?: CompiledStage;
 
   constructor(label: string, trial: TrialBuilder) {
@@ -34,6 +35,7 @@ export class StimUnit {
       unit_label: this.label,
       op: "show",
       phase: this.pendingContext.phase ?? null,
+      when: this.enabledWhen,
       stim_refs: [...this.stimRefs],
       duration: options.duration ?? null,
       context: this.buildContext(options.duration),
@@ -59,6 +61,7 @@ export class StimUnit {
       unit_label: this.label,
       op: "capture_response",
       phase: this.pendingContext.phase ?? null,
+      when: this.enabledWhen,
       stim_refs: [...this.stimRefs],
       duration: options.duration,
       response_cfg: {
@@ -81,6 +84,7 @@ export class StimUnit {
       unit_label: this.label,
       op: "wait_and_continue",
       phase: this.pendingContext.phase ?? null,
+      when: this.enabledWhen,
       stim_refs: [...this.stimRefs],
       response_cfg: {
         keys: [...(options.keys ?? ["space"])],
@@ -98,6 +102,14 @@ export class StimUnit {
     Object.assign(this.statePatch, patch);
     if (this.stage) {
       this.stage.state_patch = { ...this.statePatch };
+    }
+    return this;
+  }
+
+  when(predicate: Resolvable<boolean>): this {
+    this.enabledWhen = predicate;
+    if (this.stage) {
+      this.stage.when = predicate;
     }
     return this;
   }

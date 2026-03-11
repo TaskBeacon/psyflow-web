@@ -47,6 +47,14 @@ export class StimBank {
     return spec;
   }
 
+  rebuild(name: string, overrides: Partial<StimSpec> = {}): StimSpec {
+    const spec = this.resolve(name);
+    return {
+      ...spec,
+      ...structuredClone(overrides)
+    } as StimSpec;
+  }
+
   get_and_format(name: string, vars: Record<string, unknown>): StimSpec {
     return this.format(name, vars);
   }
