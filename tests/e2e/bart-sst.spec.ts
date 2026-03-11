@@ -32,6 +32,15 @@ async function playBartPreview(page: Page, totalTrials: number): Promise<void> {
   }
 }
 
+async function expectBartBalloonVisible(page: Page): Promise<void> {
+  await waitForUnit(page, "pump_0", 15000);
+  const naturalWidth = await page.locator('[data-psyflow-unit-label="pump_0"] img').evaluate((img) => {
+    const element = img as HTMLImageElement;
+    return element.complete ? element.naturalWidth : 0;
+  });
+  expect(naturalWidth).toBeGreaterThan(0);
+}
+
 async function playSstPreview(page: Page, totalTrials: number): Promise<void> {
   let respondedTrials = 0;
   let previousUnit = "";
@@ -54,6 +63,7 @@ test("BART preview runs end-to-end through the shared runner", async ({ page }) 
   await completeSubInfo(page, "102");
   await waitForUnit(page, "instruction_text");
   await page.keyboard.press("Space");
+  await expectBartBalloonVisible(page);
 
   await playBartPreview(page, 9);
 
@@ -76,6 +86,14 @@ test("BART preview runs end-to-end through the shared runner", async ({ page }) 
   expect(result.aborted).toBeFalsy();
   expect(result.reduced_rows.every((row: Record<string, unknown>) => row.condition !== undefined)).toBeTruthy();
   expect(result.reduced_rows.some((row: Record<string, unknown>) => row.feedback_fb_type === "cash")).toBeTruthy();
+  const resources = await page.evaluate(() =>
+    performance
+      .getEntriesByType("resource")
+      .map((entry) => entry.name)
+      .filter((name) => name.includes("cash_fixed") || name.includes("blue_balloon") || name.includes("yellow_balloon"))
+  );
+  expect(resources.some((name: string) => name.includes("cash_fixed"))).toBeTruthy();
+  expect(resources.some((name: string) => name.includes("balloon"))).toBeTruthy();
 });
 
 test("SST preview runs end-to-end through the shared runner", async ({ page }) => {
