@@ -31,7 +31,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000001-ax-cpt/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000001-ax-cpt",
-    last_updated: "2026-03-08T22:00:32+08:00",
+    last_updated: "2026-03-11T09:18:07+08:00",
     importTask: () => import("../../../H000001-ax-cpt/main")
   },
   "H000002-bart": {
@@ -47,7 +47,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000002-bart/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000002-bart",
-    last_updated: "2026-03-11T08:08:00+08:00",
+    last_updated: "2026-03-11T09:18:07+08:00",
     importTask: () => import("../../../H000002-bart/main")
   },
   "H000006-mid": {
@@ -63,7 +63,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000006-mid/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000006-mid",
-    last_updated: "2026-03-07T14:23:22+08:00",
+    last_updated: "2026-03-11T09:18:07+08:00",
     importTask: () => import("../../../H000006-mid/main")
   },
   "H000012-sst": {
@@ -79,7 +79,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000012-sst/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000012-sst",
-    last_updated: "2026-03-11T08:08:07+08:00",
+    last_updated: "2026-03-11T09:18:07+08:00",
     importTask: () => import("../../../H000012-sst/main")
   },
 };

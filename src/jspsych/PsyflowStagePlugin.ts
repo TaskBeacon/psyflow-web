@@ -1,6 +1,7 @@
 import { ParameterType, type JsPsych, type JsPsychPlugin, type TrialType } from "jspsych";
 
 import type { CompiledStage, ResponseConfig, SoundStimSpec, SpeechStimSpec, StimSpec, TrialContextSpec } from "../core/types";
+import { playSoundStimuli } from "./audio";
 import { PSYFLOW_ABORT_EVENT } from "./sessionEvents";
 
 export interface ResolvedStageStimulus {
@@ -190,21 +191,33 @@ function regularPolygonClipPath(edges: number): string {
   return `polygon(${points.join(", ")})`;
 }
 
-function verticesToSvgPoints(vertices: Array<[number, number]>): string {
+function buildShapeGeometry(vertices: Array<[number, number]>): {
+  points: string;
+  viewBox: string;
+} {
   if (vertices.length === 0) {
-    return "";
+    return {
+      points: "",
+      viewBox: "0 0 100 100"
+    };
   }
   const xs = vertices.map(([x]) => x);
-  const ys = vertices.map(([, y]) => y);
+  const ys = vertices.map(([, y]) => -y);
   const minX = Math.min(...xs);
   const maxX = Math.max(...xs);
   const minY = Math.min(...ys);
   const maxY = Math.max(...ys);
   const width = Math.max(maxX - minX, 1e-6);
   const height = Math.max(maxY - minY, 1e-6);
-  return vertices
-    .map(([x, y]) => `${((x - minX) / width) * 100},${((maxY - y) / height) * 100}`)
-    .join(" ");
+  const span = Math.max(width, height);
+  const padding = span * 0.15;
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  const viewSpan = span + padding * 2;
+  return {
+    points: vertices.map(([x, y]) => `${x},${-y}`).join(" "),
+    viewBox: `${centerX - viewSpan / 2} ${centerY - viewSpan / 2} ${viewSpan} ${viewSpan}`
+  };
 }
 
 function normalizeKeyForListener(key: string): string {
@@ -324,12 +337,14 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       applyBaseStimStyle(element, spec);
       element.style.width = toLength(spec.size, spec.units, spec.size);
       element.style.height = toLength(spec.size, spec.units, spec.size);
+      const geometry = buildShapeGeometry(spec.vertices);
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("viewBox", "0 0 100 100");
+      svg.setAttribute("viewBox", geometry.viewBox);
       svg.setAttribute("width", "100%");
       svg.setAttribute("height", "100%");
+      svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
       const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-      polygon.setAttribute("points", verticesToSvgPoints(spec.vertices));
+      polygon.setAttribute("points", geometry.points);
       polygon.setAttribute("fill", spec.fillColor ?? "transparent");
       polygon.setAttribute("stroke", spec.lineColor && spec.lineColor.length > 0 ? spec.lineColor : "transparent");
       polygon.setAttribute("stroke-width", "2");
@@ -346,6 +361,11 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       if (spec.size) {
         element.style.width = toLength(spec.size[0], spec.units, spec.size[0]);
         element.style.height = toLength(spec.size[1], spec.units, spec.size[1]);
+      } else {
+        element.style.maxWidth = "60vmin";
+        element.style.maxHeight = "60vmin";
+        element.style.width = "auto";
+        element.style.height = "auto";
       }
       stageRoot.appendChild(element);
       return;
@@ -361,30 +381,6 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       throw new Error(`Unsupported stimulus type: ${String(exhaustiveCheck)}`);
     }
   }
-}
-
-function playSoundStimuli(specs: StimSpec[]): (() => void) | null {
-  const soundSpecs = specs.filter((spec): spec is SoundStimSpec => spec.type === "sound");
-  if (soundSpecs.length === 0) {
-    return null;
-  }
-  const audios = soundSpecs.map((spec) => {
-    const audio = new Audio(spec.file);
-    audio.preload = "auto";
-    if (typeof spec.volume === "number") {
-      audio.volume = Math.max(0, Math.min(1, spec.volume));
-    }
-    void audio.play().catch(() => {
-      // Audio playback is best-effort in browsers.
-    });
-    return audio;
-  });
-  return () => {
-    for (const audio of audios) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
-  };
 }
 
 function pickSpeechVoice(spec: SpeechStimSpec): SpeechSynthesisVoice | null {
@@ -495,7 +491,11 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       renderStimulus(stageRoot, stim.spec);
     }
     const stopSpeech = speakStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
-    const stopSounds = playSoundStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
+    const stopSounds = playSoundStimuli(
+      execution.stimuli
+        .map((stim: ResolvedStageStimulus) => stim.spec)
+        .filter((spec): spec is SoundStimSpec => spec.type === "sound")
+    );
 
     const onsetEpochSeconds = Date.now() / 1000;
     const stageStart = performance.now();
@@ -518,6 +518,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       const correctKeys = (execution.response_cfg?.correct_keys ?? execution.response_cfg?.keys ?? []).map(
         normalizeKeyForListener
       );
+      const graceSeconds = Math.max(0, Number(execution.response_cfg?.grace_s ?? 0));
 
       const keydownListener = (event: KeyboardEvent) => {
         if (!keyboardListening || finished || response !== null || event.repeat) {
@@ -624,7 +625,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
 
       startKeyboardListener();
       if (execution.duration != null) {
-        const timeoutMs = Math.max(0, execution.duration * 1000);
+        const timeoutMs = Math.max(0, (execution.duration + graceSeconds) * 1000);
         timerId = window.setTimeout(() => {
           if (response == null) {
             timeoutTriggered = true;

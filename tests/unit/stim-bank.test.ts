@@ -26,4 +26,27 @@ describe("StimBank voice helpers", () => {
       volume: undefined
     });
   });
+
+  it("registers asset-backed sound stimuli when voice files are provided", () => {
+    const bank = new StimBank({
+      instruction_text: {
+        type: "textbox",
+        text: "Press space to begin."
+      }
+    });
+
+    bank.convert_to_voice("instruction_text", {
+      voice: "en-US-AvaMultilingualNeural",
+      assetFiles: {
+        instruction_text: "https://example.com/instruction_text_voice.mp3"
+      },
+      fallbackToSpeech: false
+    });
+
+    expect(bank.resolve("instruction_text_voice")).toEqual({
+      type: "sound",
+      file: "https://example.com/instruction_text_voice.mp3",
+      volume: undefined
+    });
+  });
 });

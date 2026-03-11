@@ -7,6 +7,7 @@ import {
   type PsyflowRunResult,
   type PsyflowRunSession
 } from "../jspsych/runtime";
+import { primePsyflowAudio } from "../jspsych/audio";
 
 declare global {
   interface Window {
@@ -400,7 +401,7 @@ function resolveForceQuitShortcut(settings: TaskSettings): ShortcutSpec | null {
           .split("+")
           .map((token) => token.trim().toLowerCase())
           .filter(Boolean)
-      : ["ctrl", "shift", "q"];
+      : ["ctrl", "q"];
   const shortcut: ShortcutSpec = {
     ctrl: false,
     shift: false,
@@ -533,6 +534,7 @@ async function waitForPreflightStart(
       }
       await requestTaskFullscreen(elements.taskPanel, options.settings.fullscreen !== false);
       await requestEscapeLock(shouldLockEscape(options.settings));
+      await primePsyflowAudio();
       await new Promise<void>((resolveAnimation) => {
         requestAnimationFrame(() => {
           elements.taskPanel.focus();

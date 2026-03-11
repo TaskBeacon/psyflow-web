@@ -18,8 +18,7 @@ test("MID example runs end-to-end and exports psyflow-style results", async ({ p
   await page.keyboard.press("Space");
 
   await waitForUnit(page, "target", 15000);
-  await page.keyboard.press("Space");
-  await page.waitForTimeout(40);
+  await page.waitForTimeout(30);
   await page.keyboard.press("Space");
 
   await waitForUnit(page, "block", 90_000);
@@ -73,9 +72,7 @@ test("MID runtime hides cursor for keyboard mode and supports force quit", async
   expect(runtimeCursor).toBe("none");
 
   await page.keyboard.down("Control");
-  await page.keyboard.down("Shift");
   await page.keyboard.press("Q");
-  await page.keyboard.up("Shift");
   await page.keyboard.up("Control");
 
   await expect(page.locator("#psyflow-task-results")).toBeVisible();

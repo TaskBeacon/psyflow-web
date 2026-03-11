@@ -67,6 +67,10 @@ export class StimBank {
       rate?: number;
       pitch?: number;
       volume?: number;
+      assetFiles?: Record<string, string>;
+      assetBaseUrl?: string | URL;
+      assetExtension?: string;
+      fallbackToSpeech?: boolean;
     } = {}
   ): this {
     const labels = Array.isArray(keys) ? keys : [keys];
@@ -80,15 +84,34 @@ export class StimBank {
         (typeof options.voice === "string" && /^[a-z]{2}-[A-Z]{2}/.test(options.voice)
           ? options.voice.slice(0, 5)
           : undefined);
-      this.config[`${label}_voice`] = {
-        type: "speech",
-        text: spec.text,
-        voice: options.voice,
-        lang,
-        rate: options.rate,
-        pitch: options.pitch,
-        volume: options.volume
-      };
+      const assetExtension = String(options.assetExtension ?? "mp3").replace(/^\./, "");
+      const assetUrlFromMap = options.assetFiles?.[label] ?? null;
+      const assetUrl =
+        assetUrlFromMap ??
+        (options.assetBaseUrl != null
+          ? new URL(`${label}_voice.${assetExtension}`, options.assetBaseUrl).href
+          : null);
+      this.config[`${label}_voice`] =
+        assetUrl != null
+          ? {
+              type: "sound",
+              file: assetUrl,
+              volume: options.volume
+            }
+          : {
+              type: "speech",
+              text: spec.text,
+              voice: options.voice,
+              lang,
+              rate: options.rate,
+              pitch: options.pitch,
+              volume: options.volume
+            };
+      if (assetUrl == null && options.fallbackToSpeech === false) {
+        throw new Error(
+          `Stimulus '${label}' requires an asset-backed voice, but no voice asset was provided.`
+        );
+      }
     }
     return this;
   }

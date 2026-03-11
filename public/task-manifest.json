@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-11T00:40:27.410Z",
+  "generated_at": "2026-03-11T02:14:50.482Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -18,7 +18,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000001-ax-cpt/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000001-ax-cpt",
-      "last_updated": "2026-03-08T22:00:32+08:00"
+      "last_updated": "2026-03-11T09:18:07+08:00"
     },
     {
       "directory": "H000002-bart",
@@ -33,7 +33,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000002-bart/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000002-bart",
-      "last_updated": "2026-03-11T08:08:00+08:00"
+      "last_updated": "2026-03-11T09:18:07+08:00"
     },
     {
       "directory": "H000006-mid",
@@ -48,7 +48,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000006-mid/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000006-mid",
-      "last_updated": "2026-03-07T14:23:22+08:00"
+      "last_updated": "2026-03-11T09:18:07+08:00"
     },
     {
       "directory": "H000012-sst",
@@ -63,7 +63,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000012-sst/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000012-sst",
-      "last_updated": "2026-03-11T08:08:07+08:00"
+      "last_updated": "2026-03-11T09:18:07+08:00"
     }
   ]
 }
