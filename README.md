@@ -52,3 +52,25 @@ https://taskbeacon.github.io/psyflow-web/task-manifest.json
 ```
 
 The included workflow at `.github/workflows/pages.yml` fetches public `Hxxxxxx-*` task repos from the `TaskBeacon` org, regenerates both the runtime import manifest and the public companion manifest, and deploys the shared runner to GitHub Pages.
+
+## Cross-Repo Refresh From HTML Task Repos
+
+`Hxxxxxx-*` repos can notify `psyflow-web` after pushes by calling the GitHub `repository_dispatch` API.
+
+Recommended secret name:
+
+```text
+TASKBEACON_ORG_DISPATCH_TOKEN
+```
+
+For a fine-grained PAT, grant access to:
+
+- `TaskBeacon/psyflow-web`
+
+Required repository permission:
+
+- `Contents: Read and write`
+
+`Actions: Read and write` alone is not sufficient for `repository_dispatch`.
+
+If the TaskBeacon organization enforces PAT approval, the token may also need org approval before dispatch requests succeed.
