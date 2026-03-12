@@ -168,13 +168,47 @@ function ensureStyles(): void {
   document.head.appendChild(style);
 }
 
-function toLength(value: number | undefined, units: string | undefined, fallback = 0): string {
+function resolveDefaultUnits(stageRoot: HTMLElement): string | undefined {
+  const runtimeRoot = stageRoot.closest<HTMLElement>(".psyflow-runtime-root");
+  return runtimeRoot?.dataset.psyflowDefaultUnits;
+}
+
+function getDegLengthInPx(stageRoot: HTMLElement, degrees: number): number | null {
+  const runtimeRoot = stageRoot.closest<HTMLElement>(".psyflow-runtime-root");
+  const monitorWidthCm = Number(runtimeRoot?.dataset.psyflowMonitorWidthCm ?? NaN);
+  const monitorDistanceCm = Number(runtimeRoot?.dataset.psyflowMonitorDistanceCm ?? NaN);
+  const viewportWidthPx = runtimeRoot?.clientWidth ?? stageRoot.clientWidth ?? window.innerWidth;
+  const configWidthPx = Number(runtimeRoot?.dataset.psyflowConfigWidthPx ?? NaN);
+  const effectiveWidthPx =
+    Number.isFinite(configWidthPx) && configWidthPx > 0
+      ? Math.max(viewportWidthPx, configWidthPx)
+      : viewportWidthPx;
+  if (!Number.isFinite(monitorWidthCm) || !Number.isFinite(monitorDistanceCm) || monitorWidthCm <= 0 || monitorDistanceCm <= 0 || effectiveWidthPx <= 0) {
+    return null;
+  }
+  const widthCm = 2 * monitorDistanceCm * Math.tan((degrees * Math.PI) / 360);
+  return (widthCm / monitorWidthCm) * effectiveWidthPx;
+}
+
+function toLength(
+  value: number | undefined,
+  units: string | undefined,
+  fallback = 0,
+  stageRoot?: HTMLElement
+): string {
   const numeric = Number.isFinite(value) ? Number(value) : fallback;
-  if (units === "px") {
+  const resolvedUnits = (units ?? (stageRoot ? resolveDefaultUnits(stageRoot) : undefined) ?? "").toLowerCase();
+  if (resolvedUnits === "px") {
     return `${numeric}px`;
   }
-  if (units === "percent") {
+  if (resolvedUnits === "percent") {
     return `${numeric}%`;
+  }
+  if (resolvedUnits === "deg" && stageRoot) {
+    const px = getDegLengthInPx(stageRoot, numeric);
+    if (px != null) {
+      return `${px}px`;
+    }
   }
   return `${numeric * 2}vmin`;
 }
@@ -250,11 +284,11 @@ function isSkippedStageExecution(
   return "skip" in execution && execution.skip;
 }
 
-function applyBaseStimStyle(element: HTMLElement, spec: StimSpec): void {
-  const units = spec.units;
+function applyBaseStimStyle(element: HTMLElement, spec: StimSpec, stageRoot: HTMLElement): void {
+  const units = spec.units ?? resolveDefaultUnits(stageRoot);
   const [x = 0, y = 0] = spec.pos ?? [0, 0];
-  element.style.left = `calc(50% + ${toLength(x, units)})`;
-  element.style.top = `calc(50% - ${toLength(y, units)})`;
+  element.style.left = `calc(50% + ${toLength(x, units, 0, stageRoot)})`;
+  element.style.top = `calc(50% - ${toLength(y, units, 0, stageRoot)})`;
   if (spec.color) {
     element.style.color = spec.color;
   }
@@ -266,8 +300,8 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       const element = document.createElement("div");
       element.className = "psyflow-stage-stim psyflow-stage-text";
       element.textContent = spec.text;
-      applyBaseStimStyle(element, spec);
-      element.style.fontSize = toLength(spec.height ?? 1.1, spec.units, 1.1);
+      applyBaseStimStyle(element, spec, stageRoot);
+      element.style.fontSize = toLength(spec.height ?? 1.1, spec.units, 1.1, stageRoot);
       if (spec.font) {
         element.style.fontFamily = spec.font;
       }
@@ -281,17 +315,17 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       const element = document.createElement("div");
       element.className = "psyflow-stage-stim psyflow-stage-textbox";
       element.textContent = spec.text;
-      applyBaseStimStyle(element, spec);
+      applyBaseStimStyle(element, spec, stageRoot);
       if (spec.font) {
         element.style.fontFamily = spec.font;
       }
       if (spec.alignment) {
         element.style.textAlign = spec.alignment;
       }
-      element.style.fontSize = toLength(spec.letterHeight ?? 1, spec.units, 1);
+      element.style.fontSize = toLength(spec.letterHeight ?? 1, spec.units, 1, stageRoot);
       if (spec.size) {
-        element.style.width = toLength(spec.size[0], spec.units, spec.size[0]);
-        element.style.minHeight = toLength(spec.size[1], spec.units, spec.size[1]);
+        element.style.width = toLength(spec.size[0], spec.units, spec.size[0], stageRoot);
+        element.style.minHeight = toLength(spec.size[1], spec.units, spec.size[1], stageRoot);
       }
       stageRoot.appendChild(element);
       return;
@@ -299,9 +333,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
     case "circle": {
       const element = document.createElement("div");
       element.className = "psyflow-stage-stim";
-      applyBaseStimStyle(element, spec);
-      element.style.width = toLength((spec.radius ?? 1) * 2, spec.units, 2);
-      element.style.height = toLength((spec.radius ?? 1) * 2, spec.units, 2);
+      applyBaseStimStyle(element, spec, stageRoot);
+      element.style.width = toLength((spec.radius ?? 1) * 2, spec.units, 2, stageRoot);
+      element.style.height = toLength((spec.radius ?? 1) * 2, spec.units, 2, stageRoot);
       element.style.borderRadius = "9999px";
       element.style.background = spec.fillColor ?? "transparent";
       element.style.border = `2px solid ${spec.lineColor ?? "transparent"}`;
@@ -311,9 +345,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
     case "rect": {
       const element = document.createElement("div");
       element.className = "psyflow-stage-stim";
-      applyBaseStimStyle(element, spec);
-      element.style.width = toLength(spec.width, spec.units, spec.width);
-      element.style.height = toLength(spec.height, spec.units, spec.height);
+      applyBaseStimStyle(element, spec, stageRoot);
+      element.style.width = toLength(spec.width, spec.units, spec.width, stageRoot);
+      element.style.height = toLength(spec.height, spec.units, spec.height, stageRoot);
       element.style.background = spec.fillColor ?? "transparent";
       element.style.border = `2px solid ${spec.lineColor ?? "transparent"}`;
       stageRoot.appendChild(element);
@@ -322,9 +356,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
     case "polygon": {
       const element = document.createElement("div");
       element.className = "psyflow-stage-stim";
-      applyBaseStimStyle(element, spec);
-      element.style.width = toLength(spec.size, spec.units, spec.size);
-      element.style.height = toLength(spec.size, spec.units, spec.size);
+      applyBaseStimStyle(element, spec, stageRoot);
+      element.style.width = toLength(spec.size, spec.units, spec.size, stageRoot);
+      element.style.height = toLength(spec.size, spec.units, spec.size, stageRoot);
       element.style.background = spec.fillColor ?? "transparent";
       element.style.border = `2px solid ${spec.lineColor ?? "transparent"}`;
       element.style.clipPath = regularPolygonClipPath(spec.edges);
@@ -334,9 +368,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
     case "shape": {
       const element = document.createElement("div");
       element.className = "psyflow-stage-stim";
-      applyBaseStimStyle(element, spec);
-      element.style.width = toLength(spec.size, spec.units, spec.size);
-      element.style.height = toLength(spec.size, spec.units, spec.size);
+      applyBaseStimStyle(element, spec, stageRoot);
+      element.style.width = toLength(spec.size, spec.units, spec.size, stageRoot);
+      element.style.height = toLength(spec.size, spec.units, spec.size, stageRoot);
       const geometry = buildShapeGeometry(spec.vertices);
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("viewBox", geometry.viewBox);
@@ -357,10 +391,10 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
       const element = document.createElement("img");
       element.className = "psyflow-stage-stim psyflow-stage-image";
       element.src = spec.image;
-      applyBaseStimStyle(element, spec);
+      applyBaseStimStyle(element, spec, stageRoot);
       if (spec.size) {
-        element.style.width = toLength(spec.size[0], spec.units, spec.size[0]);
-        element.style.height = toLength(spec.size[1], spec.units, spec.size[1]);
+        element.style.width = toLength(spec.size[0], spec.units, spec.size[0], stageRoot);
+        element.style.height = toLength(spec.size[1], spec.units, spec.size[1], stageRoot);
       } else {
         element.style.maxWidth = "60vmin";
         element.style.maxHeight = "60vmin";

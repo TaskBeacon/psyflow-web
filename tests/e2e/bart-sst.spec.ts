@@ -32,13 +32,23 @@ async function playBartPreview(page: Page, totalTrials: number): Promise<void> {
   }
 }
 
+async function getBalloonMetrics(page: Page, unitLabel: string): Promise<{ naturalWidth: number; boxWidth: number }> {
+  await waitForUnit(page, unitLabel, 15000);
+  return page.locator(`[data-psyflow-unit-label="${unitLabel}"] img`).evaluate((img) => {
+    const element = img as HTMLImageElement;
+    const rect = element.getBoundingClientRect();
+    return {
+      naturalWidth: element.complete ? element.naturalWidth : 0,
+      boxWidth: rect.width
+    };
+  });
+}
+
 async function expectBartBalloonVisible(page: Page): Promise<void> {
   await waitForUnit(page, "pump_0", 15000);
-  const naturalWidth = await page.locator('[data-psyflow-unit-label="pump_0"] img').evaluate((img) => {
-    const element = img as HTMLImageElement;
-    return element.complete ? element.naturalWidth : 0;
-  });
+  const { naturalWidth, boxWidth } = await getBalloonMetrics(page, "pump_0");
   expect(naturalWidth).toBeGreaterThan(0);
+  expect(boxWidth).toBeGreaterThan(25);
 }
 
 async function playSstPreview(page: Page, totalTrials: number): Promise<void> {
@@ -64,8 +74,27 @@ test("BART preview runs end-to-end through the shared runner", async ({ page }) 
   await waitForUnit(page, "instruction_text");
   await page.keyboard.press("Space");
   await expectBartBalloonVisible(page);
+  const pump0Metrics = await getBalloonMetrics(page, "pump_0");
+  await page.keyboard.press("Space");
+  const nextUnit = await page.evaluate(async () => {
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      const unit = document.querySelector("[data-psyflow-unit-label]")?.getAttribute("data-psyflow-unit-label") ?? "";
+      if (unit && unit !== "pump_0") {
+        return unit;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 25));
+    }
+    return "";
+  });
+  if (nextUnit === "pump_1") {
+    const pump1Metrics = await getBalloonMetrics(page, "pump_1");
+    expect(pump1Metrics.boxWidth).toBeGreaterThan(pump0Metrics.boxWidth);
+    await page.keyboard.press("ArrowRight");
+  } else {
+    expect(nextUnit).toBe("pop");
+  }
 
-  await playBartPreview(page, 9);
+  await playBartPreview(page, 8);
 
   await waitForUnit(page, "block", 90_000);
   await page.keyboard.press("Space");

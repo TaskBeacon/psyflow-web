@@ -315,6 +315,18 @@ export async function runPsyflowExperiment(
   if (typeof settings?.bg_color === "string") {
     display_element.style.background = settings.bg_color;
   }
+  if (typeof settings?.units === "string") {
+    display_element.dataset.psyflowDefaultUnits = settings.units;
+  }
+  if (Number.isFinite(Number(settings?.monitor_width_cm))) {
+    display_element.dataset.psyflowMonitorWidthCm = String(Number(settings?.monitor_width_cm));
+  }
+  if (Number.isFinite(Number(settings?.monitor_distance_cm))) {
+    display_element.dataset.psyflowMonitorDistanceCm = String(Number(settings?.monitor_distance_cm));
+  }
+  if (Array.isArray(settings?.size) && Number.isFinite(Number(settings.size[0]))) {
+    display_element.dataset.psyflowConfigWidthPx = String(Number(settings.size[0]));
+  }
 
   const recorder = new ExecutionRecorder();
   for (const compiledTrial of trials) {
