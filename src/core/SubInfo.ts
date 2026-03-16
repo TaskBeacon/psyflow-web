@@ -11,6 +11,12 @@ function coerceFieldValue(field: SubInfoField, raw: string): string | number {
   return raw;
 }
 
+/**
+ * Participant information form (browser counterpart of Python's SubInfo).
+ *
+ * Renders an HTML form from field definitions and returns validated responses
+ * as a Promise resolved on submit.
+ */
 export class SubInfo {
   private readonly fields: SubInfoField[];
   private readonly mapping: Record<string, string>;
@@ -25,6 +31,7 @@ export class SubInfo {
     this.mapping = config.subinfo_mapping;
   }
 
+  /** Render the participant form into `container` and resolve with validated responses on submit. */
   collect(container: HTMLElement): Promise<Record<string, string | number>> {
     container.innerHTML = "";
     const wrapper = document.createElement("div");

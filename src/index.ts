@@ -1,3 +1,14 @@
+/**
+ * psyflow-web — browser runtime for auditable psychology experiments.
+ *
+ * **For task authors**: use {@link TaskSettings}, {@link BlockUnit}, {@link StimBank},
+ * {@link StimUnit}, {@link TrialBuilder}, and {@link SubInfo} to define trials.
+ *
+ * **For runtime consumers**: use {@link runPsyflowExperiment} or {@link mountTaskApp}.
+ *
+ * @module
+ */
+
 export { parsePsyflowConfig } from "./core/config";
 export { TaskSettings } from "./core/TaskSettings";
 export { BlockUnit } from "./core/BlockUnit";

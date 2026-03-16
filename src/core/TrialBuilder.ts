@@ -6,6 +6,11 @@ import type {
 } from "./types";
 import { StimUnit } from "./StimUnit";
 
+/**
+ * Builds a single {@link CompiledTrial} from an ordered sequence of {@link StimUnit} stages.
+ *
+ * Typical usage: `new TrialBuilder(meta).unit("fixation").addStim(...).show()...build()`
+ */
 export class TrialBuilder {
   readonly trial_id: number | string;
   readonly block_id: string | null;
@@ -27,6 +32,7 @@ export class TrialBuilder {
     this.condition = meta.condition;
   }
 
+  /** Create and register a new {@link StimUnit} stage with the given label. */
   unit(label: string): StimUnit {
     const unit = new StimUnit(label, this);
     this.units.push(unit);
@@ -42,6 +48,7 @@ export class TrialBuilder {
     this.trialState[key] = value;
   }
 
+  /** Compile all registered units into a {@link CompiledTrial}. */
   build(): CompiledTrial {
     return {
       trial_id: this.trial_id,

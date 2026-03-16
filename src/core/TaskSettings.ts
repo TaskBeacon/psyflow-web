@@ -18,6 +18,12 @@ function makeSeededRandom(seed: number): () => number {
   };
 }
 
+/**
+ * Experiment configuration container (browser counterpart of Python's TaskSettings).
+ *
+ * Create via {@link TaskSettings.from_dict} with a parsed YAML config object.
+ * Holds window display, block/trial structure, seeding, and condition weights.
+ */
 export class TaskSettings {
   [key: string]: unknown;
 
@@ -38,6 +44,10 @@ export class TaskSettings {
   trial_per_block?: number;
   subject_id?: string;
 
+  /**
+   * Create a TaskSettings from a flat config dictionary.
+   * Validates `trial_per_block` consistency and initialises block seeds.
+   */
   static from_dict(config: SettingsLike): TaskSettings {
     const settings = new TaskSettings();
     Object.assign(settings, config);
@@ -71,6 +81,7 @@ export class TaskSettings {
       .map(() => Math.floor(rng() * 100000));
   }
 
+  /** Merge participant info into settings and derive per-subject seeds when `seed_mode` is `"same_within_sub"`. */
   add_subinfo(subinfo: Record<string, unknown>): void {
     Object.assign(this, subinfo);
     const subjectId = String(subinfo.subject_id ?? "");
@@ -88,6 +99,7 @@ export class TaskSettings {
     }
   }
 
+  /** Return validated weight vector aligned to `conditions`, or `null` for equal weighting. */
   resolve_condition_weights(): number[] | null {
     const raw = this.condition_weights;
     if (raw == null) {
