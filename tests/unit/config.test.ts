@@ -38,4 +38,27 @@ describe("parsePsyflowConfig", () => {
     expect(parsed.trigger_config.exp_onset).toBe(98);
     expect(parsed.controller_config.initial_duration).toBe(0.2);
   });
+
+  it("resolves relative movie and sound asset paths when moduleUrl is provided", () => {
+    const parsed = parsePsyflowConfig(
+      `
+stimuli:
+  clip:
+    type: movie
+    filename: assets/demo.mp4
+  tone:
+    type: sound
+    file: assets/tone.mp3
+`,
+      "https://example.com/tasks/H000007/main.ts"
+    );
+    expect(parsed.stim_config.clip).toMatchObject({
+      type: "movie",
+      filename: "https://example.com/tasks/H000007/assets/demo.mp4"
+    });
+    expect(parsed.stim_config.tone).toMatchObject({
+      type: "sound",
+      file: "https://example.com/tasks/H000007/assets/tone.mp3"
+    });
+  });
 });

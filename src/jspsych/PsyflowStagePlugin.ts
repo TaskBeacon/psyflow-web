@@ -1,6 +1,13 @@
 import { ParameterType, type JsPsych, type JsPsychPlugin, type TrialType } from "jspsych";
 
-import type { CompiledStage, ResponseConfig, SoundStimSpec, SpeechStimSpec, StimSpec, TrialContextSpec } from "../core/types";
+import type {
+  CompiledStage,
+  ResponseConfig,
+  SoundStimSpec,
+  SpeechStimSpec,
+  StimSpec,
+  TrialContextSpec
+} from "../core/types";
 import { playSoundStimuli } from "./audio";
 import { PSYFLOW_ABORT_EVENT } from "./sessionEvents";
 
@@ -164,6 +171,11 @@ function ensureStyles(): void {
       object-fit: contain;
       display: block;
     }
+    .psyflow-stage-movie {
+      object-fit: contain;
+      display: block;
+      background: transparent;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -294,7 +306,7 @@ function applyBaseStimStyle(element: HTMLElement, spec: StimSpec, stageRoot: HTM
   }
 }
 
-function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
+function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLVideoElement[]): void {
   switch (spec.type) {
     case "text": {
       const element = document.createElement("div");
@@ -402,6 +414,40 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec): void {
         element.style.height = "auto";
       }
       stageRoot.appendChild(element);
+      return;
+    }
+    case "movie": {
+      const element = document.createElement("video");
+      element.className = "psyflow-stage-stim psyflow-stage-movie";
+      element.src = spec.filename;
+      element.preload = "auto";
+      element.playsInline = true;
+      element.controls = spec.controls ?? false;
+      element.muted = spec.muted ?? false;
+      element.loop = spec.loop ?? false;
+      if (typeof spec.volume === "number") {
+        element.volume = Math.min(1, Math.max(0, spec.volume));
+      }
+      applyBaseStimStyle(element, spec, stageRoot);
+      if (spec.size) {
+        element.style.width = toLength(spec.size[0], spec.units, spec.size[0], stageRoot);
+        element.style.height = toLength(spec.size[1], spec.units, spec.size[1], stageRoot);
+      } else {
+        element.style.maxWidth = "85vmin";
+        element.style.maxHeight = "85vmin";
+        element.style.width = "auto";
+        element.style.height = "auto";
+      }
+      stageRoot.appendChild(element);
+      movieSink.push(element);
+      if (spec.autoplay !== false) {
+        const playPromise = element.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            // Autoplay can fail under browser policy; task timing continues regardless.
+          });
+        }
+      }
       return;
     }
     case "sound": {
@@ -521,8 +567,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     }
     display_element.appendChild(stageRoot);
     display_element.focus();
+    const activeMovies: HTMLVideoElement[] = [];
     for (const stim of execution.stimuli) {
-      renderStimulus(stageRoot, stim.spec);
+      renderStimulus(stageRoot, stim.spec, activeMovies);
     }
     const stopSpeech = speakStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
     const stopSounds = playSoundStimuli(
@@ -588,6 +635,12 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         keyboardListening = false;
         stopSpeech?.();
         stopSounds?.();
+        for (const movie of activeMovies) {
+          movie.pause();
+          movie.currentTime = 0;
+          movie.removeAttribute("src");
+          movie.load();
+        }
         window.removeEventListener("keydown", keydownListener, true);
         document.removeEventListener("keydown", keydownListener, true);
         display_element.removeEventListener("keydown", keydownListener, true);

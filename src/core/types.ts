@@ -37,6 +37,7 @@ export type StimSpec =
   | PolygonStimSpec
   | ShapeStimSpec
   | ImageStimSpec
+  | MovieStimSpec
   | SoundStimSpec
   | SpeechStimSpec;
 
@@ -99,6 +100,17 @@ export interface ImageStimSpec extends BaseStimSpec {
   type: "image";
   image: string;
   size?: [number, number];
+}
+
+export interface MovieStimSpec extends BaseStimSpec {
+  type: "movie";
+  filename: string;
+  size?: [number, number];
+  controls?: boolean;
+  muted?: boolean;
+  loop?: boolean;
+  autoplay?: boolean;
+  volume?: number;
 }
 
 export interface SoundStimSpec extends BaseStimSpec {

@@ -16,6 +16,12 @@ function resolveStimSpecAssets(spec: StimSpec, moduleUrl?: string): StimSpec {
       image: new URL(spec.image, moduleUrl).href
     };
   }
+  if (spec.type === "movie" && isRelativeAssetPath(spec.filename)) {
+    return {
+      ...spec,
+      filename: new URL(spec.filename, moduleUrl).href
+    };
+  }
   if (spec.type === "sound" && isRelativeAssetPath(spec.file)) {
     return {
       ...spec,
