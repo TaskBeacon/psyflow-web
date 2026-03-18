@@ -559,8 +559,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000034-cyberball/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000034-cyberball",
-    last_updated: "2026-03-18T03:29:03.158Z",
+    last_updated: "2026-03-18T11:31:20+08:00",
     importTask: () => import("../../../H000034-cyberball/main")
+  },
+  "H000035-sternberg-working-memory": {
+    directory: "H000035-sternberg-working-memory",
+    id: "H000035",
+    slug: "sternberg-working-memory",
+    title: "Sternberg Working Memory Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of Sternberg Working Memory Task built with psyflow-web. Memory-set generation, old/new probe logic, response scoring, and block/final s...",
+    repo_url: "https://github.com/TaskBeacon/H000035-sternberg-working-memory",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000035-sternberg-working-memory/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000035-sternberg-working-memory",
+    last_updated: "2026-03-18T03:36:49.710Z",
+    importTask: () => import("../../../H000035-sternberg-working-memory/main")
   },
 };
 
