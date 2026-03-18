@@ -575,7 +575,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000035-sternberg-working-memory/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000035-sternberg-working-memory",
-    last_updated: "2026-03-18T03:36:49.710Z",
+    last_updated: "2026-03-18T11:39:15+08:00",
     importTask: () => import("../../../H000035-sternberg-working-memory/main")
   },
 };
