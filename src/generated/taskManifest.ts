@@ -431,8 +431,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000026-mcgurk/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000026-mcgurk",
-    last_updated: "2026-03-18T02:05:36.999Z",
+    last_updated: "2026-03-18T10:07:15+08:00",
     importTask: () => import("../../../H000026-mcgurk/main")
+  },
+  "H000027-task-switching": {
+    directory: "H000027-task-switching",
+    id: "H000027",
+    slug: "task-switching",
+    title: "Task Switching Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of the cue-based Task Switching task built with psyflow-web. Rule-cue transitions (start/repeat/switch), digit classification (parity/ma...",
+    repo_url: "https://github.com/TaskBeacon/H000027-task-switching",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000027-task-switching/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000027-task-switching",
+    last_updated: "2026-03-18T02:14:14.312Z",
+    importTask: () => import("../../../H000027-task-switching/main")
   },
 };
 
