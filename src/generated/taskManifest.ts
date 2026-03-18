@@ -495,8 +495,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000030-iowa-gambling/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000030-iowa-gambling",
-    last_updated: "2026-03-18T02:48:51.000Z",
+    last_updated: "2026-03-18T10:50:41+08:00",
     importTask: () => import("../../../H000030-iowa-gambling/main")
+  },
+  "H000031-loss-aversion-framing": {
+    directory: "H000031-loss-aversion-framing",
+    id: "H000031",
+    slug: "loss-aversion-framing",
+    title: "Loss Aversion / Framing Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of Loss Aversion / Framing Task built with psyflow-web. Trial structure, three-condition offer sampling, timeout handling, and framing-s...",
+    repo_url: "https://github.com/TaskBeacon/H000031-loss-aversion-framing",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000031-loss-aversion-framing/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000031-loss-aversion-framing",
+    last_updated: "2026-03-18T02:56:47.712Z",
+    importTask: () => import("../../../H000031-loss-aversion-framing/main")
   },
 };
 
