@@ -511,8 +511,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000031-loss-aversion-framing/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000031-loss-aversion-framing",
-    last_updated: "2026-03-18T02:56:47.712Z",
+    last_updated: "2026-03-18T10:58:33+08:00",
     importTask: () => import("../../../H000031-loss-aversion-framing/main")
+  },
+  "H000032-antisaccade": {
+    directory: "H000032-antisaccade",
+    id: "H000032",
+    slug: "antisaccade",
+    title: "Antisaccade Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of Antisaccade Task built with psyflow-web. Rule cue, gap, target-side sampling, response-key mapping, and accuracy/RT summary logic are...",
+    repo_url: "https://github.com/TaskBeacon/H000032-antisaccade",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000032-antisaccade/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000032-antisaccade",
+    last_updated: "2026-03-18T03:03:08.612Z",
+    importTask: () => import("../../../H000032-antisaccade/main")
   },
 };
 
