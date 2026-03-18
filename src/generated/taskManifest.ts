@@ -479,8 +479,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000029-cambridge-gambling/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000029-cambridge-gambling",
-    last_updated: "2026-03-18T02:39:27.044Z",
+    last_updated: "2026-03-18T10:42:00+08:00",
     importTask: () => import("../../../H000029-cambridge-gambling/main")
+  },
+  "H000030-iowa-gambling": {
+    directory: "H000030-iowa-gambling",
+    id: "H000030",
+    slug: "iowa-gambling",
+    title: "Iowa Gambling Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of Iowa Gambling Task built with psyflow-web. The stage order, deck outcome schedules, timeout behavior, and summary metrics are aligned...",
+    repo_url: "https://github.com/TaskBeacon/H000030-iowa-gambling",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000030-iowa-gambling/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000030-iowa-gambling",
+    last_updated: "2026-03-18T02:48:51.000Z",
+    importTask: () => import("../../../H000030-iowa-gambling/main")
   },
 };
 
