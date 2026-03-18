@@ -415,8 +415,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000025-dictator-game/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000025-dictator-game",
-    last_updated: "2026-03-18T01:54:40.073Z",
+    last_updated: "2026-03-18T09:57:28+08:00",
     importTask: () => import("../../../H000025-dictator-game/main")
+  },
+  "H000026-mcgurk": {
+    directory: "H000026-mcgurk",
+    id: "H000026",
+    slug: "mcgurk",
+    title: "McGurk Effect Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of the McGurk Effect task built with psyflow-web. Audiovisual congruent/incongruent/audio-only trial logic, syllable report mapping (/ba...",
+    repo_url: "https://github.com/TaskBeacon/H000026-mcgurk",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000026-mcgurk/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000026-mcgurk",
+    last_updated: "2026-03-18T02:05:36.999Z",
+    importTask: () => import("../../../H000026-mcgurk/main")
   },
 };
 
