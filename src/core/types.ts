@@ -71,6 +71,7 @@ export interface CircleStimSpec extends BaseStimSpec {
   radius: number;
   fillColor?: string;
   lineColor?: string;
+  lineWidth?: number;
 }
 
 export interface RectStimSpec extends BaseStimSpec {
@@ -79,6 +80,7 @@ export interface RectStimSpec extends BaseStimSpec {
   height: number;
   fillColor?: string;
   lineColor?: string;
+  lineWidth?: number;
 }
 
 export interface PolygonStimSpec extends BaseStimSpec {
@@ -87,6 +89,7 @@ export interface PolygonStimSpec extends BaseStimSpec {
   size: number;
   fillColor?: string;
   lineColor?: string;
+  lineWidth?: number;
 }
 
 export interface ShapeStimSpec extends BaseStimSpec {
@@ -95,6 +98,7 @@ export interface ShapeStimSpec extends BaseStimSpec {
   size: number;
   fillColor?: string;
   lineColor?: string;
+  lineWidth?: number;
 }
 
 export interface ImageStimSpec extends BaseStimSpec {

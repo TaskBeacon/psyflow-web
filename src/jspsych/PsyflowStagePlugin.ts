@@ -354,7 +354,8 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       element.style.height = toLength((spec.radius ?? 1) * 2, spec.units, 2, stageRoot);
       element.style.borderRadius = "9999px";
       element.style.background = spec.fillColor ?? "transparent";
-      element.style.border = `2px solid ${spec.lineColor ?? "transparent"}`;
+      const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
+      element.style.border = `${Math.max(0, lineWidth)}px solid ${spec.lineColor ?? "transparent"}`;
       stageRoot.appendChild(element);
       return;
     }
@@ -365,7 +366,8 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       element.style.width = toLength(spec.width, spec.units, spec.width, stageRoot);
       element.style.height = toLength(spec.height, spec.units, spec.height, stageRoot);
       element.style.background = spec.fillColor ?? "transparent";
-      element.style.border = `2px solid ${spec.lineColor ?? "transparent"}`;
+      const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
+      element.style.border = `${Math.max(0, lineWidth)}px solid ${spec.lineColor ?? "transparent"}`;
       stageRoot.appendChild(element);
       return;
     }
@@ -376,7 +378,8 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       element.style.width = toLength(spec.size, spec.units, spec.size, stageRoot);
       element.style.height = toLength(spec.size, spec.units, spec.size, stageRoot);
       element.style.background = spec.fillColor ?? "transparent";
-      element.style.border = `2px solid ${spec.lineColor ?? "transparent"}`;
+      const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
+      element.style.border = `${Math.max(0, lineWidth)}px solid ${spec.lineColor ?? "transparent"}`;
       element.style.clipPath = regularPolygonClipPath(spec.edges);
       stageRoot.appendChild(element);
       return;
@@ -397,7 +400,8 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       polygon.setAttribute("points", geometry.points);
       polygon.setAttribute("fill", spec.fillColor ?? "transparent");
       polygon.setAttribute("stroke", spec.lineColor && spec.lineColor.length > 0 ? spec.lineColor : "transparent");
-      polygon.setAttribute("stroke-width", "2");
+      const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
+      polygon.setAttribute("stroke-width", String(Math.max(0, lineWidth)));
       svg.appendChild(polygon);
       element.appendChild(svg);
       stageRoot.appendChild(element);

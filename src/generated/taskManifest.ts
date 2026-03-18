@@ -543,8 +543,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000033-visual-search/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000033-visual-search",
-    last_updated: "2026-03-18T03:15:57.887Z",
+    last_updated: "2026-03-18T11:18:21+08:00",
     importTask: () => import("../../../H000033-visual-search/main")
+  },
+  "H000034-cyberball": {
+    directory: "H000034-cyberball",
+    id: "H000034",
+    slug: "cyberball",
+    title: "Cyberball Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of Cyberball Task built with psyflow-web. Three-player toss flow, inclusion/exclusion block policy, shared ball-holder state, and block/...",
+    repo_url: "https://github.com/TaskBeacon/H000034-cyberball",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000034-cyberball/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000034-cyberball",
+    last_updated: "2026-03-18T03:29:03.158Z",
+    importTask: () => import("../../../H000034-cyberball/main")
   },
 };
 
