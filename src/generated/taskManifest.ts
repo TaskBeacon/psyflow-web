@@ -463,8 +463,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000028-weather-prediction/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000028-weather-prediction",
-    last_updated: "2026-03-18T02:22:23.903Z",
+    last_updated: "2026-03-18T10:24:27+08:00",
     importTask: () => import("../../../H000028-weather-prediction/main")
+  },
+  "H000029-cambridge-gambling": {
+    directory: "H000029-cambridge-gambling",
+    id: "H000029",
+    slug: "cambridge-gambling",
+    title: "Cambridge Gambling Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of Cambridge Gambling Task built on psyflow-web. The trial procedure, controller rules, block order semantics, timeout policy, and summa...",
+    repo_url: "https://github.com/TaskBeacon/H000029-cambridge-gambling",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000029-cambridge-gambling/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000029-cambridge-gambling",
+    last_updated: "2026-03-18T02:39:27.044Z",
+    importTask: () => import("../../../H000029-cambridge-gambling/main")
   },
 };
 
