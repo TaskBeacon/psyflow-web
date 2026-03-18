@@ -447,8 +447,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000027-task-switching/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000027-task-switching",
-    last_updated: "2026-03-18T02:14:14.312Z",
+    last_updated: "2026-03-18T10:15:28+08:00",
     importTask: () => import("../../../H000027-task-switching/main")
+  },
+  "H000028-weather-prediction": {
+    directory: "H000028-weather-prediction",
+    id: "H000028",
+    slug: "weather-prediction",
+    title: "Weather Prediction Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of the probabilistic Weather Prediction task built with psyflow-web. Cue-pattern sampling, probabilistic weather outcomes (sun/rain), re...",
+    repo_url: "https://github.com/TaskBeacon/H000028-weather-prediction",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000028-weather-prediction/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000028-weather-prediction",
+    last_updated: "2026-03-18T02:22:23.903Z",
+    importTask: () => import("../../../H000028-weather-prediction/main")
   },
 };
 
