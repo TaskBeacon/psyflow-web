@@ -527,8 +527,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000032-antisaccade/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000032-antisaccade",
-    last_updated: "2026-03-18T03:03:08.612Z",
+    last_updated: "2026-03-18T11:07:17+08:00",
     importTask: () => import("../../../H000032-antisaccade/main")
+  },
+  "H000033-visual-search": {
+    directory: "H000033-visual-search",
+    id: "H000033",
+    slug: "visual-search",
+    title: "Visual Search Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "0.1.0",
+    short_description: "HTML/browser preview of Visual Search Task built with psyflow-web. Feature vs conjunction display generation, present/absent key mapping, and block/session s...",
+    repo_url: "https://github.com/TaskBeacon/H000033-visual-search",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000033-visual-search/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000033-visual-search",
+    last_updated: "2026-03-18T03:15:57.887Z",
+    importTask: () => import("../../../H000033-visual-search/main")
   },
 };
 

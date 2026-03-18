@@ -46,6 +46,7 @@ interface BaseStimSpec {
   pos?: [number, number];
   color?: string;
   units?: string;
+  ori?: number;
 }
 
 export interface TextStimSpec extends BaseStimSpec {

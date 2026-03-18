@@ -301,6 +301,10 @@ function applyBaseStimStyle(element: HTMLElement, spec: StimSpec, stageRoot: HTM
   const [x = 0, y = 0] = spec.pos ?? [0, 0];
   element.style.left = `calc(50% + ${toLength(x, units, 0, stageRoot)})`;
   element.style.top = `calc(50% - ${toLength(y, units, 0, stageRoot)})`;
+  const orientation = Number(spec.ori ?? 0);
+  if (Number.isFinite(orientation) && orientation !== 0) {
+    element.style.transform = `translate(-50%, -50%) rotate(${orientation}deg)`;
+  }
   if (spec.color) {
     element.style.color = spec.color;
   }
