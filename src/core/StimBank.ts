@@ -25,6 +25,12 @@ function formatTemplate(template: string, vars: Record<string, unknown>): string
   );
 }
 
+/**
+ * Immutable stimulus registry (browser counterpart of Python's StimBank).
+ *
+ * Holds {@link StimSpec} definitions keyed by name.  Returns {@link StimRef}
+ * handles from {@link get} that are resolved to concrete specs at runtime.
+ */
 export class StimBank {
   private readonly config: Record<string, StimSpec>;
 
@@ -32,6 +38,7 @@ export class StimBank {
     this.config = config;
   }
 
+  /** Return a {@link StimRef} handle for a named stimulus. Throws if not found. */
   get(key: string): StimRef {
     if (!this.config[key]) {
       throw new Error(`Stimulus '${key}' not found.`);
@@ -39,6 +46,7 @@ export class StimBank {
     return { kind: "stim_ref", key };
   }
 
+  /** Resolve a ref or key to a deep-cloned {@link StimSpec}. Throws if not found. */
   resolve(ref: StimRef | string): StimSpec {
     const key = typeof ref === "string" ? ref : ref.key;
     const spec = this.config[key];
@@ -68,6 +76,10 @@ export class StimBank {
     return this.format(name, vars);
   }
 
+  /**
+   * Register `<key>_voice` entries for the given text stimuli.
+   * Uses pre-recorded audio assets when available, falls back to Web Speech API.
+   */
   convert_to_voice(
     keys: string[] | string,
     options: {
@@ -149,6 +161,10 @@ export class StimBank {
   }
 }
 
+/**
+ * Resolve a potentially late-bound stimulus input to a concrete {@link StimSpec}.
+ * Handles {@link Resolver} functions, {@link StateRef} lookups, string keys, and {@link StimRef} handles.
+ */
 export function resolveStimInput(
   input: Resolvable<StimRef | StimSpec | null>,
   snapshot: TrialSnapshot,

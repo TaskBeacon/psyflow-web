@@ -11,6 +11,12 @@ import { TrialBuilder } from "./TrialBuilder";
 
 type StageStatePatch = Record<string, Resolvable<unknown>>;
 
+/**
+ * Builder for a single trial stage (browser counterpart of Python's StimUnit).
+ *
+ * Chain `.addStim()` → `.show()` / `.captureResponse()` / `.waitAndContinue()` →
+ * optionally `.set_state()` / `.to_dict()` → then call `.compile()` to produce a {@link CompiledStage}.
+ */
 export class StimUnit {
   readonly label: string;
   private readonly trial: TrialBuilder;
@@ -125,6 +131,7 @@ export class StimUnit {
     return this;
   }
 
+  /** Create a {@link StateRef} pointing to a key in this unit's runtime state. */
   ref<T = unknown>(key: string): StateRef<T> {
     return {
       kind: "state_ref",

@@ -38,6 +38,10 @@ const RAW_FIELDS = new Set([
   "task_factors"
 ]);
 
+/**
+ * Resolve a {@link Resolvable} value: call it if it's a {@link Resolver},
+ * look up state if it's a {@link StateRef}, or return it as-is.
+ */
 export function resolveValue<T>(
   value: Resolvable<T>,
   snapshot: TrialSnapshot,
@@ -63,6 +67,12 @@ export function splitRawExtraData(unitState: Record<string, unknown>): Record<st
   return extra;
 }
 
+/**
+ * Records trial execution data and produces raw JSONL + reduced CSV output.
+ *
+ * Implements {@link RuntimeView} so that Resolvers and finalizers can query
+ * accumulated results during execution.
+ */
 export class ExecutionRecorder implements RuntimeView {
   private readonly trialStore = new Map<
     number | string,

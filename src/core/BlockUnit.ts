@@ -10,6 +10,11 @@ function makeSeededRandom(seed: number): () => number {
   };
 }
 
+/**
+ * Block-level trial controller (browser counterpart of Python's BlockUnit).
+ *
+ * Generates a shuffled, weighted condition sequence for a block of trials.
+ */
 export class BlockUnit {
   block_id: string;
   block_idx: number;
@@ -37,6 +42,12 @@ export class BlockUnit {
     this.seed = Number(seeds[block_idx] ?? settings.overall_seed ?? 2025);
   }
 
+  /**
+   * Generate a shuffled condition sequence for this block.
+   *
+   * Uses weighted sampling to distribute remainder trials, then Fisher-Yates shuffle.
+   * Pass `func` to delegate generation to a custom function instead.
+   */
   generate_conditions(options: {
     weights?: number[] | null;
     func?: (...args: any[]) => string[];
