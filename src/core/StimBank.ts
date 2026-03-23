@@ -1,19 +1,28 @@
 import type { Resolvable, RuntimeView, StimRef, StimSpec, TrialSnapshot } from "./types";
 
-function formatNumber(value: unknown, precision: string | undefined): string {
-  if (precision && typeof value === "number") {
-    const digits = Number(precision.replace(".",""));
-    if (Number.isFinite(digits)) {
-      return value.toFixed(digits);
-    }
+function formatNumber(
+  value: unknown,
+  precision: string | undefined,
+  kind: "f" | "%" | undefined
+): string {
+  if (typeof value !== "number") {
+    return String(value ?? "");
   }
-  return String(value ?? "");
+  const digits = precision ? Number(precision.replace(".", "")) : 0;
+  const safeDigits = Number.isFinite(digits) ? digits : 0;
+  if (kind === "%") {
+    return `${(value * 100).toFixed(safeDigits)}%`;
+  }
+  return value.toFixed(safeDigits);
 }
 
 function formatTemplate(template: string, vars: Record<string, unknown>): string {
-  return template.replace(/\{([a-zA-Z0-9_]+)(?::(\.\d+f))?\}/g, (_, key: string, precision?: string) => {
-    return formatNumber(vars[key], precision);
-  });
+  return template.replace(
+    /\{([a-zA-Z0-9_]+)(?::(\.\d+)?([f%]))?\}/g,
+    (_, key: string, precision?: string, kind?: "f" | "%") => {
+      return formatNumber(vars[key], precision, kind);
+    }
+  );
 }
 
 export class StimBank {
