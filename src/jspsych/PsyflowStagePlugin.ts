@@ -266,6 +266,45 @@ function buildShapeGeometry(vertices: Array<[number, number]>): {
   };
 }
 
+function normalizeCssColor(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (!Array.isArray(value) || (value.length !== 3 && value.length !== 4)) {
+    return undefined;
+  }
+
+  const numeric = value.map((component) => Number(component));
+  if (numeric.some((component) => !Number.isFinite(component))) {
+    return undefined;
+  }
+
+  const rgb = numeric.slice(0, 3);
+  const alpha = numeric.length === 4 ? Math.max(0, Math.min(1, numeric[3])) : null;
+  const usesPsychoPyRange = rgb.some((component) => component < 0) || rgb.every((component) => component <= 1);
+  const converted = usesPsychoPyRange
+    ? rgb.map((component) => {
+        const normalized = component < 0 ? (component + 1) / 2 : component;
+        return Math.round(Math.max(0, Math.min(1, normalized)) * 255);
+      })
+    : rgb.map((component) => Math.round(component));
+
+  if (alpha !== null) {
+    return `rgba(${converted[0]}, ${converted[1]}, ${converted[2]}, ${alpha})`;
+  }
+
+  return `rgb(${converted[0]}, ${converted[1]}, ${converted[2]})`;
+}
+
+function applyWrapWidth(element: HTMLElement, spec: StimSpec): void {
+  const wrapWidth = (spec as { wrapWidth?: unknown }).wrapWidth;
+  if (typeof wrapWidth === "number" && Number.isFinite(wrapWidth) && wrapWidth > 0) {
+    element.style.maxWidth = `${wrapWidth}px`;
+    return;
+  }
+  element.style.maxWidth = "min(70ch, 90vw)";
+}
+
 function normalizeKeyForListener(key: string): string {
   const normalized = key.toLowerCase();
   return KEY_TO_DOM[normalized] ?? normalized;
@@ -305,8 +344,9 @@ function applyBaseStimStyle(element: HTMLElement, spec: StimSpec, stageRoot: HTM
   if (Number.isFinite(orientation) && orientation !== 0) {
     element.style.transform = `translate(-50%, -50%) rotate(${orientation}deg)`;
   }
-  if (spec.color) {
-    element.style.color = spec.color;
+  const color = normalizeCssColor(spec.color);
+  if (color) {
+    element.style.color = color;
   }
 }
 
@@ -318,6 +358,7 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       element.textContent = spec.text;
       applyBaseStimStyle(element, spec, stageRoot);
       element.style.fontSize = toLength(spec.height ?? 1.1, spec.units, 1.1, stageRoot);
+      applyWrapWidth(element, spec);
       if (spec.font) {
         element.style.fontFamily = spec.font;
       }
@@ -332,6 +373,7 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       element.className = "psyflow-stage-stim psyflow-stage-textbox";
       element.textContent = spec.text;
       applyBaseStimStyle(element, spec, stageRoot);
+      applyWrapWidth(element, spec);
       if (spec.font) {
         element.style.fontFamily = spec.font;
       }
@@ -353,9 +395,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       element.style.width = toLength((spec.radius ?? 1) * 2, spec.units, 2, stageRoot);
       element.style.height = toLength((spec.radius ?? 1) * 2, spec.units, 2, stageRoot);
       element.style.borderRadius = "9999px";
-      element.style.background = spec.fillColor ?? "transparent";
+      element.style.background = normalizeCssColor(spec.fillColor) ?? "transparent";
       const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
-      element.style.border = `${Math.max(0, lineWidth)}px solid ${spec.lineColor ?? "transparent"}`;
+      element.style.border = `${Math.max(0, lineWidth)}px solid ${normalizeCssColor(spec.lineColor) ?? "transparent"}`;
       stageRoot.appendChild(element);
       return;
     }
@@ -365,9 +407,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       applyBaseStimStyle(element, spec, stageRoot);
       element.style.width = toLength(spec.width, spec.units, spec.width, stageRoot);
       element.style.height = toLength(spec.height, spec.units, spec.height, stageRoot);
-      element.style.background = spec.fillColor ?? "transparent";
+      element.style.background = normalizeCssColor(spec.fillColor) ?? "transparent";
       const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
-      element.style.border = `${Math.max(0, lineWidth)}px solid ${spec.lineColor ?? "transparent"}`;
+      element.style.border = `${Math.max(0, lineWidth)}px solid ${normalizeCssColor(spec.lineColor) ?? "transparent"}`;
       stageRoot.appendChild(element);
       return;
     }
@@ -377,9 +419,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       applyBaseStimStyle(element, spec, stageRoot);
       element.style.width = toLength(spec.size, spec.units, spec.size, stageRoot);
       element.style.height = toLength(spec.size, spec.units, spec.size, stageRoot);
-      element.style.background = spec.fillColor ?? "transparent";
+      element.style.background = normalizeCssColor(spec.fillColor) ?? "transparent";
       const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
-      element.style.border = `${Math.max(0, lineWidth)}px solid ${spec.lineColor ?? "transparent"}`;
+      element.style.border = `${Math.max(0, lineWidth)}px solid ${normalizeCssColor(spec.lineColor) ?? "transparent"}`;
       element.style.clipPath = regularPolygonClipPath(spec.edges);
       stageRoot.appendChild(element);
       return;
@@ -398,8 +440,13 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
       const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
       polygon.setAttribute("points", geometry.points);
-      polygon.setAttribute("fill", spec.fillColor ?? "transparent");
-      polygon.setAttribute("stroke", spec.lineColor && spec.lineColor.length > 0 ? spec.lineColor : "transparent");
+      polygon.setAttribute("fill", normalizeCssColor(spec.fillColor) ?? "transparent");
+      polygon.setAttribute(
+        "stroke",
+        normalizeCssColor(spec.lineColor) && String(spec.lineColor).length > 0
+          ? String(normalizeCssColor(spec.lineColor))
+          : "transparent"
+      );
       const lineWidth = Number.isFinite(Number(spec.lineWidth)) ? Number(spec.lineWidth) : 2;
       polygon.setAttribute("stroke-width", String(Math.max(0, lineWidth)));
       svg.appendChild(polygon);

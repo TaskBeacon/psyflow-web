@@ -32,6 +32,10 @@ export class StimBank {
     this.config = config;
   }
 
+  has(key: string): boolean {
+    return Object.prototype.hasOwnProperty.call(this.config, key);
+  }
+
   get(key: string): StimRef {
     if (!this.config[key]) {
       throw new Error(`Stimulus '${key}' not found.`);

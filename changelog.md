@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-04-04
+
+- Added `StimBank.has(key)` so task code and the shared runner can check for optional stimuli without falling back to ad hoc property probes.
+- Extended `PsyflowStagePlugin` to accept PsychoPy-style RGB/RGBA array colors and `wrapWidth` on text stimuli, which keeps browser rendering aligned with existing task configs that were authored for PsychoPy/PsyFlow.
+- Kept these fixes in the shared runtime so all HTML companions benefit from the same rendering and stimulus-bank behavior.
+
 ## 2026-03-11
 
 - Added a public `task-manifest.json` build artifact so `psyflow-web` becomes the single published source of truth for HTML task companions.
