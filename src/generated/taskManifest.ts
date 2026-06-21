@@ -31,7 +31,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000001-ax-cpt/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000001-ax-cpt",
-    last_updated: "2026-05-15T10:33:39+08:00",
+    last_updated: "2026-03-11T09:18:07+08:00",
     importTask: () => import("../../../H000001-ax-cpt/main")
   },
   "H000002-bart": {
@@ -641,6 +641,22 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000039-probabilistic-reward-task",
     last_updated: "2026-05-15T11:49:37+08:00",
     importTask: () => import("../../../H000039-probabilistic-reward-task/main")
+  },
+  "H000040-probabilistic-stimulus-selection": {
+    directory: "H000040-probabilistic-stimulus-selection",
+    id: "H000040",
+    slug: "probabilistic-stimulus-selection",
+    title: "Probabilistic Stimulus Selection Task",
+    acquisition: "behavior",
+    maturity: "prototype",
+    release_tag: "v0.1.0-dev",
+    short_description: "Browser companion for the Chinese probabilistic stimulus selection task with kana stimuli and criterion-driven learning/transfer blocks",
+    repo_url: "https://github.com/TaskBeacon/H000040-probabilistic-stimulus-selection",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000040-probabilistic-stimulus-selection/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000040-probabilistic-stimulus-selection",
+    last_updated: "2026-06-21T22:52:06+08:00",
+    importTask: () => import("../../../H000040-probabilistic-stimulus-selection/main")
   },
 };
 
