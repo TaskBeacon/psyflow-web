@@ -138,6 +138,7 @@ export interface ResponseConfig {
   keys: string[];
   correct_keys?: string[];
   terminate_on_response?: boolean;
+  count_responses?: boolean;
   grace_s?: number;
   response_trigger?: number | Record<string, number> | null;
   timeout_trigger?: number | null;

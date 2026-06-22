@@ -319,7 +319,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000019-eefrt/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000019-eefrt",
-    last_updated: "2026-05-15T11:16:46+08:00",
+    last_updated: "2026-06-22T08:50:14+08:00",
     importTask: () => import("../../../H000019-eefrt/main")
   },
   "H000020-one-armed-bandit": {

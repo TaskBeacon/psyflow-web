@@ -36,6 +36,7 @@ export interface PsyflowStageResult {
   duration: number;
   response: string | null;
   key_press: boolean;
+  response_count?: number;
   rt: number | null;
   response_time: number | null;
   response_time_global: number | null;
@@ -598,6 +599,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         duration: 0,
         response: null,
         key_press: false,
+        response_count: 0,
         rt: null,
         response_time: null,
         response_time_global: null,
@@ -645,6 +647,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       let finished = false;
       let timerId: number | null = null;
       let response: string | null = null;
+      let responseCount = 0;
       let rtSeconds: number | null = null;
       let hit: boolean | null = stage.op === "capture_response" ? false : null;
       let timeoutTriggered = false;
@@ -655,9 +658,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         normalizeKeyForListener
       );
       const graceSeconds = Math.max(0, Number(execution.response_cfg?.grace_s ?? 0));
+      const countResponses = Boolean(execution.response_cfg?.count_responses);
 
       const keydownListener = (event: KeyboardEvent) => {
-        if (!keyboardListening || finished || response !== null || event.repeat) {
+        if (!keyboardListening || finished || (!countResponses && response !== null) || event.repeat) {
           return;
         }
         if (event.timeStamp < stageStart) {
@@ -669,13 +673,16 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         }
 
         event.preventDefault();
-        response = recordedKey;
-        rtSeconds = (performance.now() - stageStart) / 1000;
+        responseCount += 1;
+        if (response === null) {
+          response = recordedKey;
+          rtSeconds = (performance.now() - stageStart) / 1000;
+        }
         if (stage.op === "capture_response") {
-          hit = correctKeys.length > 0 ? correctKeys.includes(normalizeKeyForListener(response)) : true;
+          hit = correctKeys.length > 0 ? correctKeys.includes(normalizeKeyForListener(recordedKey)) : true;
         }
         if (execution.response_cfg?.terminate_on_response ?? false) {
-          finish(rtSeconds);
+          finish((performance.now() - stageStart) / 1000);
         }
       };
 
@@ -722,7 +729,8 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           close_time_global: onsetEpochSeconds + elapsedSeconds,
           duration,
           response,
-          key_press: response !== null,
+          key_press: responseCount > 0,
+          response_count: responseCount,
           rt: rtSeconds,
           response_time: rtSeconds,
           response_time_global: rtSeconds == null ? null : onsetEpochSeconds + rtSeconds,

@@ -51,6 +51,7 @@ export class StimUnit {
       duration: Resolvable<number | number[] | null>;
       correct_keys?: string[] | string;
       terminate_on_response?: boolean;
+      count_responses?: boolean;
       grace_s?: number;
       response_trigger?: number | Record<string, number> | null;
       timeout_trigger?: number | null;
@@ -69,6 +70,7 @@ export class StimUnit {
         keys: [...options.keys],
         correct_keys: correctKeys ? [...correctKeys] : undefined,
         terminate_on_response: options.terminate_on_response ?? true,
+        count_responses: options.count_responses ?? false,
         grace_s: options.grace_s ?? 0,
         response_trigger: options.response_trigger ?? null,
         timeout_trigger: options.timeout_trigger ?? null

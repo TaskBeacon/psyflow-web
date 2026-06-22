@@ -182,6 +182,7 @@ function toUnitState(
     duration: result.duration,
     response: result.response,
     key_press: result.key_press,
+    response_count: result.response_count ?? (result.key_press ? 1 : 0),
     rt: result.rt,
     response_time: result.response_time,
     response_time_global: result.response_time_global,
