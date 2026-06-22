@@ -719,7 +719,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000044-tapping-synchronization-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000044-tapping-synchronization-task",
-    last_updated: "2026-06-21T23:19:51+08:00",
+    last_updated: "2026-06-22T08:57:02+08:00",
     importTask: () => import("../../../H000044-tapping-synchronization-task/main")
   },
   "H000045-hand-laterality-judgment": {

@@ -37,6 +37,7 @@ export interface PsyflowStageResult {
   response: string | null;
   key_press: boolean;
   response_count?: number;
+  response_times?: number[];
   rt: number | null;
   response_time: number | null;
   response_time_global: number | null;
@@ -600,6 +601,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         response: null,
         key_press: false,
         response_count: 0,
+        response_times: [],
         rt: null,
         response_time: null,
         response_time_global: null,
@@ -648,6 +650,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       let timerId: number | null = null;
       let response: string | null = null;
       let responseCount = 0;
+      const responseTimes: number[] = [];
       let rtSeconds: number | null = null;
       let hit: boolean | null = stage.op === "capture_response" ? false : null;
       let timeoutTriggered = false;
@@ -673,10 +676,12 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         }
 
         event.preventDefault();
+        const responseRt = (performance.now() - stageStart) / 1000;
         responseCount += 1;
+        responseTimes.push(responseRt);
         if (response === null) {
           response = recordedKey;
-          rtSeconds = (performance.now() - stageStart) / 1000;
+          rtSeconds = responseRt;
         }
         if (stage.op === "capture_response") {
           hit = correctKeys.length > 0 ? correctKeys.includes(normalizeKeyForListener(recordedKey)) : true;
@@ -731,6 +736,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           response,
           key_press: responseCount > 0,
           response_count: responseCount,
+          response_times: responseTimes,
           rt: rtSeconds,
           response_time: rtSeconds,
           response_time_global: rtSeconds == null ? null : onsetEpochSeconds + rtSeconds,
