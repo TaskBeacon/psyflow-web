@@ -657,8 +657,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       let timeoutTime: number | null = null;
       let keyboardListening = false;
       const validKeys = (execution.response_cfg?.keys ?? ["space"]).map((key: string) => key.toLowerCase());
-      const correctKeys = (execution.response_cfg?.correct_keys ?? execution.response_cfg?.keys ?? []).map(
-        normalizeKeyForListener
+      const rawCorrectKeys = execution.response_cfg?.correct_keys ?? execution.response_cfg?.keys ?? [];
+      const correctKeys = (Array.isArray(rawCorrectKeys) ? rawCorrectKeys : [rawCorrectKeys]).map((key) =>
+        normalizeKeyForListener(String(key))
       );
       const graceSeconds = Math.max(0, Number(execution.response_cfg?.grace_s ?? 0));
       const countResponses = Boolean(execution.response_cfg?.count_responses);

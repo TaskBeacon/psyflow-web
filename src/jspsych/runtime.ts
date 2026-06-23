@@ -122,10 +122,33 @@ function resolveStageExecution(
   }
   const rawDuration = stage.duration == null ? null : resolveValue(stage.duration, snapshot, recorder);
   const sampledDuration = sampleDuration(rawDuration as number | number[] | null);
-  const responseCfg = stage.response_cfg ? structuredClone(stage.response_cfg) : undefined;
+  const responseCfg = stage.response_cfg ? { ...stage.response_cfg } : undefined;
+  if (responseCfg?.correct_keys != null) {
+    const resolvedCorrectKeys = resolveValue(responseCfg.correct_keys, snapshot, recorder);
+    responseCfg.correct_keys =
+      typeof resolvedCorrectKeys === "string"
+        ? [resolvedCorrectKeys]
+        : Array.isArray(resolvedCorrectKeys)
+          ? [...resolvedCorrectKeys]
+          : undefined;
+  }
+  if (responseCfg?.response_trigger != null) {
+    responseCfg.response_trigger = resolveValue(responseCfg.response_trigger, snapshot, recorder);
+  }
+  if (responseCfg?.timeout_trigger != null) {
+    responseCfg.timeout_trigger = resolveValue(responseCfg.timeout_trigger, snapshot, recorder);
+  }
   const context: TrialContextSpec = {
     ...(stage.context ?? {})
   };
+  if (context.task_factors) {
+    context.task_factors = Object.fromEntries(
+      Object.entries(context.task_factors).map(([key, value]) => [
+        key,
+        resolveValue(value as Resolvable<unknown>, snapshot, recorder)
+      ])
+    );
+  }
   if (context.deadline_s == null) {
     context.deadline_s = resolve_deadline(sampledDuration);
   }

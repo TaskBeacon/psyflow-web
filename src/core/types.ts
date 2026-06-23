@@ -136,12 +136,12 @@ export interface SpeechStimSpec extends BaseStimSpec {
 
 export interface ResponseConfig {
   keys: string[];
-  correct_keys?: string[];
+  correct_keys?: Resolvable<string[] | string | undefined>;
   terminate_on_response?: boolean;
   count_responses?: boolean;
   grace_s?: number;
-  response_trigger?: number | Record<string, number> | null;
-  timeout_trigger?: number | null;
+  response_trigger?: Resolvable<number | Record<string, number> | null>;
+  timeout_trigger?: Resolvable<number | null>;
 }
 
 export interface TrialContextSpec {
