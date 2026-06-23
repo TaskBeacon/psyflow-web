@@ -28,35 +28,45 @@ function ensureRunnerStyles(): void {
       --pf-sky-soft: #d7ebf6;
       --pf-peach-soft: #ffe9de;
       --pf-mint: #39d95d;
+      --pf-mint-dark: #2fb651;
       background:
-        radial-gradient(circle at 12% 8%, rgba(245, 193, 181, 0.28), transparent 20%),
-        radial-gradient(circle at 86% 16%, rgba(185, 220, 235, 0.28), transparent 22%),
-        radial-gradient(circle at 80% 82%, rgba(57, 217, 93, 0.1), transparent 20%),
+        linear-gradient(90deg, rgba(37, 49, 77, 0.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(37, 49, 77, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 12% 8%, rgba(245, 193, 181, 0.34), transparent 24%),
+        radial-gradient(circle at 86% 18%, rgba(185, 220, 235, 0.36), transparent 26%),
         linear-gradient(180deg, var(--pf-paper) 0%, #f1ece6 100%);
+      background-size: 28px 28px, 28px 28px, auto, auto, auto;
       color: var(--pf-ink);
+      font-variant-numeric: tabular-nums;
     }
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100dvh;
       background: transparent;
     }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
     .psyflow-runner {
-      min-height: 100vh;
-      padding: 24px;
+      min-height: 100dvh;
+      padding: 28px;
       box-sizing: border-box;
     }
     .psyflow-runner-shell {
-      width: min(980px, 100%);
+      width: min(1120px, 100%);
       margin: 0 auto;
       display: grid;
-      gap: 18px;
+      gap: 20px;
     }
     .psyflow-runner-card {
       background: var(--pf-panel);
       border: 2px solid var(--pf-ink);
-      border-radius: 30px;
+      border-radius: 26px;
       box-shadow: 0 6px 0 var(--pf-ink);
-      padding: 24px;
+      padding: 24px 26px;
+      overflow: hidden;
     }
     .psyflow-runner-card h1,
     .psyflow-runner-card h2,
@@ -68,7 +78,7 @@ function ensureRunnerStyles(): void {
       align-items: center;
       gap: 8px;
       border-radius: 999px;
-      background: #c9f7b9;
+      background: var(--pf-sky-soft);
       padding: 8px 12px;
       font-size: 0.72rem;
       font-weight: 700;
@@ -77,22 +87,27 @@ function ensureRunnerStyles(): void {
     }
     .psyflow-runner-card h1 {
       margin-top: 12px;
-      font-size: clamp(2.1rem, 5vw, 3.2rem);
-      line-height: 0.94;
-      letter-spacing: -0.04em;
+      font-size: clamp(2.1rem, 6vw, 3.6rem);
+      line-height: 1.02;
+      letter-spacing: 0;
       color: var(--pf-ink);
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      font-family: "Outfit", "DM Sans", sans-serif;
+      font-weight: 800;
+      text-wrap: balance;
     }
     .psyflow-runner-card h2 {
       margin-bottom: 10px;
       font-size: 1.1rem;
-      letter-spacing: -0.03em;
+      letter-spacing: 0;
       color: var(--pf-ink);
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      font-family: "Outfit", "DM Sans", sans-serif;
+      font-weight: 800;
     }
     .psyflow-runner-card p {
       color: rgba(37, 49, 77, 0.84);
       line-height: 1.6;
+      max-width: 68ch;
+      text-wrap: pretty;
     }
     .psyflow-runner-form {
       display: grid;
@@ -126,14 +141,30 @@ function ensureRunnerStyles(): void {
       padding: 13px 18px;
       font: inherit;
       background: var(--pf-mint);
-      color: white;
+      color: var(--pf-ink);
       cursor: pointer;
       font-weight: 700;
       box-shadow: 0 4px 0 var(--pf-ink);
-      transition: transform 120ms ease;
+      transition:
+        background-color 160ms ease,
+        color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
     }
     .psyflow-runner-button:hover {
+      background: var(--pf-mint-dark);
+      color: white;
       transform: translateY(-1px);
+    }
+    .psyflow-runner-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--pf-ink);
+    }
+    .psyflow-runner-button:focus-visible,
+    .psyflow-runner-input:focus-visible,
+    .psyflow-runner-select:focus-visible {
+      outline: 3px solid var(--pf-sky);
+      outline-offset: 3px;
     }
     .psyflow-runner-meta {
       display: grid;

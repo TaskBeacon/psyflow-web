@@ -56,52 +56,81 @@ function ensureTaskAppStyles(): void {
   style.id = "psyflow-task-app-styles";
   style.textContent = `
     .psyflow-task-app {
-      min-height: 100vh;
-      padding: 24px;
+      --tb-ink: #25314d;
+      --tb-paper: #f4efe9;
+      --tb-paper-strong: #fffdf9;
+      --tb-sky: #b9dceb;
+      --tb-sky-soft: #d9edf6;
+      --tb-peach: #f5c1b5;
+      --tb-mint: #39d95d;
+      --tb-mint-dark: #2fb651;
+      --tb-cream: #fff7ef;
+      min-height: 100dvh;
+      padding: 28px;
       background:
-        radial-gradient(circle at 12% 8%, rgba(245, 193, 181, 0.28), transparent 20%),
-        radial-gradient(circle at 86% 16%, rgba(185, 220, 235, 0.28), transparent 22%),
-        radial-gradient(circle at 80% 82%, rgba(57, 217, 93, 0.1), transparent 20%),
-        linear-gradient(180deg, #f4efe9 0%, #f1ece6 100%);
-      color: #25314d;
+        linear-gradient(90deg, rgba(37, 49, 77, 0.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(37, 49, 77, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 12% 8%, rgba(245, 193, 181, 0.34), transparent 24%),
+        radial-gradient(circle at 86% 18%, rgba(185, 220, 235, 0.36), transparent 26%),
+        linear-gradient(180deg, var(--tb-paper) 0%, #f1ece6 100%);
+      background-size: 28px 28px, 28px 28px, auto, auto, auto;
+      color: var(--tb-ink);
       font-family: "DM Sans", "Segoe UI", sans-serif;
+      font-variant-numeric: tabular-nums;
+      box-sizing: border-box;
+    }
+    .psyflow-task-app *,
+    .psyflow-task-app *::before,
+    .psyflow-task-app *::after {
       box-sizing: border-box;
     }
     .psyflow-task-shell {
-      width: min(1080px, 100%);
+      width: min(1120px, 100%);
       margin: 0 auto;
       display: grid;
-      gap: 18px;
+      gap: 20px;
     }
     .psyflow-task-panel {
-      border: 2px solid #25314d;
-      background: #fffdf9;
-      border-radius: 28px;
-      box-shadow: 0 6px 0 #25314d;
+      border: 2px solid var(--tb-ink);
+      background: var(--tb-paper-strong);
+      border-radius: 26px;
+      box-shadow: 0 6px 0 var(--tb-ink);
+      overflow: hidden;
     }
     .psyflow-task-header,
     .psyflow-task-body,
     .psyflow-task-result {
-      padding: 22px 24px;
+      padding: 24px 26px;
+    }
+    .psyflow-task-header {
+      display: grid;
+      gap: 10px;
+      background:
+        linear-gradient(90deg, rgba(185, 220, 235, 0.34), transparent 62%),
+        var(--tb-paper-strong);
     }
     .psyflow-task-header h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      line-height: 0.94;
-      letter-spacing: -0.04em;
-      color: #25314d;
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+      color: var(--tb-ink);
+      font-family: "Outfit", "DM Sans", sans-serif;
+      font-weight: 800;
+      text-wrap: balance;
     }
     .psyflow-task-header p,
     .psyflow-task-preflight p,
     .psyflow-task-result p {
       margin: 0;
       color: rgba(37, 49, 77, 0.84);
-      line-height: 1.5;
+      line-height: 1.62;
+      max-width: 68ch;
+      text-wrap: pretty;
     }
     .psyflow-task-preflight {
       display: grid;
-      gap: 16px;
+      gap: 18px;
     }
     .psyflow-task-preflight dl {
       margin: 0;
@@ -118,31 +147,54 @@ function ensureTaskAppStyles(): void {
     .psyflow-task-preflight dd {
       margin: 4px 0 0;
       font-weight: 700;
-      color: #25314d;
+      color: var(--tb-ink);
     }
     .psyflow-task-button,
     .psyflow-download-button,
     .psyflow-subinfo-form button {
       appearance: none;
-      border: 2px solid #25314d;
+      border: 2px solid var(--tb-ink);
       border-radius: 18px;
       padding: 12px 16px;
       font: inherit;
-      background: #39d95d;
-      color: white;
+      background: var(--tb-mint);
+      color: var(--tb-ink);
       cursor: pointer;
       font-weight: 700;
-      box-shadow: 0 4px 0 #25314d;
-      transition: transform 120ms ease;
+      box-shadow: 0 4px 0 var(--tb-ink);
+      transition:
+        background-color 160ms ease,
+        color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
     }
     .psyflow-task-button:hover,
     .psyflow-download-button:hover,
     .psyflow-subinfo-form button:hover {
       transform: translateY(-1px);
     }
+    .psyflow-task-button:hover,
+    .psyflow-subinfo-form button:hover {
+      background: var(--tb-mint-dark);
+      color: white;
+    }
+    .psyflow-task-button:active,
+    .psyflow-download-button:active,
+    .psyflow-subinfo-form button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--tb-ink);
+    }
+    .psyflow-task-button:focus-visible,
+    .psyflow-download-button:focus-visible,
+    .psyflow-subinfo-form button:focus-visible,
+    .psyflow-subinfo-field input:focus-visible,
+    .psyflow-subinfo-field select:focus-visible {
+      outline: 3px solid var(--tb-sky);
+      outline-offset: 3px;
+    }
     .psyflow-download-button {
-      background: #d7ebf6;
-      color: #25314d;
+      background: var(--tb-sky-soft);
+      color: var(--tb-ink);
     }
     .psyflow-task-button[disabled] {
       opacity: 0.72;
@@ -153,7 +205,7 @@ function ensureTaskAppStyles(): void {
     .psyflow-task-runtime {
       min-height: 72vh;
       overflow: hidden;
-      background: #fffdf9;
+      background: var(--tb-paper-strong);
     }
     .psyflow-task-runtime--hide-cursor,
     .psyflow-task-runtime--hide-cursor * {
@@ -178,8 +230,10 @@ function ensureTaskAppStyles(): void {
     .psyflow-task-result-card h2,
     .psyflow-task-result-card h1 {
       margin: 0;
-      color: #25314d;
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      color: var(--tb-ink);
+      font-family: "Outfit", "DM Sans", sans-serif;
+      font-weight: 800;
+      letter-spacing: 0;
     }
     .psyflow-task-result-actions {
       display: flex;
@@ -190,8 +244,8 @@ function ensureTaskAppStyles(): void {
       margin: 0;
       padding: 18px;
       border-radius: 18px;
-      border: 2px solid #25314d;
-      background: #25314d;
+      border: 2px solid var(--tb-ink);
+      background: var(--tb-ink);
       color: #f8fafc;
       overflow: auto;
       max-height: 360px;
@@ -204,8 +258,10 @@ function ensureTaskAppStyles(): void {
     .psyflow-subinfo h1 {
       margin: 0;
       font-size: 1.35rem;
-      color: #25314d;
-      font-family: "Baloo 2", "DM Sans", sans-serif;
+      color: var(--tb-ink);
+      font-family: "Outfit", "DM Sans", sans-serif;
+      font-weight: 800;
+      letter-spacing: 0;
     }
     .psyflow-subinfo-form {
       display: grid;
@@ -221,11 +277,17 @@ function ensureTaskAppStyles(): void {
     .psyflow-subinfo-field input,
     .psyflow-subinfo-field select {
       appearance: none;
-      border: 2px solid #25314d;
+      border: 2px solid var(--tb-ink);
       border-radius: 18px;
       padding: 12px 14px;
       font: inherit;
-      box-shadow: 0 4px 0 #25314d;
+      color: var(--tb-ink);
+      background: white;
+      box-shadow: 0 4px 0 var(--tb-ink);
+      transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
     }
     .psyflow-subinfo-error {
       min-height: 1.25rem;
