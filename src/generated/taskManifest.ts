@@ -351,7 +351,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000021-drifting-double-bandit/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000021-drifting-double-bandit",
-    last_updated: "2026-06-23T13:53:35+08:00",
+    last_updated: "2026-06-23T15:44:09+08:00",
     importTask: () => import("../../../H000021-drifting-double-bandit/main")
   },
   "H000022-passive-lottery": {
