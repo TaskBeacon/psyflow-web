@@ -255,7 +255,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000015-ant/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000015-ant",
-    last_updated: "2026-06-22T09:06:46+08:00",
+    last_updated: "2026-06-23T15:08:06+08:00",
     importTask: () => import("../../../H000015-ant/main")
   },
   "H000016-card-sorting": {
