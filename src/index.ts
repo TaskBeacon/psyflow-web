@@ -1,4 +1,5 @@
 export { parsePsyflowConfig } from "./core/config";
+export { PythonRandom } from "./core/pythonRandom";
 export { TaskSettings } from "./core/TaskSettings";
 export { BlockUnit } from "./core/BlockUnit";
 export { StimBank } from "./core/StimBank";
