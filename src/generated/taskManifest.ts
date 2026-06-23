@@ -207,7 +207,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000012-sst/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000012-sst",
-    last_updated: "2026-06-22T09:06:17+08:00",
+    last_updated: "2026-06-23T14:58:07+08:00",
     importTask: () => import("../../../H000012-sst/main")
   },
   "H000013-sst-audio": {
@@ -223,7 +223,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000013-sst-audio/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000013-sst-audio",
-    last_updated: "2026-06-22T09:06:26+08:00",
+    last_updated: "2026-06-23T15:00:58+08:00",
     importTask: () => import("../../../H000013-sst-audio/main")
   },
   "H000014-stroop": {
