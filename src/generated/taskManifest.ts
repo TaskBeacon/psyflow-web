@@ -367,7 +367,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000022-passive-lottery/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000022-passive-lottery",
-    last_updated: "2026-06-23T13:53:42+08:00",
+    last_updated: "2026-06-23T15:49:08+08:00",
     importTask: () => import("../../../H000022-passive-lottery/main")
   },
   "H000023-ultimatum-game": {
