@@ -1,14 +1,5 @@
 import { TaskSettings } from "./TaskSettings";
-
-function makeSeededRandom(seed: number): () => number {
-  let value = seed >>> 0;
-  return () => {
-    value = (value + 0x6d2b79f5) >>> 0;
-    let t = Math.imul(value ^ (value >>> 15), 1 | value);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+import { PythonRandom } from "./pythonRandom";
 
 export class BlockUnit {
   block_id: string;
@@ -53,18 +44,18 @@ export class BlockUnit {
       return this;
     }
     const weights = options.weights ?? this.settings.resolve_condition_weights();
-    const rng = makeSeededRandom(this.seed);
+    const rng = new PythonRandom(this.seed);
     const normalizedWeights = weights ?? new Array(labels.length).fill(1);
     const totalWeight = normalizedWeights.reduce((sum, value) => sum + value, 0);
     const counts = normalizedWeights.map((weight) => Math.floor((this.n_trials * weight) / totalWeight));
     let remainder = this.n_trials - counts.reduce((sum, value) => sum + value, 0);
     while (remainder > 0) {
-      const sample = rng() * totalWeight;
+      const sample = rng.random() * totalWeight;
       let cumulative = 0;
       let chosenIndex = normalizedWeights.length - 1;
       for (let index = 0; index < normalizedWeights.length; index += 1) {
         cumulative += normalizedWeights[index];
-        if (sample <= cumulative) {
+        if (sample < cumulative) {
           chosenIndex = index;
           break;
         }
@@ -78,11 +69,7 @@ export class BlockUnit {
         result.push(label);
       }
     });
-    for (let i = result.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(rng() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    this.conditions = result;
+    this.conditions = rng.shuffle(result);
     return this;
   }
 }

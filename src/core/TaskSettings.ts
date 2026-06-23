@@ -1,3 +1,5 @@
+import { PythonRandom } from "./pythonRandom";
+
 type SettingsLike = Record<string, unknown>;
 
 function hashString(input: string): number {
@@ -6,16 +8,6 @@ function hashString(input: string): number {
     hash = (hash * 31 + input.charCodeAt(i)) >>> 0;
   }
   return hash;
-}
-
-function makeSeededRandom(seed: number): () => number {
-  let value = seed >>> 0;
-  return () => {
-    value = (value + 0x6d2b79f5) >>> 0;
-    let t = Math.imul(value ^ (value >>> 15), 1 | value);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 export class TaskSettings {
@@ -65,10 +57,10 @@ export class TaskSettings {
   }
 
   set_block_seed(seedBase: number): void {
-    const rng = makeSeededRandom(seedBase);
+    const rng = new PythonRandom(seedBase);
     this.block_seed = new Array(Number(this.total_blocks ?? 1))
       .fill(null)
-      .map(() => Math.floor(rng() * 100000));
+      .map(() => rng.randint(0, 99999));
   }
 
   add_subinfo(subinfo: Record<string, unknown>): void {

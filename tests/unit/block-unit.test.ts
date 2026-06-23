@@ -30,5 +30,47 @@ describe("BlockUnit", () => {
     expect(first.conditions.filter((condition) => condition === "win")).toHaveLength(2);
     expect(first.conditions.filter((condition) => condition === "lose")).toHaveLength(2);
     expect(first.conditions.filter((condition) => condition === "neut")).toHaveLength(2);
+    expect(first.conditions).toEqual(["neut", "neut", "win", "win", "lose", "lose"]);
+  });
+
+  it("matches canonical PsyFlow condition order for the H004 flanker schedule", () => {
+    const settings = TaskSettings.from_dict({
+      total_blocks: 3,
+      total_trials: 180,
+      trial_per_block: 60,
+      conditions: ["congruent_left", "congruent_right", "incongruent_left", "incongruent_right"],
+      overall_seed: 2025,
+      seed_mode: "same_across_sub"
+    });
+
+    const block = new BlockUnit({
+      block_id: "block_0",
+      block_idx: 0,
+      settings
+    }).generate_conditions();
+
+    expect(settings.block_seed.slice(0, 3)).toEqual([73105, 10839, 84652]);
+    expect(block.conditions.slice(0, 20)).toEqual([
+      "incongruent_left",
+      "incongruent_right",
+      "incongruent_left",
+      "congruent_left",
+      "incongruent_right",
+      "congruent_right",
+      "incongruent_left",
+      "incongruent_right",
+      "incongruent_right",
+      "congruent_right",
+      "congruent_left",
+      "congruent_left",
+      "incongruent_left",
+      "incongruent_right",
+      "congruent_left",
+      "congruent_left",
+      "congruent_right",
+      "congruent_left",
+      "incongruent_right",
+      "congruent_right"
+    ]);
   });
 });

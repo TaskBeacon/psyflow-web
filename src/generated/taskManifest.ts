@@ -79,7 +79,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000004-flanker/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000004-flanker",
-    last_updated: "2026-06-22T09:05:07+08:00",
+    last_updated: "2026-06-23T14:22:13+08:00",
     importTask: () => import("../../../H000004-flanker/main")
   },
   "H000005-go-nogo": {
