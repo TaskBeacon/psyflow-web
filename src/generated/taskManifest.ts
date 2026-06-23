@@ -31,7 +31,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000001-ax-cpt/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000001-ax-cpt",
-    last_updated: "2026-06-22T08:15:49+08:00",
+    last_updated: "2026-06-22T09:04:40+08:00",
     importTask: () => import("../../../H000001-ax-cpt/main")
   },
   "H000002-bart": {
@@ -47,7 +47,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000002-bart/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000002-bart",
-    last_updated: "2026-05-15T10:54:38+08:00",
+    last_updated: "2026-06-22T09:04:49+08:00",
     importTask: () => import("../../../H000002-bart/main")
   },
   "H000003-emodot": {
@@ -63,7 +63,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000003-emodot/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000003-emodot",
-    last_updated: "2026-05-15T10:54:39+08:00",
+    last_updated: "2026-06-22T09:04:58+08:00",
     importTask: () => import("../../../H000003-emodot/main")
   },
   "H000004-flanker": {
@@ -79,7 +79,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000004-flanker/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000004-flanker",
-    last_updated: "2026-05-15T10:54:40+08:00",
+    last_updated: "2026-06-22T09:05:07+08:00",
     importTask: () => import("../../../H000004-flanker/main")
   },
   "H000005-go-nogo": {
@@ -95,7 +95,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000005-go-nogo/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000005-go-nogo",
-    last_updated: "2026-05-15T10:54:40+08:00",
+    last_updated: "2026-06-22T09:05:16+08:00",
     importTask: () => import("../../../H000005-go-nogo/main")
   },
   "H000006-mid": {
@@ -111,7 +111,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000006-mid/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000006-mid",
-    last_updated: "2026-05-15T10:54:41+08:00",
+    last_updated: "2026-06-22T09:05:25+08:00",
     importTask: () => import("../../../H000006-mid/main")
   },
   "H000007-movie": {
@@ -127,7 +127,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000007-movie/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000007-movie",
-    last_updated: "2026-05-15T10:54:42+08:00",
+    last_updated: "2026-06-22T09:05:35+08:00",
     importTask: () => import("../../../H000007-movie/main")
   },
   "H000008-nback": {
@@ -143,7 +143,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000008-nback/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000008-nback",
-    last_updated: "2026-05-15T10:54:43+08:00",
+    last_updated: "2026-06-22T09:05:44+08:00",
     importTask: () => import("../../../H000008-nback/main")
   },
   "H000009-prl": {
@@ -159,7 +159,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000009-prl/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000009-prl",
-    last_updated: "2026-05-15T10:54:43+08:00",
+    last_updated: "2026-06-22T09:05:53+08:00",
     importTask: () => import("../../../H000009-prl/main")
   },
   "H000010-rest": {
@@ -175,7 +175,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000010-rest/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000010-rest",
-    last_updated: "2026-05-15T10:54:44+08:00",
+    last_updated: "2026-06-22T08:59:33+08:00",
     importTask: () => import("../../../H000010-rest/main")
   },
   "H000011-simon": {
@@ -191,7 +191,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000011-simon/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000011-simon",
-    last_updated: "2026-05-15T11:16:03+08:00",
+    last_updated: "2026-06-22T09:06:03+08:00",
     importTask: () => import("../../../H000011-simon/main")
   },
   "H000012-sst": {
@@ -207,7 +207,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000012-sst/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000012-sst",
-    last_updated: "2026-05-15T11:16:08+08:00",
+    last_updated: "2026-06-22T09:06:17+08:00",
     importTask: () => import("../../../H000012-sst/main")
   },
   "H000013-sst-audio": {
@@ -223,7 +223,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000013-sst-audio/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000013-sst-audio",
-    last_updated: "2026-05-15T11:16:14+08:00",
+    last_updated: "2026-06-22T09:06:26+08:00",
     importTask: () => import("../../../H000013-sst-audio/main")
   },
   "H000014-stroop": {
@@ -239,7 +239,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000014-stroop/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000014-stroop",
-    last_updated: "2026-05-15T11:16:19+08:00",
+    last_updated: "2026-06-22T09:06:36+08:00",
     importTask: () => import("../../../H000014-stroop/main")
   },
   "H000015-ant": {
@@ -255,7 +255,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000015-ant/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000015-ant",
-    last_updated: "2026-05-15T11:16:24+08:00",
+    last_updated: "2026-06-22T09:06:46+08:00",
     importTask: () => import("../../../H000015-ant/main")
   },
   "H000016-card-sorting": {
@@ -271,7 +271,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000016-card-sorting/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000016-card-sorting",
-    last_updated: "2026-05-15T11:16:30+08:00",
+    last_updated: "2026-06-22T09:06:55+08:00",
     importTask: () => import("../../../H000016-card-sorting/main")
   },
   "H000017-delay-discounting": {
@@ -287,7 +287,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000017-delay-discounting/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000017-delay-discounting",
-    last_updated: "2026-05-15T11:16:35+08:00",
+    last_updated: "2026-06-22T09:07:04+08:00",
     importTask: () => import("../../../H000017-delay-discounting/main")
   },
   "H000018-oddball-mmn": {
@@ -303,7 +303,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000018-oddball-mmn/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000018-oddball-mmn",
-    last_updated: "2026-05-15T11:16:41+08:00",
+    last_updated: "2026-06-23T13:53:13+08:00",
     importTask: () => import("../../../H000018-oddball-mmn/main")
   },
   "H000019-eefrt": {
@@ -319,7 +319,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000019-eefrt/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000019-eefrt",
-    last_updated: "2026-06-22T08:50:14+08:00",
+    last_updated: "2026-06-23T13:53:21+08:00",
     importTask: () => import("../../../H000019-eefrt/main")
   },
   "H000020-one-armed-bandit": {
@@ -335,7 +335,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000020-one-armed-bandit/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000020-one-armed-bandit",
-    last_updated: "2026-05-15T11:16:51+08:00",
+    last_updated: "2026-06-23T13:53:28+08:00",
     importTask: () => import("../../../H000020-one-armed-bandit/main")
   },
   "H000021-drifting-double-bandit": {
@@ -351,7 +351,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000021-drifting-double-bandit/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000021-drifting-double-bandit",
-    last_updated: "2026-05-15T11:16:56+08:00",
+    last_updated: "2026-06-23T13:53:35+08:00",
     importTask: () => import("../../../H000021-drifting-double-bandit/main")
   },
   "H000022-passive-lottery": {
@@ -367,7 +367,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000022-passive-lottery/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000022-passive-lottery",
-    last_updated: "2026-05-15T11:17:01+08:00",
+    last_updated: "2026-06-23T13:53:42+08:00",
     importTask: () => import("../../../H000022-passive-lottery/main")
   },
   "H000023-ultimatum-game": {
@@ -383,7 +383,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000023-ultimatum-game/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000023-ultimatum-game",
-    last_updated: "2026-05-15T11:17:07+08:00",
+    last_updated: "2026-06-23T13:53:49+08:00",
     importTask: () => import("../../../H000023-ultimatum-game/main")
   },
   "H000024-trust-game": {
@@ -399,7 +399,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000024-trust-game/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000024-trust-game",
-    last_updated: "2026-05-15T11:17:12+08:00",
+    last_updated: "2026-06-23T13:53:56+08:00",
     importTask: () => import("../../../H000024-trust-game/main")
   },
   "H000025-dictator-game": {
@@ -415,7 +415,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000025-dictator-game/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000025-dictator-game",
-    last_updated: "2026-05-15T11:17:17+08:00",
+    last_updated: "2026-06-23T13:54:04+08:00",
     importTask: () => import("../../../H000025-dictator-game/main")
   },
   "H000026-mcgurk": {
@@ -431,7 +431,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000026-mcgurk/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000026-mcgurk",
-    last_updated: "2026-05-15T11:17:22+08:00",
+    last_updated: "2026-06-23T13:54:11+08:00",
     importTask: () => import("../../../H000026-mcgurk/main")
   },
   "H000027-task-switching": {
@@ -879,7 +879,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000054-delayed-recall-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000054-delayed-recall-task",
-    last_updated: "2026-06-22T00:04:09+08:00",
+    last_updated: "2026-06-22T09:02:12+08:00",
     importTask: () => import("../../../H000054-delayed-recall-task/main")
   },
   "H000055-drm-false-memory-paradigm": {

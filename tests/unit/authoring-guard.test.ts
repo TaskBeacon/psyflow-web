@@ -93,4 +93,40 @@ describe("HTML task authoring layer", () => {
       }
     }
   });
+
+  it("keeps H010 rest acquisition windows aligned with T010", () => {
+    const htmlTaskDir = "H000010-rest";
+    const canonicalTaskDir = "T000010-rest";
+    const htmlConfig = readYamlFile(path.join(repoRoot, htmlTaskDir, "config/config.yaml"));
+    const canonicalConfig = readYamlFile(path.join(repoRoot, canonicalTaskDir, "config/config.yaml"));
+    const htmlTask = htmlConfig.task as Record<string, unknown>;
+    const canonicalTask = canonicalConfig.task as Record<string, unknown>;
+    const source = readFileSync(path.join(repoRoot, htmlTaskDir, "src/run_trial.ts"), "utf8");
+
+    expect(htmlTask.total_trials).toBe(canonicalTask.total_trials);
+    expect(htmlTask.trial_per_block).toBe(canonicalTask.trial_per_block);
+    expect(source).not.toMatch(/instructionUnit\.waitAndContinue/);
+  });
+
+  it("keeps H task trial and block counts aligned to canonical T configs", () => {
+    const documentedExceptions = new Set(["H000050-mental-rotation-task"]);
+
+    for (const taskDir of discoverHtmlTaskDirs()) {
+      if (documentedExceptions.has(taskDir)) {
+        continue;
+      }
+
+      const canonicalDir = findCanonicalTaskDir(taskDir);
+      const htmlConfig = readYamlFile(path.join(repoRoot, taskDir, "config/config.yaml"));
+      const canonicalConfig = readYamlFile(path.join(repoRoot, canonicalDir, "config/config.yaml"));
+      const htmlTask = (htmlConfig.task ?? {}) as Record<string, unknown>;
+      const canonicalTask = (canonicalConfig.task ?? {}) as Record<string, unknown>;
+
+      for (const key of ["total_trials", "trial_per_block", "trials_per_block", "total_blocks"]) {
+        if (key in htmlTask && key in canonicalTask) {
+          expect(htmlTask[key], `${taskDir} ${key}`).toBe(canonicalTask[key]);
+        }
+      }
+    }
+  });
 });
