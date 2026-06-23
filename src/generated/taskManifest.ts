@@ -287,7 +287,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000017-delay-discounting/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000017-delay-discounting",
-    last_updated: "2026-06-22T09:07:04+08:00",
+    last_updated: "2026-06-23T15:19:53+08:00",
     importTask: () => import("../../../H000017-delay-discounting/main")
   },
   "H000018-oddball-mmn": {

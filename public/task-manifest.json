@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T07:15:07.514Z",
+  "generated_at": "2026-06-23T07:20:10.748Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -258,7 +258,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000017-delay-discounting/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000017-delay-discounting",
-      "last_updated": "2026-06-22T09:07:04+08:00"
+      "last_updated": "2026-06-23T15:19:53+08:00"
     },
     {
       "directory": "H000018-oddball-mmn",
