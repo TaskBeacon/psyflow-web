@@ -431,7 +431,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000026-mcgurk/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000026-mcgurk",
-    last_updated: "2026-06-23T13:54:11+08:00",
+    last_updated: "2026-06-23T16:13:27+08:00",
     importTask: () => import("../../../H000026-mcgurk/main")
   },
   "H000027-task-switching": {

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T08:05:24.005Z",
+  "generated_at": "2026-06-23T08:13:59.460Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -393,7 +393,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000026-mcgurk/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000026-mcgurk",
-      "last_updated": "2026-06-23T13:54:11+08:00"
+      "last_updated": "2026-06-23T16:13:27+08:00"
     },
     {
       "directory": "H000027-task-switching",
