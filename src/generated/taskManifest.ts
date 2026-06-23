@@ -175,7 +175,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000010-rest/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000010-rest",
-    last_updated: "2026-06-22T08:59:33+08:00",
+    last_updated: "2026-06-23T14:46:06+08:00",
     importTask: () => import("../../../H000010-rest/main")
   },
   "H000011-simon": {
