@@ -152,7 +152,7 @@ export interface TrialContextSpec {
   block_id?: string | null;
   condition_id?: string | null;
   task_factors?: Record<string, unknown>;
-  stim_id?: string | null;
+  stim_id?: Resolvable<string | null>;
   stim_features?: Record<string, unknown> | null;
 }
 

@@ -141,6 +141,9 @@ function resolveStageExecution(
   const context: TrialContextSpec = {
     ...(stage.context ?? {})
   };
+  if (context.stim_id != null) {
+    context.stim_id = resolveValue(context.stim_id, snapshot, recorder) as string | null;
+  }
   if (context.task_factors) {
     context.task_factors = Object.fromEntries(
       Object.entries(context.task_factors).map(([key, value]) => [
@@ -185,7 +188,8 @@ function toUnitState(
 ): { unitState: Record<string, unknown>; rawRow: RawStageRow } {
   const phase = resolvedStage.context.phase ?? stage.phase ?? null;
   const conditionId = resolvedStage.context.condition_id ?? compiledTrial.condition;
-  const stimId = resolvedStage.context.stim_id ?? result.resolved_stim_id ?? null;
+  const stimId =
+    typeof resolvedStage.context.stim_id === "string" ? resolvedStage.context.stim_id : result.resolved_stim_id ?? null;
   const validKeys = resolvedStage.context.valid_keys ? [...resolvedStage.context.valid_keys] : null;
   const taskFactors = resolvedStage.context.task_factors
     ? structuredClone(resolvedStage.context.task_factors)

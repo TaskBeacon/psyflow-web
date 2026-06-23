@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T07:01:15.328Z",
+  "generated_at": "2026-06-23T07:04:53.565Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -213,7 +213,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000014-stroop/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000014-stroop",
-      "last_updated": "2026-06-22T09:06:36+08:00"
+      "last_updated": "2026-06-23T15:04:38+08:00"
     },
     {
       "directory": "H000015-ant",

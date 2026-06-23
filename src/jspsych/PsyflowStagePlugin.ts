@@ -640,7 +640,8 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
 
     const onsetEpochSeconds = Date.now() / 1000;
     const stageStart = performance.now();
-    const primaryStimId = execution.context.stim_id ?? execution.stimuli[0]?.stim_id ?? null;
+    const primaryStimId =
+      typeof execution.context.stim_id === "string" ? execution.context.stim_id : execution.stimuli[0]?.stim_id ?? null;
     const deadlineSeconds =
       execution.context.deadline_s == null
         ? execution.duration
