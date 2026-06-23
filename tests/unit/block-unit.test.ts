@@ -73,4 +73,57 @@ describe("BlockUnit", () => {
       "congruent_right"
     ]);
   });
+
+  it("matches canonical weighted Go/NoGo scheduling for H005", () => {
+    const settings = TaskSettings.from_dict({
+      total_blocks: 3,
+      total_trials: 210,
+      trial_per_block: 70,
+      conditions: ["go", "nogo"],
+      condition_weights: { go: 3, nogo: 1 },
+      overall_seed: 2025,
+      seed_mode: "same_across_sub"
+    });
+
+    const block = new BlockUnit({
+      block_id: "block_0",
+      block_idx: 0,
+      settings
+    }).generate_conditions();
+
+    expect(block.conditions.filter((condition) => condition === "go")).toHaveLength(52);
+    expect(block.conditions.filter((condition) => condition === "nogo")).toHaveLength(18);
+    expect(block.conditions.slice(0, 30)).toEqual([
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "nogo",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "nogo",
+      "go",
+      "nogo",
+      "go",
+      "go",
+      "go",
+      "go",
+      "nogo",
+      "go",
+      "nogo",
+      "go",
+      "nogo"
+    ]);
+  });
 });
