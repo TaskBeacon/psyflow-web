@@ -303,7 +303,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000018-oddball-mmn/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000018-oddball-mmn",
-    last_updated: "2026-06-23T13:53:13+08:00",
+    last_updated: "2026-06-23T15:23:15+08:00",
     importTask: () => import("../../../H000018-oddball-mmn/main")
   },
   "H000019-eefrt": {
