@@ -447,7 +447,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000027-task-switching/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000027-task-switching",
-    last_updated: "2026-05-15T11:17:28+08:00",
+    last_updated: "2026-06-23T16:20:10+08:00",
     importTask: () => import("../../../H000027-task-switching/main")
   },
   "H000028-weather-prediction": {
