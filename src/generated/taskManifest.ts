@@ -415,7 +415,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000025-dictator-game/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000025-dictator-game",
-    last_updated: "2026-06-23T13:54:04+08:00",
+    last_updated: "2026-06-23T16:04:45+08:00",
     importTask: () => import("../../../H000025-dictator-game/main")
   },
   "H000026-mcgurk": {
