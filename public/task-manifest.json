@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T07:32:19.995Z",
+  "generated_at": "2026-06-23T07:37:56.076Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -288,7 +288,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000019-eefrt/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000019-eefrt",
-      "last_updated": "2026-06-23T13:53:21+08:00"
+      "last_updated": "2026-06-23T15:33:06+08:00"
     },
     {
       "directory": "H000020-one-armed-bandit",
