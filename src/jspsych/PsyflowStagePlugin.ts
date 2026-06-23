@@ -20,6 +20,7 @@ export interface ResolvedStageExecution {
   context: TrialContextSpec;
   duration: number | null;
   min_wait: number;
+  onset_trigger: number | null;
   response_cfg?: ResponseConfig;
   stimuli: ResolvedStageStimulus[];
 }

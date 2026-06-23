@@ -30,11 +30,15 @@ export class StimUnit {
     return this;
   }
 
-  show(options: { duration?: Resolvable<number | number[] | null> } = {}): this {
+  show(options: {
+    duration?: Resolvable<number | number[] | null>;
+    onset_trigger?: Resolvable<number | null>;
+  } = {}): this {
     this.stage = {
       unit_label: this.label,
       op: "show",
       phase: this.pendingContext.phase ?? null,
+      onset_trigger: options.onset_trigger ?? null,
       when: this.enabledWhen,
       stim_refs: [...this.stimRefs],
       duration: options.duration ?? null,
@@ -53,6 +57,7 @@ export class StimUnit {
       terminate_on_response?: boolean;
       count_responses?: boolean;
       grace_s?: number;
+      onset_trigger?: Resolvable<number | null>;
       response_trigger?: Resolvable<number | Record<string, number> | null>;
       timeout_trigger?: Resolvable<number | null>;
     }
@@ -61,6 +66,7 @@ export class StimUnit {
       unit_label: this.label,
       op: "capture_response",
       phase: this.pendingContext.phase ?? null,
+      onset_trigger: options.onset_trigger ?? null,
       when: this.enabledWhen,
       stim_refs: [...this.stimRefs],
       duration: options.duration,

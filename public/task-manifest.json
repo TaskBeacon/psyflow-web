@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T06:50:18.467Z",
+  "generated_at": "2026-06-23T06:57:15.942Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -168,7 +168,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000011-simon/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000011-simon",
-      "last_updated": "2026-06-22T09:06:03+08:00"
+      "last_updated": "2026-06-23T14:51:12+08:00"
     },
     {
       "directory": "H000012-sst",

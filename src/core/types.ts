@@ -160,6 +160,7 @@ export interface CompiledStage {
   unit_label: string;
   op: "show" | "capture_response" | "wait_and_continue";
   phase?: string | null;
+  onset_trigger?: Resolvable<number | null>;
   when?: Resolvable<boolean>;
   stim_refs: Array<Resolvable<StimRef | StimSpec | null>>;
   duration?: Resolvable<number | number[] | null>;

@@ -162,6 +162,7 @@ function resolveStageExecution(
     context,
     duration: sampledDuration,
     min_wait: stage.min_wait ?? 0,
+    onset_trigger: stage.onset_trigger == null ? null : Number(resolveValue(stage.onset_trigger, snapshot, recorder)),
     response_cfg: responseCfg,
     stimuli
   };
@@ -213,6 +214,7 @@ function toUnitState(
     hit: result.hit,
     timeout_triggered: result.timeout_triggered,
     timeout_time: result.timeout_time,
+    onset_trigger: resolvedStage.onset_trigger,
     task_factors: taskFactors
   };
   if (resolvedStage.context.stim_features != null) {
