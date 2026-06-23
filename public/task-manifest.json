@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T06:25:47.532Z",
+  "generated_at": "2026-06-23T06:29:38.433Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -93,7 +93,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000006-mid/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000006-mid",
-      "last_updated": "2026-06-22T09:05:25+08:00"
+      "last_updated": "2026-06-23T14:29:10+08:00"
     },
     {
       "directory": "H000007-movie",
