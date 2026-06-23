@@ -383,7 +383,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000023-ultimatum-game/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000023-ultimatum-game",
-    last_updated: "2026-06-23T13:53:49+08:00",
+    last_updated: "2026-06-23T15:53:00+08:00",
     importTask: () => import("../../../H000023-ultimatum-game/main")
   },
   "H000024-trust-game": {
@@ -399,7 +399,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000024-trust-game/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000024-trust-game",
-    last_updated: "2026-06-23T13:53:56+08:00",
+    last_updated: "2026-06-23T15:57:59+08:00",
     importTask: () => import("../../../H000024-trust-game/main")
   },
   "H000025-dictator-game": {

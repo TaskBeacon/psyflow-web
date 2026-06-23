@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-23T07:52:17.844Z",
+  "generated_at": "2026-06-23T07:58:34.156Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -348,7 +348,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000023-ultimatum-game/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000023-ultimatum-game",
-      "last_updated": "2026-06-23T13:53:49+08:00"
+      "last_updated": "2026-06-23T15:53:00+08:00"
     },
     {
       "directory": "H000024-trust-game",
@@ -363,7 +363,7 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000024-trust-game/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000024-trust-game",
-      "last_updated": "2026-06-23T13:53:56+08:00"
+      "last_updated": "2026-06-23T15:57:59+08:00"
     },
     {
       "directory": "H000025-dictator-game",
