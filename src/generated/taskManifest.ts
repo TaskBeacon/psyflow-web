@@ -47,7 +47,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000002-bart/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000002-bart",
-    last_updated: "2026-06-22T09:04:49+08:00",
+    last_updated: "2026-06-23T14:08:24+08:00",
     importTask: () => import("../../../H000002-bart/main")
   },
   "H000003-emodot": {
@@ -63,7 +63,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000003-emodot/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000003-emodot",
-    last_updated: "2026-06-22T09:04:58+08:00",
+    last_updated: "2026-06-23T14:17:48+08:00",
     importTask: () => import("../../../H000003-emodot/main")
   },
   "H000004-flanker": {
