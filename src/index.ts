@@ -18,6 +18,7 @@ export type {
   CompiledStage,
   CompiledTrial,
   ParsedConfig,
+  PointerSequenceConfig,
   RawStageRow,
   ReducedTrialRow,
   ResponseConfig,

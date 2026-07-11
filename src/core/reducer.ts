@@ -140,6 +140,10 @@ export class ExecutionRecorder implements RuntimeView {
       finalizer(snapshot, this, helpers);
     }
 
+    if (compiledTrial.omit_if_empty && Object.keys(store.units).length === 0) {
+      return {};
+    }
+
     const row: ReducedTrialRow = {
       trial_id: store.meta.trial_id,
       block_id: store.meta.block_id,

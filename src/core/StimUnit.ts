@@ -1,6 +1,7 @@
 import type {
   CompiledStage,
   Resolvable,
+  PointerSequenceConfig,
   StateRef,
   StimRef,
   StimSpec,
@@ -86,6 +87,47 @@ export class StimUnit {
     return this;
   }
 
+  capturePointerSequence(options: {
+    targets: PointerSequenceConfig["targets"];
+    max_selections: number;
+    duration: Resolvable<number | number[] | null>;
+    onset_trigger?: Resolvable<number | null>;
+    selection_trigger?: PointerSequenceConfig["selection_trigger"];
+    complete_trigger?: PointerSequenceConfig["complete_trigger"];
+    timeout_trigger?: PointerSequenceConfig["timeout_trigger"];
+    highlight_color?: string;
+    highlight_duration_s?: number;
+  }): this {
+    if (!Number.isInteger(options.max_selections) || options.max_selections < 1) {
+      throw new Error("capturePointerSequence requires max_selections >= 1.");
+    }
+    if (Object.keys(options.targets).length === 0) {
+      throw new Error("capturePointerSequence requires at least one named target.");
+    }
+    this.stage = {
+      unit_label: this.label,
+      op: "capture_pointer_sequence",
+      phase: this.pendingContext.phase ?? null,
+      onset_trigger: options.onset_trigger ?? null,
+      when: this.enabledWhen,
+      stim_refs: [...this.stimRefs],
+      duration: options.duration,
+      pointer_cfg: {
+        targets: { ...options.targets },
+        max_selections: options.max_selections,
+        selection_trigger: options.selection_trigger ?? null,
+        complete_trigger: options.complete_trigger ?? null,
+        timeout_trigger: options.timeout_trigger ?? null,
+        highlight_color: options.highlight_color,
+        highlight_duration_s: options.highlight_duration_s
+      },
+      context: this.buildContext(options.duration, Object.keys(options.targets)),
+      state_patch: { ...this.statePatch },
+      export_to_reduced: false
+    };
+    return this;
+  }
+
   waitAndContinue(options: { keys?: string[]; min_wait?: number } = {}): this {
     const minWait = options.min_wait ?? 0;
     this.stage = {
@@ -141,7 +183,7 @@ export class StimUnit {
 
   to_dict(): this {
     if (!this.stage) {
-      throw new Error("Cannot export a StimUnit before calling show/captureResponse/waitAndContinue.");
+      throw new Error("Cannot export a StimUnit before defining an operation.");
     }
     this.stage.export_to_reduced = true;
     return this;

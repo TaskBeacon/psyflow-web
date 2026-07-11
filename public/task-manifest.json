@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-11T17:45:58.709Z",
+  "generated_at": "2026-07-11T18:28:54.060Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -889,6 +889,21 @@
       "download_url": "https://github.com/TaskBeacon/H000059-object-location-memory/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000059-object-location-memory",
       "last_updated": "2026-07-12T01:44:18+08:00"
+    },
+    {
+      "directory": "H000060-corsi-block-tapping-task",
+      "id": "H000060",
+      "slug": "corsi-block-tapping-task",
+      "title": "Corsi Block-Tapping Task",
+      "acquisition": "behavior",
+      "maturity": "draft",
+      "release_tag": "v0.1.0",
+      "short_description": "Browser companion for T000060, preserving forward/backward Corsi span, nine-block pointer recall, adaptive two-attempt levels, and span scoring.",
+      "repo_url": "https://github.com/TaskBeacon/H000060-corsi-block-tapping-task",
+      "default_branch": "main",
+      "download_url": "https://github.com/TaskBeacon/H000060-corsi-block-tapping-task/archive/refs/heads/main.zip",
+      "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000060-corsi-block-tapping-task",
+      "last_updated": "2026-07-11T18:06:50.156Z"
     }
   ]
 }

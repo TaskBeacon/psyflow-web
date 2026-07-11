@@ -962,6 +962,22 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     last_updated: "2026-07-12T01:44:18+08:00",
     importTask: () => import("../../../H000059-object-location-memory/main")
   },
+  "H000060-corsi-block-tapping-task": {
+    directory: "H000060-corsi-block-tapping-task",
+    id: "H000060",
+    slug: "corsi-block-tapping-task",
+    title: "Corsi Block-Tapping Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion for T000060, preserving forward/backward Corsi span, nine-block pointer recall, adaptive two-attempt levels, and span scoring.",
+    repo_url: "https://github.com/TaskBeacon/H000060-corsi-block-tapping-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000060-corsi-block-tapping-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000060-corsi-block-tapping-task",
+    last_updated: "2026-07-11T18:06:50.156Z",
+    importTask: () => import("../../../H000060-corsi-block-tapping-task/main")
+  },
 };
 
 export const taskEntries = Object.values(taskManifest);

@@ -22,6 +22,15 @@ export interface ResolvedStageExecution {
   min_wait: number;
   onset_trigger: number | null;
   response_cfg?: ResponseConfig;
+  pointer_cfg?: {
+    target_ids: string[];
+    max_selections: number;
+    selection_trigger?: number | Record<string, number> | null;
+    complete_trigger?: number | null;
+    timeout_trigger?: number | null;
+    highlight_color?: string;
+    highlight_duration_s?: number;
+  };
   stimuli: ResolvedStageStimulus[];
 }
 
@@ -39,6 +48,12 @@ export interface PsyflowStageResult {
   key_press: boolean;
   response_count?: number;
   response_times?: number[];
+  responses?: string[];
+  response_positions?: Array<[number, number]>;
+  first_rt?: number | null;
+  completed?: boolean;
+  selection_triggers?: Array<number | null>;
+  completion_trigger?: number | null;
   rt: number | null;
   response_time: number | null;
   response_time_global: number | null;
@@ -637,7 +652,12 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     display_element.focus();
     const activeMovies: HTMLVideoElement[] = [];
     for (const stim of execution.stimuli) {
+      const childCount = stageRoot.children.length;
       renderStimulus(stageRoot, stim.spec, activeMovies);
+      const rendered = stageRoot.children.item(childCount);
+      if (rendered instanceof HTMLElement && stim.stim_id) {
+        rendered.dataset.psyflowStimId = stim.stim_id;
+      }
     }
     const stopSpeech = speakStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
     const stopSounds = playSoundStimuli(
@@ -662,6 +682,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       let response: string | null = null;
       let responseCount = 0;
       const responseTimes: number[] = [];
+      const responses: string[] = [];
+      const responsePositions: Array<[number, number]> = [];
+      const selectionTriggers: Array<number | null> = [];
+      let completionTrigger: number | null = null;
       let rtSeconds: number | null = null;
       let hit: boolean | null = stage.op === "capture_response" ? false : null;
       let timeoutTriggered = false;
@@ -725,6 +749,44 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         }
       };
 
+      const pointerListener = (event: PointerEvent) => {
+        if (finished || stage.op !== "capture_pointer_sequence") {
+          return;
+        }
+        const element = (event.target as Element | null)?.closest<HTMLElement>("[data-psyflow-stim-id]");
+        const targetId = element?.dataset.psyflowStimId;
+        const pointerCfg = execution.pointer_cfg;
+        if (!element || !targetId || !pointerCfg?.target_ids.includes(targetId)) {
+          return;
+        }
+        event.preventDefault();
+        const responseRt = (performance.now() - stageStart) / 1000;
+        const selectionTrigger = pointerCfg.selection_trigger;
+        const resolvedTrigger =
+          typeof selectionTrigger === "number"
+            ? selectionTrigger
+            : selectionTrigger && typeof selectionTrigger === "object"
+              ? Number(selectionTrigger[targetId] ?? NaN)
+              : NaN;
+        responses.push(targetId);
+        responseTimes.push(responseRt);
+        responsePositions.push([event.clientX, event.clientY]);
+        selectionTriggers.push(Number.isFinite(resolvedTrigger) ? resolvedTrigger : null);
+        responseCount = responses.length;
+        response = targetId;
+        rtSeconds = responseRt;
+        const highlightColor = pointerCfg.highlight_color ?? "#34d399";
+        const oldBackground = element.style.background;
+        element.style.background = highlightColor;
+        window.setTimeout(() => {
+          element.style.background = oldBackground;
+        }, Math.max(0, Number(pointerCfg.highlight_duration_s ?? 0.15)) * 1000);
+        if (responses.length >= pointerCfg.max_selections) {
+          completionTrigger = pointerCfg.complete_trigger ?? null;
+          finish(responseRt);
+        }
+      };
+
       const abortListener = () => {
         finish((performance.now() - stageStart) / 1000, true);
       };
@@ -749,6 +811,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         document.removeEventListener("keydown", keydownListener, true);
         display_element.removeEventListener("keydown", keydownListener, true);
         stageRoot.removeEventListener("keydown", keydownListener, true);
+        stageRoot.removeEventListener("pointerdown", pointerListener, true);
         display_element.removeEventListener(PSYFLOW_ABORT_EVENT, abortListener as EventListener);
       };
 
@@ -774,6 +837,12 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           key_press: responseCount > 0,
           response_count: responseCount,
           response_times: responseTimes,
+          responses,
+          response_positions: responsePositions,
+          first_rt: responseTimes[0] ?? null,
+          completed: stage.op === "capture_pointer_sequence" ? responses.length >= (execution.pointer_cfg?.max_selections ?? 1) : undefined,
+          selection_triggers: selectionTriggers,
+          completion_trigger: completionTrigger,
           rt: rtSeconds,
           response_time: rtSeconds,
           response_time_global: rtSeconds == null ? null : onsetEpochSeconds + rtSeconds,
@@ -812,6 +881,18 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           }, minWaitMs);
         } else {
           startKeyboardListener();
+        }
+        return;
+      }
+
+      if (stage.op === "capture_pointer_sequence") {
+        stageRoot.addEventListener("pointerdown", pointerListener, true);
+        if (execution.duration != null) {
+          timerId = window.setTimeout(() => {
+            timeoutTriggered = responses.length < (execution.pointer_cfg?.max_selections ?? 1);
+            timeoutTime = timeoutTriggered ? execution.duration : null;
+            finish((performance.now() - stageStart) / 1000);
+          }, Math.max(0, execution.duration * 1000));
         }
         return;
       }

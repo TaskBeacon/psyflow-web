@@ -138,6 +138,28 @@ function resolveStageExecution(
   if (responseCfg?.timeout_trigger != null) {
     responseCfg.timeout_trigger = resolveValue(responseCfg.timeout_trigger, snapshot, recorder);
   }
+  let pointerCfg: ResolvedStageExecution["pointer_cfg"];
+  const pointerStimuli: ResolvedStageStimulus[] = [];
+  if (stage.pointer_cfg) {
+    const resolvePointerValue = <T>(value: Resolvable<T> | undefined): T | undefined =>
+      value == null ? undefined : resolveValue(value, snapshot, recorder);
+    const selectionTrigger = resolvePointerValue(stage.pointer_cfg.selection_trigger);
+    pointerCfg = {
+      max_selections: stage.pointer_cfg.max_selections,
+      target_ids: Object.keys(stage.pointer_cfg.targets),
+      selection_trigger: selectionTrigger,
+      complete_trigger: resolvePointerValue(stage.pointer_cfg.complete_trigger),
+      timeout_trigger: resolvePointerValue(stage.pointer_cfg.timeout_trigger),
+      highlight_color: stage.pointer_cfg.highlight_color,
+      highlight_duration_s: stage.pointer_cfg.highlight_duration_s
+    };
+    for (const [targetId, target] of Object.entries(stage.pointer_cfg.targets)) {
+      const resolvedTarget = resolveStimulusWithMeta(target, snapshot, recorder, stimBank);
+      if (resolvedTarget) {
+        pointerStimuli.push({ stim_id: targetId, spec: resolvedTarget.spec });
+      }
+    }
+  }
   const context: TrialContextSpec = {
     ...(stage.context ?? {})
   };
@@ -160,13 +182,15 @@ function resolveStageExecution(
   }
   const stimuli = stage.stim_refs
     .map((stim) => resolveStimulusWithMeta(stim, snapshot, recorder, stimBank))
-    .filter((stimulus): stimulus is ResolvedStageStimulus => stimulus !== null);
+    .filter((stimulus): stimulus is ResolvedStageStimulus => stimulus !== null)
+    .concat(pointerStimuli);
   return {
     context,
     duration: sampledDuration,
     min_wait: stage.min_wait ?? 0,
     onset_trigger: stage.onset_trigger == null ? null : Number(resolveValue(stage.onset_trigger, snapshot, recorder)),
     response_cfg: responseCfg,
+    pointer_cfg: pointerCfg,
     stimuli
   };
 }
@@ -212,6 +236,12 @@ function toUnitState(
     key_press: result.key_press,
     response_count: result.response_count ?? (result.key_press ? 1 : 0),
     response_times: result.response_times ?? (result.rt == null ? [] : [result.rt]),
+    responses: result.responses ?? [],
+    response_positions: result.response_positions ?? [],
+    first_rt: result.first_rt ?? result.rt,
+    completed: result.completed,
+    selection_triggers: result.selection_triggers ?? [],
+    completion_trigger: result.completion_trigger ?? null,
     rt: result.rt,
     response_time: result.response_time,
     response_time_global: result.response_time_global,

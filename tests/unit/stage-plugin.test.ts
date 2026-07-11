@@ -94,4 +94,44 @@ describe("PsyflowStagePlugin", () => {
     expect(result.response_times).toHaveLength(3);
     expect(result.response_times?.every((value) => typeof value === "number" && value >= 0)).toBe(true);
   });
+
+  it("captures an ordered pointer sequence and stops at the requested length", async () => {
+    const display = document.createElement("div");
+    document.body.appendChild(display);
+    const plugin = new PsyflowStagePlugin({} as never);
+
+    const resultPromise = plugin.trial(display, {
+      stage: { unit_label: "recall", op: "capture_pointer_sequence", phase: "recall" },
+      resolve_stage: () => ({
+        context: { trial_id: "pointer_1", phase: "recall", deadline_s: 0.2, valid_keys: ["a", "b"] },
+        duration: 0.2,
+        min_wait: 0,
+        pointer_cfg: {
+          target_ids: ["a", "b"],
+          max_selections: 2,
+          selection_trigger: { a: 41, b: 42 },
+          complete_trigger: 49
+        },
+        stimuli: [
+          { stim_id: "a", spec: { type: "rect", width: 30, height: 30, pos: [-30, 0] } },
+          { stim_id: "b", spec: { type: "rect", width: 30, height: 30, pos: [30, 0] } }
+        ]
+      })
+    } as never);
+
+    const a = display.querySelector<HTMLElement>('[data-psyflow-stim-id="a"]');
+    const b = display.querySelector<HTMLElement>('[data-psyflow-stim-id="b"]');
+    a?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 20 }));
+    b?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, clientX: 30, clientY: 40 }));
+    const result = await resultPromise;
+
+    expect(result.responses).toEqual(["a", "b"]);
+    expect(result.response).toBe("b");
+    expect(result.response_count).toBe(2);
+    expect(result.response_positions).toEqual([[10, 20], [30, 40]]);
+    expect(result.selection_triggers).toEqual([41, 42]);
+    expect(result.completion_trigger).toBe(49);
+    expect(result.completed).toBe(true);
+    expect(result.timeout_triggered).toBe(false);
+  });
 });

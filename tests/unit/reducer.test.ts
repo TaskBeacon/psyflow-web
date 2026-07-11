@@ -105,4 +105,18 @@ describe("ExecutionRecorder and authoring helpers", () => {
     expect(resolveValue(ref, snapshot, runtime)).toBe("space");
     expect(resolveValue((row) => Boolean(row.units.target?.response), snapshot, runtime)).toBe(true);
   });
+
+  it("can omit a conditionally skipped trial from reduced output", () => {
+    const trial = new TrialBuilder({
+      trial_id: "skipped",
+      block_id: "adaptive",
+      trial_index: 1,
+      condition: "forward"
+    });
+    trial.omitIfEmpty().finalize(() => undefined);
+    const recorder = new ExecutionRecorder();
+
+    expect(recorder.finalizeTrial(trial.build())).toEqual({});
+    expect(recorder.getReducedRows()).toEqual([]);
+  });
 });

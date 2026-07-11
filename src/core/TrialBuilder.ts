@@ -14,6 +14,7 @@ export class TrialBuilder {
   private readonly units: StimUnit[] = [];
   private readonly finalizers: TrialFinalizer[] = [];
   private readonly trialState: Record<string, unknown> = {};
+  private omitEmpty = false;
 
   constructor(meta: {
     trial_id: number | string;
@@ -38,6 +39,11 @@ export class TrialBuilder {
     return this;
   }
 
+  omitIfEmpty(): this {
+    this.omitEmpty = true;
+    return this;
+  }
+
   setTrialState(key: string, value: unknown): void {
     this.trialState[key] = value;
   }
@@ -50,7 +56,8 @@ export class TrialBuilder {
       condition: this.condition,
       units: this.units.map((unit) => unit.compile()),
       trial_state: { ...this.trialState },
-      finalizers: [...this.finalizers]
+      finalizers: [...this.finalizers],
+      omit_if_empty: this.omitEmpty
     };
   }
 }

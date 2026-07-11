@@ -149,6 +149,16 @@ export interface ResponseConfig {
   timeout_trigger?: Resolvable<number | null>;
 }
 
+export interface PointerSequenceConfig {
+  targets: Record<string, Resolvable<StimRef | StimSpec>>;
+  max_selections: number;
+  selection_trigger?: Resolvable<number | Record<string, number> | null>;
+  complete_trigger?: Resolvable<number | null>;
+  timeout_trigger?: Resolvable<number | null>;
+  highlight_color?: string;
+  highlight_duration_s?: number;
+}
+
 export interface TrialContextSpec {
   trial_id?: number | string;
   phase?: string;
@@ -163,13 +173,14 @@ export interface TrialContextSpec {
 
 export interface CompiledStage {
   unit_label: string;
-  op: "show" | "capture_response" | "wait_and_continue";
+  op: "show" | "capture_response" | "capture_pointer_sequence" | "wait_and_continue";
   phase?: string | null;
   onset_trigger?: Resolvable<number | null>;
   when?: Resolvable<boolean>;
   stim_refs: Array<Resolvable<StimRef | StimSpec | null>>;
   duration?: Resolvable<number | number[] | null>;
   response_cfg?: ResponseConfig;
+  pointer_cfg?: PointerSequenceConfig;
   context?: TrialContextSpec;
   state_patch?: Record<string, Resolvable<unknown>>;
   export_to_reduced: boolean;
@@ -195,6 +206,7 @@ export interface CompiledTrial {
   units: CompiledStage[];
   trial_state: Record<string, unknown>;
   finalizers: TrialFinalizer[];
+  omit_if_empty?: boolean;
 }
 
 export interface RawStageRow {
