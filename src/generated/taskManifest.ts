@@ -1023,8 +1023,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000063-navon-global-local-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000063-navon-global-local-task",
-    last_updated: "2026-07-11T20:38:38.559Z",
+    last_updated: "2026-07-12T04:57:44+08:00",
     importTask: () => import("../../../H000063-navon-global-local-task/main")
+  },
+  "H000064-sustained-attention-to-response-task": {
+    directory: "H000064-sustained-attention-to-response-task",
+    id: "H000064",
+    slug: "sustained-attention-to-response-task",
+    title: "Sustained Attention to Response Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion to canonical T000064-sustained-attention-to-response-task. It preserves exact digit counts, five sizes, 250/900 ms fixed timing, response a...",
+    repo_url: "https://github.com/TaskBeacon/H000064-sustained-attention-to-response-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000064-sustained-attention-to-response-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000064-sustained-attention-to-response-task",
+    last_updated: "2026-07-11T23:02:03.979Z",
+    importTask: () => import("../../../H000064-sustained-attention-to-response-task/main")
   },
 };
 
