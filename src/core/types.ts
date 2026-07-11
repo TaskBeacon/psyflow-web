@@ -55,6 +55,11 @@ export interface TextStimSpec extends BaseStimSpec {
   height?: number;
   font?: string;
   alignment?: "left" | "center" | "right";
+  dynamic_text?: {
+    mode: "elapsed_ms";
+    digits?: number;
+    suffix?: string;
+  };
 }
 
 export interface TextBoxStimSpec extends BaseStimSpec {

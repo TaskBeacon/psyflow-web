@@ -213,7 +213,7 @@ function toLength(
 ): string {
   const numeric = Number.isFinite(value) ? Number(value) : fallback;
   const resolvedUnits = (units ?? (stageRoot ? resolveDefaultUnits(stageRoot) : undefined) ?? "").toLowerCase();
-  if (resolvedUnits === "px") {
+  if (resolvedUnits === "px" || resolvedUnits === "pix") {
     return `${numeric}px`;
   }
   if (resolvedUnits === "percent") {
@@ -367,6 +367,14 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       }
       if (spec.alignment) {
         element.style.textAlign = spec.alignment;
+      }
+      if (spec.dynamic_text?.mode === "elapsed_ms") {
+        const digits = Math.max(1, Math.min(9, Math.floor(Number(spec.dynamic_text.digits ?? 5))));
+        element.dataset.psyflowDynamicText = "elapsed_ms";
+        element.dataset.psyflowDynamicDigits = String(digits);
+        element.dataset.psyflowDynamicSuffix = String(spec.dynamic_text.suffix ?? "");
+        element.textContent = `${"0".repeat(digits)}${spec.dynamic_text.suffix ?? ""}`;
+        element.style.fontVariantNumeric = "tabular-nums";
       }
       stageRoot.appendChild(element);
       return;
@@ -650,6 +658,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     return new Promise<PsyflowStageResult>((resolve) => {
       let finished = false;
       let timerId: number | null = null;
+      let animationFrameId: number | null = null;
       let response: string | null = null;
       let responseCount = 0;
       const responseTimes: number[] = [];
@@ -665,6 +674,28 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       );
       const graceSeconds = Math.max(0, Number(execution.response_cfg?.grace_s ?? 0));
       const countResponses = Boolean(execution.response_cfg?.count_responses);
+      const dynamicTextElements = Array.from(
+        stageRoot.querySelectorAll<HTMLElement>('[data-psyflow-dynamic-text="elapsed_ms"]')
+      );
+
+      const updateDynamicText = () => {
+        if (finished) {
+          return;
+        }
+        const elapsedMs = Math.max(0, Math.round(performance.now() - stageStart));
+        for (const element of dynamicTextElements) {
+          const digits = Math.max(1, Number(element.dataset.psyflowDynamicDigits ?? 5));
+          const maxValue = 10 ** digits - 1;
+          const value = Math.min(maxValue, elapsedMs);
+          const suffix = element.dataset.psyflowDynamicSuffix ?? "";
+          element.textContent = `${String(value).padStart(digits, "0")}${suffix}`;
+        }
+        animationFrameId = window.requestAnimationFrame(updateDynamicText);
+      };
+
+      if (dynamicTextElements.length > 0) {
+        animationFrameId = window.requestAnimationFrame(updateDynamicText);
+      }
 
       const keydownListener = (event: KeyboardEvent) => {
         if (!keyboardListening || finished || (!countResponses && response !== null) || event.repeat) {
@@ -701,6 +732,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       const cleanup = () => {
         if (timerId != null) {
           window.clearTimeout(timerId);
+        }
+        if (animationFrameId != null) {
+          window.cancelAnimationFrame(animationFrameId);
         }
         keyboardListening = false;
         stopSpeech?.();
