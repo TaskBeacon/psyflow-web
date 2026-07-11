@@ -1007,8 +1007,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000062-lexical-decision-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000062-lexical-decision-task",
-    last_updated: "2026-07-11T19:57:12.953Z",
+    last_updated: "2026-07-12T04:08:43+08:00",
     importTask: () => import("../../../H000062-lexical-decision-task/main")
+  },
+  "H000063-navon-global-local-task": {
+    directory: "H000063-navon-global-local-task",
+    id: "H000063",
+    slug: "navon-global-local-task",
+    title: "Navon Global-Local Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser-native companion to canonical T000063-navon-global-local-task.",
+    repo_url: "https://github.com/TaskBeacon/H000063-navon-global-local-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000063-navon-global-local-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000063-navon-global-local-task",
+    last_updated: "2026-07-11T20:38:38.559Z",
+    importTask: () => import("../../../H000063-navon-global-local-task/main")
   },
 };
 
