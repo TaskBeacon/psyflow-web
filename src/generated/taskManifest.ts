@@ -79,7 +79,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000004-flanker/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000004-flanker",
-    last_updated: "2026-06-23T14:22:13+08:00",
+    last_updated: "2026-07-12T01:11:12+08:00",
     importTask: () => import("../../../H000004-flanker/main")
   },
   "H000005-go-nogo": {
@@ -815,7 +815,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000050-mental-rotation-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000050-mental-rotation-task",
-    last_updated: "2026-06-22T08:15:49+08:00",
+    last_updated: "2026-07-11T23:40:34+08:00",
     importTask: () => import("../../../H000050-mental-rotation-task/main")
   },
   "H000051-paired-associate-learning-task": {
@@ -897,6 +897,70 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000055-drm-false-memory-paradigm",
     last_updated: "2026-06-22T00:07:58+08:00",
     importTask: () => import("../../../H000055-drm-false-memory-paradigm/main")
+  },
+  "H000056-psychomotor-vigilance-task": {
+    directory: "H000056-psychomotor-vigilance-task",
+    id: "H000056",
+    slug: "psychomotor-vigilance-task",
+    title: "Psychomotor Vigilance Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion for the visual Psychomotor Vigilance Task, preserving unpredictable intervals, millisecond reaction-time feedback, false starts, lapses, and no-response outcomes.",
+    repo_url: "https://github.com/TaskBeacon/H000056-psychomotor-vigilance-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000056-psychomotor-vigilance-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000056-psychomotor-vigilance-task",
+    last_updated: "2026-07-12T01:00:56+08:00",
+    importTask: () => import("../../../H000056-psychomotor-vigilance-task/main")
+  },
+  "H000057-serial-reaction-time-task": {
+    directory: "H000057-serial-reaction-time-task",
+    id: "H000057",
+    slug: "serial-reaction-time-task",
+    title: "Serial Reaction Time Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0-dev",
+    short_description: "Browser companion for the SRTT, preserving counterbalanced SOC sequences, spatial D/F/J/K responses, transfer cost, recovery, and error-tone feedback.",
+    repo_url: "https://github.com/TaskBeacon/H000057-serial-reaction-time-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000057-serial-reaction-time-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000057-serial-reaction-time-task",
+    last_updated: "2026-07-12T00:58:32+08:00",
+    importTask: () => import("../../../H000057-serial-reaction-time-task/main")
+  },
+  "H000058-attentional-blink": {
+    directory: "H000058-attentional-blink",
+    id: "H000058",
+    slug: "attentional-blink",
+    title: "Attentional Blink Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion for T000058, preserving digit-target RSVP timing, lag and T2-presence conditions, ordered reports, and conditional T2 scoring.",
+    repo_url: "https://github.com/TaskBeacon/H000058-attentional-blink",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000058-attentional-blink/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000058-attentional-blink",
+    last_updated: "2026-07-12T01:11:04+08:00",
+    importTask: () => import("../../../H000058-attentional-blink/main")
+  },
+  "H000059-object-location-memory": {
+    directory: "H000059-object-location-memory",
+    id: "H000059",
+    slug: "object-location-memory",
+    title: "Object-Location Memory Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion for T000059, preserving ten-object study arrays, silent and articulatory-suppression conditions, marked-position assignment, and percentage-mislocated scoring.",
+    repo_url: "https://github.com/TaskBeacon/H000059-object-location-memory",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000059-object-location-memory/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000059-object-location-memory",
+    last_updated: "2026-07-12T01:44:18+08:00",
+    importTask: () => import("../../../H000059-object-location-memory/main")
   },
 };
 
