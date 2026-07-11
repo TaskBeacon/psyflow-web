@@ -975,8 +975,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000060-corsi-block-tapping-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000060-corsi-block-tapping-task",
-    last_updated: "2026-07-11T18:06:50.156Z",
+    last_updated: "2026-07-12T02:31:01+08:00",
     importTask: () => import("../../../H000060-corsi-block-tapping-task/main")
+  },
+  "H000061-posner-spatial-cueing-task": {
+    directory: "H000061-posner-spatial-cueing-task",
+    id: "H000061",
+    slug: "posner-spatial-cueing-task",
+    title: "Posner Spatial Cueing Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion for T000061, preserving predictive central cues, valid/invalid/neutral/no-cue/catch conditions, dual SOAs, target detection, and Posner effect scoring.",
+    repo_url: "https://github.com/TaskBeacon/H000061-posner-spatial-cueing-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000061-posner-spatial-cueing-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000061-posner-spatial-cueing-task",
+    last_updated: "2026-07-11T19:06:48.390Z",
+    importTask: () => import("../../../H000061-posner-spatial-cueing-task/main")
   },
 };
 
