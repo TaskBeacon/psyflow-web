@@ -1,3 +1,5 @@
+import { parse } from "csv-parse/browser/esm/sync";
+
 function escapeCsv(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
@@ -24,4 +26,13 @@ export function toCsv(rows: Array<Record<string, unknown>>): string {
     lines.push(headers.map((header) => escapeCsv(row[header])).join(","));
   }
   return lines.join("\n");
+}
+
+export function parseCsvRows<T extends object = Record<string, string>>(text: string): T[] {
+  return parse(text, {
+    bom: true,
+    columns: true,
+    skip_empty_lines: true,
+    trim: true
+  }) as T[];
 }

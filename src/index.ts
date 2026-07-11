@@ -10,6 +10,7 @@ export { TrialBuilder } from "./core/TrialBuilder";
 export { ExecutionRecorder, resolveValue } from "./core/reducer";
 export { toCsv } from "./core/csv";
 export { count_down } from "./core/display";
+export { parseCsvRows } from "./core/csv";
 export type { CountDownOptions } from "./core/display";
 export { runPsyflowExperiment } from "./jspsych/runtime";
 export { default as PsyflowStagePlugin } from "./jspsych/PsyflowStagePlugin";

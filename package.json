@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@jspsych/plugin-call-function": "2.1.0",
+    "csv-parse": "^6.1.0",
     "jspsych": "8.2.3",
     "yaml": "2.8.2"
   },

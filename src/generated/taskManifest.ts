@@ -991,8 +991,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000061-posner-spatial-cueing-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000061-posner-spatial-cueing-task",
-    last_updated: "2026-07-11T19:06:48.390Z",
+    last_updated: "2026-07-12T03:26:43+08:00",
     importTask: () => import("../../../H000061-posner-spatial-cueing-task/main")
+  },
+  "H000062-lexical-decision-task": {
+    directory: "H000062-lexical-decision-task",
+    id: "H000062",
+    slug: "lexical-decision-task",
+    title: "Lexical Decision Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion for T000062, preserving high/low-frequency words, held-out-donor pseudowords, F/J lexical decisions, error feedback, and word-frequency scoring.",
+    repo_url: "https://github.com/TaskBeacon/H000062-lexical-decision-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000062-lexical-decision-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000062-lexical-decision-task",
+    last_updated: "2026-07-11T19:57:12.953Z",
+    importTask: () => import("../../../H000062-lexical-decision-task/main")
   },
 };
 
