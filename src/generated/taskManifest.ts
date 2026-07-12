@@ -1039,8 +1039,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000064-sustained-attention-to-response-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000064-sustained-attention-to-response-task",
-    last_updated: "2026-07-11T23:02:03.979Z",
+    last_updated: "2026-07-12T07:24:25+08:00",
     importTask: () => import("../../../H000064-sustained-attention-to-response-task/main")
+  },
+  "H000065-levels-of-processing-task": {
+    directory: "H000065-levels-of-processing-task",
+    id: "H000065",
+    slug: "levels-of-processing-task",
+    title: "Levels of Processing Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser companion to canonical T000065-levels-of-processing-task. It preserves the balanced 3 x 2 incidental-encoding design, 2 s question, 200 ms word, unex...",
+    repo_url: "https://github.com/TaskBeacon/H000065-levels-of-processing-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000065-levels-of-processing-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000065-levels-of-processing-task",
+    last_updated: "2026-07-11T23:50:04.566Z",
+    importTask: () => import("../../../H000065-levels-of-processing-task/main")
   },
 };
 

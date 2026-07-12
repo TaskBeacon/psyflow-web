@@ -1,0 +1,21 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { expect, test } from "@playwright/test";
+import { parse } from "csv-parse/sync";
+
+test.setTimeout(60_000);
+const csvPath = fileURLToPath(new URL("../../../H000065-levels-of-processing-task/assets/stimuli.csv", import.meta.url));
+const items = parse(readFileSync(csvPath, "utf8"), { columns: true, skip_empty_lines: true, trim: true }) as Array<Record<string, string>>;
+const byWord = new Map(items.map((r) => [r.word.toLowerCase(), r]));
+
+test("Levels of Processing browser task preserves surprise recognition and exports linked outcomes", async ({ page }) => {
+  await page.route("**/*", async (route) => { if (!route.request().url().toLowerCase().includes(".yaml")) return route.continue(); const response = await route.fetch(); const body = (await response.text()).replace("encoding_items_per_cell: 10", "encoding_items_per_cell: 1").replace("recognition_distractors: 120", "recognition_distractors: 6").replace("question_duration: 2.0", "question_duration: 0.05").replace("word_duration: 0.2", "word_duration: 0.60").replace("encoding_response_duration: 1.8", "encoding_response_duration: 0.40").replace("recognition_duration: 3.0", "recognition_duration: 0.60"); await route.fulfill({ response, body }); });
+  await page.goto("/?task=H000065-levels-of-processing-task"); await page.locator('input[name="subject_id"]').fill("165"); await page.locator('#psyflow-task-form button[type="submit"]').click(); await page.locator("#psyflow-task-preflight .psyflow-task-button").click(); await page.keyboard.press("Space");
+  const oldWords = new Set<string>();
+  for (let i = 0; i < 6; i += 1) { const word = page.locator('[data-psyflow-unit-label="encoding_word"]').filter({ visible: true }); await word.waitFor({ state: "visible", timeout: 5000 }); const value = ((await word.textContent()) ?? "").trim().toLowerCase(); oldWords.add(value); const row = byWord.get(value); expect(row).toBeDefined(); const handle = await word.elementHandle(); await page.keyboard.press(row?.expected_answer === "yes" ? "f" : "j"); await page.waitForFunction((el) => !el?.isConnected, handle, { timeout: 3000 }); }
+  const recognitionIntro = page.locator('[data-psyflow-unit-label="recognition_instruction"]').filter({ visible: true }); await recognitionIntro.waitFor({ state: "visible" }); expect(await recognitionIntro.textContent()).toContain("Memory test"); await page.keyboard.press("Space");
+  let missMade = false, falseAlarmMade = false;
+  for (let i = 0; i < 12; i += 1) { const word = page.locator('[data-psyflow-unit-label="recognition_word"]').filter({ visible: true }); await word.waitFor({ state: "visible", timeout: 5000 }); if (i === 0) await word.screenshot({ path: "test-results/levels-of-processing-recognition.png" }); const value = ((await word.textContent()) ?? "").trim().toLowerCase(); const isOld = oldWords.has(value); let key = isOld ? "f" : "j"; if (isOld && !missMade) { key = "j"; missMade = true; } else if (!isOld && !falseAlarmMade) { key = "f"; falseAlarmMade = true; } const handle = await word.elementHandle(); await page.keyboard.press(key); await page.waitForFunction((el) => !el?.isConnected, handle, { timeout: 3000 }); }
+  await page.locator('[data-psyflow-unit-label="good_bye"]').filter({ visible: true }).waitFor({ state: "visible" }); await page.keyboard.press("Space"); await expect(page.locator("#psyflow-task-results")).toBeVisible(); const result = await page.evaluate(() => window.__PSYFLOW_WEB_LAST_RESULT__ ?? null); expect(result).not.toBeNull(); if (!result) return; const rows = result.reduced_rows as Array<Record<string, unknown>>; expect(rows.filter((r) => r.phase === "encoding")).toHaveLength(6); const rec = rows.filter((r) => r.phase === "recognition"); expect(rec).toHaveLength(12); expect(rec.filter((r) => r.is_old === true)).toHaveLength(6); expect(new Set(rec.map((r) => r.outcome))).toEqual(new Set(["hit", "miss", "false_alarm", "correct_rejection"])); const download = page.waitForEvent("download"); await page.getByRole("button", { name: "Download reduced.csv" }).click(); expect((await download).suggestedFilename()).toBe("H000065-levels-of-processing-task_reduced.csv");
+});
+
