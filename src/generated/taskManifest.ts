@@ -1103,8 +1103,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000068-visual-change-detection-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000068-visual-change-detection-task",
-    last_updated: "2026-07-12T01:50:38.346Z",
+    last_updated: "2026-07-12T10:00:04+08:00",
     importTask: () => import("../../../H000068-visual-change-detection-task/main")
+  },
+  "H000069-automated-operation-span-task": {
+    directory: "H000069-automated-operation-span-task",
+    id: "H000069",
+    slug: "automated-operation-span-task",
+    title: "Automated Operation Span Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "# Automated Operation Span Task (Web) Browser companion to canonical T000069-automated-operation-span-task. It preserves 15 math-practice items, runtime mean...",
+    repo_url: "https://github.com/TaskBeacon/H000069-automated-operation-span-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000069-automated-operation-span-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000069-automated-operation-span-task",
+    last_updated: "2026-07-12T02:15:11.772Z",
+    importTask: () => import("../../../H000069-automated-operation-span-task/main")
   },
 };
 
