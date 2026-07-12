@@ -1071,8 +1071,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000066-fitts-law-pointing-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000066-fitts-law-pointing-task",
-    last_updated: "2026-07-12T00:17:18.130Z",
+    last_updated: "2026-07-12T08:29:01+08:00",
     importTask: () => import("../../../H000066-fitts-law-pointing-task/main")
+  },
+  "H000067-directed-forgetting-task": {
+    directory: "H000067-directed-forgetting-task",
+    id: "H000067",
+    slug: "directed-forgetting-task",
+    title: "Directed Forgetting Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "# Directed Forgetting Task (Web) Browser companion to canonical T000067-directed-forgetting-task, preserving post-item remember/forget cues, 30/30 balance, t...",
+    repo_url: "https://github.com/TaskBeacon/H000067-directed-forgetting-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000067-directed-forgetting-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000067-directed-forgetting-task",
+    last_updated: "2026-07-12T00:44:05.067Z",
+    importTask: () => import("../../../H000067-directed-forgetting-task/main")
   },
 };
 
