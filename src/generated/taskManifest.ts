@@ -1087,8 +1087,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000067-directed-forgetting-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000067-directed-forgetting-task",
-    last_updated: "2026-07-12T00:44:05.067Z",
+    last_updated: "2026-07-12T08:59:32+08:00",
     importTask: () => import("../../../H000067-directed-forgetting-task/main")
+  },
+  "H000068-visual-change-detection-task": {
+    directory: "H000068-visual-change-detection-task",
+    id: "H000068",
+    slug: "visual-change-detection-task",
+    title: "Visual Change Detection Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser-native companion to T000068-visual-change-detection-task, delivered by the shared psyflow-web runner.",
+    repo_url: "https://github.com/TaskBeacon/H000068-visual-change-detection-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000068-visual-change-detection-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000068-visual-change-detection-task",
+    last_updated: "2026-07-12T01:50:38.346Z",
+    importTask: () => import("../../../H000068-visual-change-detection-task/main")
   },
 };
 
