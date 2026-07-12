@@ -1119,8 +1119,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000069-automated-operation-span-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000069-automated-operation-span-task",
-    last_updated: "2026-07-12T02:15:11.772Z",
+    last_updated: "2026-07-12T10:28:25+08:00",
     importTask: () => import("../../../H000069-automated-operation-span-task/main")
+  },
+  "H000070-psychological-refractory-period-task": {
+    directory: "H000070-psychological-refractory-period-task",
+    id: "H000070",
+    slug: "psychological-refractory-period-task",
+    title: "Psychological Refractory Period Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "# Psychological Refractory Period Task (Web) Browser companion to canonical T000070-psychological-refractory-period-task. It preserves five SOAs, balanced 2 ...",
+    repo_url: "https://github.com/TaskBeacon/H000070-psychological-refractory-period-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000070-psychological-refractory-period-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000070-psychological-refractory-period-task",
+    last_updated: "2026-07-12T02:46:53.113Z",
+    importTask: () => import("../../../H000070-psychological-refractory-period-task/main")
   },
 };
 
