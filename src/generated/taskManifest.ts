@@ -1135,8 +1135,24 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000070-psychological-refractory-period-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000070-psychological-refractory-period-task",
-    last_updated: "2026-07-12T02:46:53.113Z",
+    last_updated: "2026-07-12T10:57:20+08:00",
     importTask: () => import("../../../H000070-psychological-refractory-period-task/main")
+  },
+  "H000071-multiple-object-tracking-task": {
+    directory: "H000071-multiple-object-tracking-task",
+    id: "H000071",
+    slug: "multiple-object-tracking-task",
+    title: "Multiple Object Tracking Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "# Multiple Object Tracking Task (Web) Browser companion to canonical T000071-multiple-object-tracking-task. It preserves the 2/4/6 target loads, slow/fast mo...",
+    repo_url: "https://github.com/TaskBeacon/H000071-multiple-object-tracking-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000071-multiple-object-tracking-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000071-multiple-object-tracking-task",
+    last_updated: "2026-07-12T11:31:48+08:00",
+    importTask: () => import("../../../H000071-multiple-object-tracking-task/main")
   },
 };
 
