@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-11T23:57:20.849Z",
+  "generated_at": "2026-07-12T00:26:45.429Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -978,7 +978,22 @@
       "default_branch": "main",
       "download_url": "https://github.com/TaskBeacon/H000065-levels-of-processing-task/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000065-levels-of-processing-task",
-      "last_updated": "2026-07-11T23:50:04.566Z"
+      "last_updated": "2026-07-12T08:00:19+08:00"
+    },
+    {
+      "directory": "H000066-fitts-law-pointing-task",
+      "id": "H000066",
+      "slug": "fitts-law-pointing-task",
+      "title": "Fitts Law Pointing Task",
+      "acquisition": "behavior",
+      "maturity": "draft",
+      "release_tag": "v0.1.0",
+      "short_description": "Browser companion to canonical T000066-fitts-law-pointing-task, preserving 16 amplitude-width conditions, grouped reciprocal alternation, homing-click exclus...",
+      "repo_url": "https://github.com/TaskBeacon/H000066-fitts-law-pointing-task",
+      "default_branch": "main",
+      "download_url": "https://github.com/TaskBeacon/H000066-fitts-law-pointing-task/archive/refs/heads/main.zip",
+      "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000066-fitts-law-pointing-task",
+      "last_updated": "2026-07-12T00:17:18.130Z"
     }
   ]
 }
