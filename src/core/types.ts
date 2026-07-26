@@ -38,6 +38,7 @@ export type StimSpec =
   | ShapeStimSpec
   | ImageStimSpec
   | MovieStimSpec
+  | RandomDotMotionStimSpec
   | SoundStimSpec
   | SpeechStimSpec;
 
@@ -121,6 +122,20 @@ export interface MovieStimSpec extends BaseStimSpec {
   loop?: boolean;
   autoplay?: boolean;
   volume?: number;
+}
+
+export interface RandomDotMotionStimSpec extends BaseStimSpec {
+  type: "random_dot_motion";
+  direction: "left" | "right";
+  coherence: number;
+  seed?: number;
+  n_dots?: number;
+  dot_size_deg?: number;
+  dot_life_frames?: number;
+  speed_deg_s?: number;
+  aperture_diameter_deg?: number;
+  refresh_hz?: number;
+  dot_color?: string;
 }
 
 export interface SoundStimSpec extends BaseStimSpec {
