@@ -368,7 +368,23 @@ function applyBaseStimStyle(element: HTMLElement, spec: StimSpec, stageRoot: HTM
   }
 }
 
-function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLVideoElement[]): void {
+function seededRandom(seed: number): () => number {
+  let state = Math.trunc(seed) >>> 0;
+  return () => {
+    state += 0x6d2b79f5;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function renderStimulus(
+  stageRoot: HTMLElement,
+  spec: StimSpec,
+  movieSink: HTMLVideoElement[],
+  animationCleanupSink: Array<() => void>
+): void {
   switch (spec.type) {
     case "text": {
       const element = document.createElement("div");
@@ -531,6 +547,126 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       }
       return;
     }
+    case "random_dot_motion": {
+      const canvas = document.createElement("canvas");
+      canvas.className = "psyflow-stage-stim psyflow-stage-random-dot-motion";
+      applyBaseStimStyle(canvas, spec, stageRoot);
+      const apertureDiameter = Math.max(
+        0.1,
+        Number(spec.aperture_diameter_deg ?? 6)
+      );
+      canvas.style.width = toLength(
+        apertureDiameter,
+        spec.units ?? "deg",
+        apertureDiameter,
+        stageRoot
+      );
+      canvas.style.height = canvas.style.width;
+      canvas.style.borderRadius = "50%";
+      canvas.style.display = "block";
+      stageRoot.appendChild(canvas);
+
+      const context = canvas.getContext("2d");
+      if (!context) {
+        return;
+      }
+      const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
+      const cssSize = Math.max(
+        64,
+        canvas.getBoundingClientRect().width || apertureDiameter * 32
+      );
+      canvas.width = Math.round(cssSize * pixelRatio);
+      canvas.height = Math.round(cssSize * pixelRatio);
+
+      const random = seededRandom(Number(spec.seed ?? 0));
+      const nDots = Math.max(1, Math.trunc(Number(spec.n_dots ?? 150)));
+      const radiusDeg = apertureDiameter / 2;
+      const coherence = Math.min(1, Math.max(0, Number(spec.coherence ?? 0)));
+      const lifeFrames = Math.max(
+        1,
+        Math.trunc(Number(spec.dot_life_frames ?? 4))
+      );
+      const speedDegS = Math.max(0, Number(spec.speed_deg_s ?? 6));
+      const refreshHz = Math.max(1, Number(spec.refresh_hz ?? 60));
+      const signalAngle = spec.direction === "left" ? Math.PI : 0;
+      const positions = new Float64Array(nDots * 2);
+      const ages = new Int32Array(nDots);
+      const signalMask = new Uint8Array(nDots);
+
+      const respawn = (index: number) => {
+        const radius = radiusDeg * Math.sqrt(random());
+        const angle = random() * Math.PI * 2;
+        positions[index * 2] = radius * Math.cos(angle);
+        positions[index * 2 + 1] = radius * Math.sin(angle);
+        ages[index] = lifeFrames;
+      };
+      for (let index = 0; index < nDots; index += 1) {
+        respawn(index);
+        ages[index] = 1 + Math.floor(random() * lifeFrames);
+      }
+      const shuffled = Array.from({ length: nDots }, (_, index) => index);
+      for (let index = shuffled.length - 1; index > 0; index -= 1) {
+        const swap = Math.floor(random() * (index + 1));
+        [shuffled[index], shuffled[swap]] = [shuffled[swap], shuffled[index]];
+      }
+      const signalCount = Math.round(nDots * coherence);
+      for (let index = 0; index < signalCount; index += 1) {
+        signalMask[shuffled[index]] = 1;
+      }
+
+      let stopped = false;
+      let frameId = 0;
+      let lastTimestamp: number | null = null;
+      const renderFrame = (timestamp: number) => {
+        if (stopped) {
+          return;
+        }
+        const elapsedSeconds =
+          lastTimestamp == null
+            ? 1 / refreshHz
+            : Math.min(0.05, Math.max(0, (timestamp - lastTimestamp) / 1000));
+        lastTimestamp = timestamp;
+        const step = speedDegS * elapsedSeconds;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = normalizeCssColor(spec.dot_color ?? spec.color) ?? "#ffffff";
+        const dotRadiusPx = Math.max(
+          0.75 * pixelRatio,
+          (Number(spec.dot_size_deg ?? 0.1) / apertureDiameter) *
+            canvas.width *
+            0.5
+        );
+        for (let index = 0; index < nDots; index += 1) {
+          const angle = signalMask[index]
+            ? signalAngle
+            : random() * Math.PI * 2;
+          positions[index * 2] += step * Math.cos(angle);
+          positions[index * 2 + 1] += step * Math.sin(angle);
+          ages[index] -= 1;
+          const x = positions[index * 2];
+          const y = positions[index * 2 + 1];
+          if (ages[index] <= 0 || x * x + y * y > radiusDeg * radiusDeg) {
+            respawn(index);
+          }
+          const px =
+            canvas.width / 2 +
+            (positions[index * 2] / apertureDiameter) * canvas.width;
+          const py =
+            canvas.height / 2 -
+            (positions[index * 2 + 1] / apertureDiameter) * canvas.height;
+          context.beginPath();
+          context.arc(px, py, dotRadiusPx, 0, Math.PI * 2);
+          context.fill();
+        }
+        frameId = window.requestAnimationFrame(renderFrame);
+      };
+      frameId = window.requestAnimationFrame(renderFrame);
+      animationCleanupSink.push(() => {
+        stopped = true;
+        window.cancelAnimationFrame(frameId);
+      });
+      return;
+    }
     case "sound": {
       return;
     }
@@ -651,9 +787,15 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     display_element.appendChild(stageRoot);
     display_element.focus();
     const activeMovies: HTMLVideoElement[] = [];
+    const activeAnimationCleanups: Array<() => void> = [];
     for (const stim of execution.stimuli) {
       const childCount = stageRoot.children.length;
-      renderStimulus(stageRoot, stim.spec, activeMovies);
+      renderStimulus(
+        stageRoot,
+        stim.spec,
+        activeMovies,
+        activeAnimationCleanups
+      );
       const rendered = stageRoot.children.item(childCount);
       if (rendered instanceof HTMLElement && stim.stim_id) {
         rendered.dataset.psyflowStimId = stim.stim_id;
@@ -806,6 +948,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           movie.currentTime = 0;
           movie.removeAttribute("src");
           movie.load();
+        }
+        for (const stopAnimation of activeAnimationCleanups) {
+          stopAnimation();
         }
         window.removeEventListener("keydown", keydownListener, true);
         document.removeEventListener("keydown", keydownListener, true);
