@@ -1167,7 +1167,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000072-semantic-priming-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000072-semantic-priming-task",
-    last_updated: "2026-07-26T09:31:38.337Z",
+    last_updated: "2026-07-26T17:58:43+08:00",
     importTask: () => import("../../../H000072-semantic-priming-task/main")
   },
   "H000073-gaze-cueing-task": {
@@ -1183,9 +1183,26 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000073-gaze-cueing-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000073-gaze-cueing-task",
-    last_updated: "2026-07-26T10:35:22.346Z",
+    last_updated: "2026-07-26T18:43:22+08:00",
     importTask: () => import("../../../H000073-gaze-cueing-task/main")
+  },
+  "H000074-tower-of-london-task": {
+    directory: "H000074-tower-of-london-task",
+    id: "H000074",
+    slug: "tower-of-london-task",
+    title: "Tower of London Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser-native companion to canonical T000074-tower-of-london-task, implemented for the shared psyflow-web runner.",
+    repo_url: "https://github.com/TaskBeacon/H000074-tower-of-london-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000074-tower-of-london-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000074-tower-of-london-task",
+    last_updated: "2026-07-26T23:35:56+08:00",
+    importTask: () => import("../../../H000074-tower-of-london-task/main")
   },
 };
 
 export const taskEntries = Object.values(taskManifest);
+
