@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T03:32:03.626Z",
+  "generated_at": "2026-07-26T09:53:08.216Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -1069,6 +1069,21 @@
       "download_url": "https://github.com/TaskBeacon/H000071-multiple-object-tracking-task/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000071-multiple-object-tracking-task",
       "last_updated": "2026-07-12T11:31:48+08:00"
+    },
+    {
+      "directory": "H000072-semantic-priming-task",
+      "id": "H000072",
+      "slug": "semantic-priming-task",
+      "title": "Semantic Priming Task",
+      "acquisition": "behavior",
+      "maturity": "draft",
+      "release_tag": "v0.1.0",
+      "short_description": "Browser companion to canonical T000072-semantic-priming-task. It preserves the 200-ms prime-target SOA, 6 practice and 48 scored trials, A/B item counterbala...",
+      "repo_url": "https://github.com/TaskBeacon/H000072-semantic-priming-task",
+      "default_branch": "main",
+      "download_url": "https://github.com/TaskBeacon/H000072-semantic-priming-task/archive/refs/heads/main.zip",
+      "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000072-semantic-priming-task",
+      "last_updated": "2026-07-26T09:31:38.337Z"
     }
   ]
 }
