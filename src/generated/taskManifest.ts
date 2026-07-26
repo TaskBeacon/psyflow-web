@@ -1199,7 +1199,7 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     default_branch: "main",
     download_url: "https://github.com/TaskBeacon/H000074-tower-of-london-task/archive/refs/heads/main.zip",
     run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000074-tower-of-london-task",
-    last_updated: "2026-07-26T23:35:56+08:00",
+    last_updated: "2026-07-26T23:42:08+08:00",
     importTask: () => import("../../../H000074-tower-of-london-task/main")
   },
 };
