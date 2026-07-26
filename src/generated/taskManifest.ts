@@ -1170,7 +1170,22 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     last_updated: "2026-07-26T09:31:38.337Z",
     importTask: () => import("../../../H000072-semantic-priming-task/main")
   },
+  "H000073-gaze-cueing-task": {
+    directory: "H000073-gaze-cueing-task",
+    id: "H000073",
+    slug: "gaze-cueing-task",
+    title: "Gaze Cueing Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser-native companion to canonical T000073-gaze-cueing-task, implemented for the shared psyflow-web runner.",
+    repo_url: "https://github.com/TaskBeacon/H000073-gaze-cueing-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000073-gaze-cueing-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000073-gaze-cueing-task",
+    last_updated: "2026-07-26T10:35:22.346Z",
+    importTask: () => import("../../../H000073-gaze-cueing-task/main")
+  },
 };
 
 export const taskEntries = Object.values(taskManifest);
-
