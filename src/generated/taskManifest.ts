@@ -1202,6 +1202,22 @@ export const taskManifest: Record<string, RunnerTaskManifestEntry> = {
     last_updated: "2026-07-26T23:42:08+08:00",
     importTask: () => import("../../../H000074-tower-of-london-task/main")
   },
+  "H000075-two-step-sequential-decision-task": {
+    directory: "H000075-two-step-sequential-decision-task",
+    id: "H000075",
+    slug: "two-step-sequential-decision-task",
+    title: "Two-Step Sequential Decision Task",
+    acquisition: "behavior",
+    maturity: "draft",
+    release_tag: "v0.1.0",
+    short_description: "Browser-native companion to canonical T000075-two-step-sequential-decision-task, implemented for the shared psyflow-web runner.",
+    repo_url: "https://github.com/TaskBeacon/H000075-two-step-sequential-decision-task",
+    default_branch: "main",
+    download_url: "https://github.com/TaskBeacon/H000075-two-step-sequential-decision-task/archive/refs/heads/main.zip",
+    run_url: "https://taskbeacon.github.io/psyflow-web/?task=H000075-two-step-sequential-decision-task",
+    last_updated: "2026-07-26T16:17:09.040Z",
+    importTask: () => import("../../../H000075-two-step-sequential-decision-task/main")
+  },
 };
 
 export const taskEntries = Object.values(taskManifest);

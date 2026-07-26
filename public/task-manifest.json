@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-26T15:42:34.967Z",
+  "generated_at": "2026-07-26T16:23:14.478Z",
   "org": "TaskBeacon",
   "runner_repo": "psyflow-web",
   "runner_url": "https://taskbeacon.github.io/psyflow-web/",
@@ -1114,6 +1114,21 @@
       "download_url": "https://github.com/TaskBeacon/H000074-tower-of-london-task/archive/refs/heads/main.zip",
       "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000074-tower-of-london-task",
       "last_updated": "2026-07-26T23:42:08+08:00"
+    },
+    {
+      "directory": "H000075-two-step-sequential-decision-task",
+      "id": "H000075",
+      "slug": "two-step-sequential-decision-task",
+      "title": "Two-Step Sequential Decision Task",
+      "acquisition": "behavior",
+      "maturity": "draft",
+      "release_tag": "v0.1.0",
+      "short_description": "Browser-native companion to canonical T000075-two-step-sequential-decision-task, implemented for the shared psyflow-web runner.",
+      "repo_url": "https://github.com/TaskBeacon/H000075-two-step-sequential-decision-task",
+      "default_branch": "main",
+      "download_url": "https://github.com/TaskBeacon/H000075-two-step-sequential-decision-task/archive/refs/heads/main.zip",
+      "run_url": "https://taskbeacon.github.io/psyflow-web/?task=H000075-two-step-sequential-decision-task",
+      "last_updated": "2026-07-26T16:17:09.040Z"
     }
   ]
 }

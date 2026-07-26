@@ -28,7 +28,9 @@ export interface MountTaskAppOptions {
   settings: TaskSettings;
   subInfo: SubInfo;
   stimBank: StimBank;
-  buildTrials: () => Promise<CompiledTrial[]> | CompiledTrial[];
+  buildTrials: (
+    subjectData: Record<string, string | number>
+  ) => Promise<CompiledTrial[]> | CompiledTrial[];
   onResults?: (result: PsyflowRunResult) => void;
 }
 
@@ -745,7 +747,7 @@ export async function mountTaskApp(options: MountTaskAppOptions): Promise<Psyflo
     window.addEventListener("keydown", onForceQuitKeydown, true);
     document.addEventListener("fullscreenchange", onFullscreenChange);
 
-    const trials = await options.buildTrials();
+    const trials = await options.buildTrials(subjectData);
     const result = await runPsyflowExperiment({
       display_element: elements.taskPanel,
       stimBank: options.stimBank,
