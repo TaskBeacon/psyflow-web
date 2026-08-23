@@ -45,6 +45,7 @@ export interface PsyflowStageResult {
   close_time_global: number;
   duration: number;
   response: string | null;
+  response_text?: string;
   key_press: boolean;
   response_count?: number;
   response_times?: number[];
@@ -325,7 +326,7 @@ function applyWrapWidth(element: HTMLElement, spec: StimSpec): void {
 
 function normalizeKeyForListener(key: string): string {
   const normalized = key.toLowerCase();
-  return KEY_TO_DOM[normalized] ?? normalized;
+  return normalizeRecordedKey(KEY_TO_DOM[normalized] ?? normalized);
 }
 
 function normalizeRecordedKey(key: string): string {
@@ -379,6 +380,98 @@ function seededRandom(seed: number): () => number {
   };
 }
 
+function clampUnit(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
+function renderAnaglyphGrating(
+  stageRoot: HTMLElement,
+  spec: Extract<StimSpec, { type: "anaglyph_grating" }>
+): void {
+  const canvas = document.createElement("canvas");
+  canvas.className = "psyflow-stage-stim psyflow-stage-anaglyph-grating";
+  applyBaseStimStyle(canvas, spec, stageRoot);
+
+  const aperture = Math.max(0.1, Number(spec.aperture_diameter_deg));
+  const frameSpan = Math.max(aperture, Number(spec.fusion_frame_span_deg));
+  const frameWidth = Math.max(0, Number(spec.fusion_frame_width_deg));
+  const extent = frameSpan + frameWidth;
+  canvas.style.width = toLength(extent, spec.units ?? "deg", extent, stageRoot);
+  canvas.style.height = canvas.style.width;
+  canvas.style.display = "block";
+  stageRoot.appendChild(canvas);
+
+  const context = canvas.getContext("2d");
+  if (!context) return;
+
+  const requestedResolution = Number(spec.texture_resolution ?? 512);
+  const resolution = Math.max(128, Math.min(1024, Math.round(requestedResolution)));
+  canvas.width = resolution;
+  canvas.height = resolution;
+
+  const pixels = context.createImageData(resolution, resolution);
+  const redNormal = (Number(spec.red_orientation_deg) + 90) * Math.PI / 180;
+  const cyanNormal = (Number(spec.cyan_orientation_deg) + 90) * Math.PI / 180;
+  const frequency = Math.max(0, Number(spec.spatial_frequency_cpd));
+  const contrast = clampUnit(Number(spec.contrast));
+  const redGain = Math.max(0, Number(spec.red_gain ?? 1));
+  const cyanGain = Math.max(0, Number(spec.cyan_gain ?? 1));
+  const radiusSquared = (aperture / 2) ** 2;
+
+  for (let row = 0; row < resolution; row += 1) {
+    const yDeg = (0.5 - (row + 0.5) / resolution) * extent;
+    for (let column = 0; column < resolution; column += 1) {
+      const xDeg = ((column + 0.5) / resolution - 0.5) * extent;
+      const offset = (row * resolution + column) * 4;
+      if (xDeg * xDeg + yDeg * yDeg <= radiusSquared) {
+        const redAxis = xDeg * Math.cos(redNormal) + yDeg * Math.sin(redNormal);
+        const cyanAxis = xDeg * Math.cos(cyanNormal) + yDeg * Math.sin(cyanNormal);
+        const red = clampUnit((0.5 + 0.5 * contrast * Math.sin(2 * Math.PI * frequency * redAxis)) * redGain);
+        const cyan = clampUnit((0.5 + 0.5 * contrast * Math.sin(2 * Math.PI * frequency * cyanAxis)) * cyanGain);
+        pixels.data[offset] = Math.round(255 * red);
+        pixels.data[offset + 1] = Math.round(255 * cyan);
+        pixels.data[offset + 2] = Math.round(255 * cyan);
+      } else {
+        pixels.data[offset] = 0;
+        pixels.data[offset + 1] = 0;
+        pixels.data[offset + 2] = 0;
+      }
+      pixels.data[offset + 3] = 255;
+    }
+  }
+  context.putImageData(pixels, 0, 0);
+
+  const scale = resolution / extent;
+  const fillRectDeg = (centerX: number, centerY: number, width: number, height: number) => {
+    context.fillRect(
+      (centerX - width / 2 + extent / 2) * scale,
+      (extent / 2 - centerY - height / 2) * scale,
+      width * scale,
+      height * scale
+    );
+  };
+  const frameCells = 16;
+  const cell = frameSpan / frameCells;
+  for (let index = 0; index < frameCells; index += 1) {
+    const offset = -frameSpan / 2 + cell * (index + 0.5);
+    context.fillStyle = index % 2 === 0 ? "#ffffff" : "#777777";
+    fillRectDeg(offset, frameSpan / 2, cell, frameWidth);
+    fillRectDeg(offset, -frameSpan / 2, cell, frameWidth);
+    fillRectDeg(frameSpan / 2, offset, frameWidth, cell);
+    fillRectDeg(-frameSpan / 2, offset, frameWidth, cell);
+  }
+
+  const fixationDiameter = Math.max(0, Number(spec.fixation_diameter_deg));
+  context.beginPath();
+  context.arc(resolution / 2, resolution / 2, fixationDiameter * scale / 2, 0, 2 * Math.PI);
+  context.fillStyle = "#ffffff";
+  context.fill();
+  context.beginPath();
+  context.arc(resolution / 2, resolution / 2, fixationDiameter * scale / 4, 0, 2 * Math.PI);
+  context.fillStyle = "#000000";
+  context.fill();
+}
+
 function renderStimulus(
   stageRoot: HTMLElement,
   spec: StimSpec,
@@ -411,9 +504,21 @@ function renderStimulus(
       return;
     }
     case "textbox": {
-      const element = document.createElement("div");
+      const element = spec.editable ? document.createElement("input") : document.createElement("div");
       element.className = "psyflow-stage-stim psyflow-stage-textbox";
-      element.textContent = spec.text;
+      if (element instanceof HTMLInputElement) {
+        element.type = "text";
+        element.value = spec.text;
+        element.placeholder = spec.placeholder ?? "";
+        element.autocomplete = "off";
+        element.spellcheck = false;
+        element.dataset.psyflowEditableTextbox = "true";
+        if (Number.isInteger(spec.maxLength) && Number(spec.maxLength) > 0) {
+          element.maxLength = Number(spec.maxLength);
+        }
+      } else {
+        element.textContent = spec.text;
+      }
       applyBaseStimStyle(element, spec, stageRoot);
       applyWrapWidth(element, spec);
       if (spec.font) {
@@ -426,6 +531,13 @@ function renderStimulus(
       if (spec.size) {
         element.style.width = toLength(spec.size[0], spec.units, spec.size[0], stageRoot);
         element.style.minHeight = toLength(spec.size[1], spec.units, spec.size[1], stageRoot);
+      }
+      if (spec.fillColor) {
+        element.style.background = normalizeCssColor(spec.fillColor) ?? spec.fillColor;
+      }
+      const borderWidth = Number(spec.borderWidth ?? 0);
+      if (spec.borderColor && borderWidth > 0) {
+        element.style.border = `${borderWidth}px solid ${normalizeCssColor(spec.borderColor) ?? spec.borderColor}`;
       }
       stageRoot.appendChild(element);
       return;
@@ -667,6 +779,10 @@ function renderStimulus(
       });
       return;
     }
+    case "anaglyph_grating": {
+      renderAnaglyphGrating(stageRoot, spec);
+      return;
+    }
     case "sound": {
       return;
     }
@@ -759,6 +875,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         close_time_global: Date.now() / 1000,
         duration: 0,
         response: null,
+        response_text: "",
         key_press: false,
         response_count: 0,
         response_times: [],
@@ -807,6 +924,13 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         .map((stim: ResolvedStageStimulus) => stim.spec)
         .filter((spec): spec is SoundStimSpec => spec.type === "sound")
     );
+    const editableTextbox = stageRoot.querySelector<HTMLInputElement>(
+      'input[data-psyflow-editable-textbox="true"]'
+    );
+    if (editableTextbox) {
+      editableTextbox.focus();
+      editableTextbox.select();
+    }
 
     const onsetEpochSeconds = Date.now() / 1000;
     const stageStart = performance.now();
@@ -833,7 +957,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       let timeoutTriggered = false;
       let timeoutTime: number | null = null;
       let keyboardListening = false;
-      const validKeys = (execution.response_cfg?.keys ?? ["space"]).map((key: string) => key.toLowerCase());
+      const processedKeyEvents = new WeakSet<KeyboardEvent>();
+      const validKeys = (execution.response_cfg?.keys ?? ["space"]).map((key: string) =>
+        normalizeKeyForListener(key)
+      );
       const rawCorrectKeys = execution.response_cfg?.correct_keys ?? execution.response_cfg?.keys ?? [];
       const correctKeys = (Array.isArray(rawCorrectKeys) ? rawCorrectKeys : [rawCorrectKeys]).map((key) =>
         normalizeKeyForListener(String(key))
@@ -867,9 +994,8 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         if (!keyboardListening || finished || (!countResponses && response !== null) || event.repeat) {
           return;
         }
-        if (event.timeStamp < stageStart) {
-          return;
-        }
+        if (processedKeyEvents.has(event)) return;
+        processedKeyEvents.add(event);
         const recordedKey = normalizeKeyboardEvent(event);
         if (!validKeys.includes(recordedKey)) {
           return;
@@ -878,6 +1004,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         event.preventDefault();
         const responseRt = (performance.now() - stageStart) / 1000;
         responseCount += 1;
+        responses.push(recordedKey);
         responseTimes.push(responseRt);
         if (response === null) {
           response = recordedKey;
@@ -887,7 +1014,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           hit = correctKeys.length > 0 ? correctKeys.includes(normalizeKeyForListener(recordedKey)) : true;
         }
         if (execution.response_cfg?.terminate_on_response ?? false) {
-          finish((performance.now() - stageStart) / 1000);
+          const responseElapsed = (performance.now() - stageStart) / 1000;
+          keyboardListening = false;
+          window.setTimeout(() => finish(responseElapsed), 0);
         }
       };
 
@@ -979,6 +1108,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           close_time_global: onsetEpochSeconds + elapsedSeconds,
           duration,
           response,
+          response_text: editableTextbox?.value ?? "",
           key_press: responseCount > 0,
           response_count: responseCount,
           response_times: responseTimes,

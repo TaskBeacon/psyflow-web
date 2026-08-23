@@ -140,6 +140,10 @@ export class ExecutionRecorder implements RuntimeView {
       finalizer(snapshot, this, helpers);
     }
 
+    if (compiledTrial.exclude_from_reduced) {
+      return {};
+    }
+
     if (compiledTrial.omit_if_empty && Object.keys(store.units).length === 0) {
       return {};
     }

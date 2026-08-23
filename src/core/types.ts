@@ -39,6 +39,7 @@ export type StimSpec =
   | ImageStimSpec
   | MovieStimSpec
   | RandomDotMotionStimSpec
+  | AnaglyphGratingStimSpec
   | SoundStimSpec
   | SpeechStimSpec;
 
@@ -70,6 +71,12 @@ export interface TextBoxStimSpec extends BaseStimSpec {
   letterHeight?: number;
   font?: string;
   alignment?: "left" | "center" | "right";
+  editable?: boolean;
+  placeholder?: string;
+  maxLength?: number;
+  fillColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
 }
 
 export interface CircleStimSpec extends BaseStimSpec {
@@ -136,6 +143,21 @@ export interface RandomDotMotionStimSpec extends BaseStimSpec {
   aperture_diameter_deg?: number;
   refresh_hz?: number;
   dot_color?: string;
+}
+
+export interface AnaglyphGratingStimSpec extends BaseStimSpec {
+  type: "anaglyph_grating";
+  red_orientation_deg: number;
+  cyan_orientation_deg: number;
+  aperture_diameter_deg: number;
+  spatial_frequency_cpd: number;
+  contrast: number;
+  red_gain?: number;
+  cyan_gain?: number;
+  texture_resolution?: number;
+  fusion_frame_span_deg: number;
+  fusion_frame_width_deg: number;
+  fixation_diameter_deg: number;
 }
 
 export interface SoundStimSpec extends BaseStimSpec {
@@ -222,6 +244,7 @@ export interface CompiledTrial {
   trial_state: Record<string, unknown>;
   finalizers: TrialFinalizer[];
   omit_if_empty?: boolean;
+  exclude_from_reduced?: boolean;
 }
 
 export interface RawStageRow {
