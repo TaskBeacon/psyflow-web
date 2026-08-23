@@ -9,6 +9,13 @@ export { next_trial_id, reset_trial_counter, resolve_deadline } from "./core/tri
 export { TrialBuilder } from "./core/TrialBuilder";
 export { ExecutionRecorder, resolveValue } from "./core/reducer";
 export { toCsv } from "./core/csv";
+export {
+  advanceOrderedTraceProgress,
+  evaluatePointerTrace,
+  nearestTracePathPosition,
+  normalizeTracePath,
+  transformTracePoint
+} from "./core/pointerTrace";
 export { count_down } from "./core/display";
 export { parseCsvRows } from "./core/csv";
 export type { CountDownOptions } from "./core/display";
@@ -20,6 +27,8 @@ export type {
   CompiledTrial,
   ParsedConfig,
   PointerSequenceConfig,
+  PointerTraceConfig,
+  PointerTraceTransform,
   RawStageRow,
   ReducedTrialRow,
   ResponseConfig,

@@ -139,6 +139,7 @@ function resolveStageExecution(
     responseCfg.timeout_trigger = resolveValue(responseCfg.timeout_trigger, snapshot, recorder);
   }
   let pointerCfg: ResolvedStageExecution["pointer_cfg"];
+  let pointerTraceCfg: ResolvedStageExecution["pointer_trace_cfg"];
   const pointerStimuli: ResolvedStageStimulus[] = [];
   if (stage.pointer_cfg) {
     const resolvePointerValue = <T>(value: Resolvable<T> | undefined): T | undefined =>
@@ -159,6 +160,18 @@ function resolveStageExecution(
         pointerStimuli.push({ stim_id: targetId, spec: resolvedTarget.spec });
       }
     }
+  }
+  if (stage.pointer_trace_cfg) {
+    const resolveTraceValue = <T>(value: Resolvable<T> | undefined): T | undefined =>
+      value == null ? undefined : resolveValue(value, snapshot, recorder);
+    pointerTraceCfg = {
+      ...stage.pointer_trace_cfg,
+      path_points: stage.pointer_trace_cfg.path_points.map(([x, y]) => [Number(x), Number(y)]),
+      start_trigger: resolveTraceValue(stage.pointer_trace_cfg.start_trigger) ?? null,
+      error_trigger: resolveTraceValue(stage.pointer_trace_cfg.error_trigger) ?? null,
+      complete_trigger: resolveTraceValue(stage.pointer_trace_cfg.complete_trigger) ?? null,
+      timeout_trigger: resolveTraceValue(stage.pointer_trace_cfg.timeout_trigger) ?? null
+    };
   }
   const context: TrialContextSpec = {
     ...(stage.context ?? {})
@@ -191,6 +204,7 @@ function resolveStageExecution(
     onset_trigger: stage.onset_trigger == null ? null : Number(resolveValue(stage.onset_trigger, snapshot, recorder)),
     response_cfg: responseCfg,
     pointer_cfg: pointerCfg,
+    pointer_trace_cfg: pointerTraceCfg,
     stimuli
   };
 }
@@ -243,6 +257,18 @@ function toUnitState(
     completed: result.completed,
     selection_triggers: result.selection_triggers ?? [],
     completion_trigger: result.completion_trigger ?? null,
+    physical_positions: result.physical_positions ?? [],
+    display_positions: result.display_positions ?? [],
+    sample_times: result.sample_times ?? [],
+    start_trigger: result.start_trigger ?? null,
+    error_triggers: result.error_triggers ?? [],
+    error_excursions: result.error_excursions ?? 0,
+    off_path_duration: result.off_path_duration ?? 0,
+    off_path_proportion: result.off_path_proportion ?? null,
+    rms_path_error: result.rms_path_error ?? null,
+    pointer_lifts: result.pointer_lifts ?? 0,
+    max_progress: result.max_progress ?? 0,
+    sample_count: result.sample_count ?? 0,
     rt: result.rt,
     response_time: result.response_time,
     response_time_global: result.response_time_global,

@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "psyflow-web": ["./src/index.ts"],
+      "psyflow-web/*": ["./src/*"],
+      "vitest": ["./node_modules/vitest/dist/index.d.ts"]
+    }
+  },
+  "include": [],
+  "files": [
+    "src/index.ts",
+    "tests/unit/pointer-trace.test.ts",
+    "tests/unit/mirror-tracing.test.ts",
+    "tests/e2e/mirror-tracing.spec.ts",
+    "../H000101-mirror-tracing/main.ts",
+    "../H000101-mirror-tracing/src/run_trial.ts",
+    "../H000101-mirror-tracing/src/utils.ts",
+    "../H000101-mirror-tracing/tests/mirror-tracing.test.ts"
+  ]
+}

@@ -2,6 +2,7 @@ import type {
   CompiledStage,
   Resolvable,
   PointerSequenceConfig,
+  PointerTraceConfig,
   StateRef,
   StimRef,
   StimSpec,
@@ -122,6 +123,51 @@ export class StimUnit {
         highlight_duration_s: options.highlight_duration_s
       },
       context: this.buildContext(options.duration, Object.keys(options.targets)),
+      state_patch: { ...this.statePatch },
+      export_to_reduced: false
+    };
+    return this;
+  }
+
+  capturePointerTrace(options: PointerTraceConfig & {
+    duration: Resolvable<number | number[] | null>;
+    onset_trigger?: Resolvable<number | null>;
+  }): this {
+    const pathPoints = options.path_points.map(([x, y]) => [Number(x), Number(y)] as [number, number]);
+    if (pathPoints.length < 2) {
+      throw new Error("capturePointerTrace requires at least two path points.");
+    }
+    if (!(Number(options.corridor_width) > 0) || !(Number(options.finish_radius) > 0)) {
+      throw new Error("capturePointerTrace requires positive corridor_width and finish_radius.");
+    }
+    if (!(Number(options.completion_progress) > 0 && Number(options.completion_progress) <= 1)) {
+      throw new Error("capturePointerTrace completion_progress must be in (0, 1].");
+    }
+    this.stage = {
+      unit_label: this.label,
+      op: "capture_pointer_trace",
+      phase: this.pendingContext.phase ?? null,
+      onset_trigger: options.onset_trigger ?? null,
+      when: this.enabledWhen,
+      stim_refs: [...this.stimRefs],
+      duration: options.duration,
+      pointer_trace_cfg: {
+        path_points: pathPoints,
+        corridor_width: Number(options.corridor_width),
+        transform: options.transform,
+        finish_radius: Number(options.finish_radius),
+        completion_progress: Number(options.completion_progress),
+        start_trigger: options.start_trigger ?? null,
+        error_trigger: options.error_trigger ?? null,
+        complete_trigger: options.complete_trigger ?? null,
+        timeout_trigger: options.timeout_trigger ?? null,
+        trail_color: options.trail_color,
+        trail_line_width: options.trail_line_width,
+        cursor_color: options.cursor_color,
+        error_cursor_color: options.error_cursor_color,
+        cursor_radius: options.cursor_radius
+      },
+      context: this.buildContext(options.duration, ["trace"]),
       state_patch: { ...this.statePatch },
       export_to_reduced: false
     };

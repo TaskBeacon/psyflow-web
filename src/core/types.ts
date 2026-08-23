@@ -162,6 +162,25 @@ export interface PointerSequenceConfig {
   highlight_duration_s?: number;
 }
 
+export type PointerTraceTransform = "identity" | "mirror_x";
+
+export interface PointerTraceConfig {
+  path_points: Array<[number, number]>;
+  corridor_width: number;
+  transform: PointerTraceTransform;
+  finish_radius: number;
+  completion_progress: number;
+  start_trigger?: Resolvable<number | null>;
+  error_trigger?: Resolvable<number | null>;
+  complete_trigger?: Resolvable<number | null>;
+  timeout_trigger?: Resolvable<number | null>;
+  trail_color?: string;
+  trail_line_width?: number;
+  cursor_color?: string;
+  error_cursor_color?: string;
+  cursor_radius?: number;
+}
+
 export interface TrialContextSpec {
   trial_id?: number | string;
   phase?: string;
@@ -176,7 +195,7 @@ export interface TrialContextSpec {
 
 export interface CompiledStage {
   unit_label: string;
-  op: "show" | "capture_response" | "capture_pointer_sequence" | "wait_and_continue";
+  op: "show" | "capture_response" | "capture_pointer_sequence" | "capture_pointer_trace" | "wait_and_continue";
   phase?: string | null;
   onset_trigger?: Resolvable<number | null>;
   when?: Resolvable<boolean>;
@@ -184,6 +203,7 @@ export interface CompiledStage {
   duration?: Resolvable<number | number[] | null>;
   response_cfg?: ResponseConfig;
   pointer_cfg?: PointerSequenceConfig;
+  pointer_trace_cfg?: PointerTraceConfig;
   context?: TrialContextSpec;
   state_patch?: Record<string, Resolvable<unknown>>;
   export_to_reduced: boolean;

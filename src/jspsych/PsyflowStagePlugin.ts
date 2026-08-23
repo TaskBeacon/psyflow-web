@@ -8,6 +8,15 @@ import type {
   StimSpec,
   TrialContextSpec
 } from "../core/types";
+import {
+  advanceOrderedTraceProgress,
+  evaluatePointerTrace,
+  nearestTracePathPosition,
+  normalizeTracePath,
+  transformTracePoint,
+  type TracePoint,
+  type TraceSample
+} from "../core/pointerTrace";
 import { playSoundStimuli } from "./audio";
 import { PSYFLOW_ABORT_EVENT } from "./sessionEvents";
 
@@ -30,6 +39,22 @@ export interface ResolvedStageExecution {
     timeout_trigger?: number | null;
     highlight_color?: string;
     highlight_duration_s?: number;
+  };
+  pointer_trace_cfg?: {
+    path_points: TracePoint[];
+    corridor_width: number;
+    transform: "identity" | "mirror_x";
+    finish_radius: number;
+    completion_progress: number;
+    start_trigger?: number | null;
+    error_trigger?: number | null;
+    complete_trigger?: number | null;
+    timeout_trigger?: number | null;
+    trail_color?: string;
+    trail_line_width?: number;
+    cursor_color?: string;
+    error_cursor_color?: string;
+    cursor_radius?: number;
   };
   stimuli: ResolvedStageStimulus[];
 }
@@ -55,6 +80,18 @@ export interface PsyflowStageResult {
   completed?: boolean;
   selection_triggers?: Array<number | null>;
   completion_trigger?: number | null;
+  physical_positions?: TracePoint[];
+  display_positions?: TracePoint[];
+  sample_times?: number[];
+  start_trigger?: number | null;
+  error_triggers?: Array<number | null>;
+  error_excursions?: number;
+  off_path_duration?: number;
+  off_path_proportion?: number | null;
+  rms_path_error?: number | null;
+  pointer_lifts?: number;
+  max_progress?: number;
+  sample_count?: number;
   rt: number | null;
   response_time: number | null;
   response_time_global: number | null;
@@ -198,6 +235,14 @@ function ensureStyles(): void {
       display: block;
       background: transparent;
     }
+    .psyflow-pointer-trace {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      touch-action: none;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -318,10 +363,10 @@ function normalizeCssColor(value: unknown): string | undefined {
   return `rgb(${converted[0]}, ${converted[1]}, ${converted[2]})`;
 }
 
-function applyWrapWidth(element: HTMLElement, spec: StimSpec): void {
+function applyWrapWidth(element: HTMLElement, spec: StimSpec, stageRoot: HTMLElement): void {
   const wrapWidth = (spec as { wrapWidth?: unknown }).wrapWidth;
   if (typeof wrapWidth === "number" && Number.isFinite(wrapWidth) && wrapWidth > 0) {
-    element.style.maxWidth = `${wrapWidth}px`;
+    element.style.maxWidth = toLength(wrapWidth, spec.units, wrapWidth, stageRoot);
     return;
   }
   element.style.maxWidth = "min(70ch, 90vw)";
@@ -380,7 +425,7 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       element.textContent = spec.text;
       applyBaseStimStyle(element, spec, stageRoot);
       element.style.fontSize = toLength(spec.height ?? 1.1, spec.units, 1.1, stageRoot);
-      applyWrapWidth(element, spec);
+      applyWrapWidth(element, spec, stageRoot);
       if (spec.font) {
         element.style.fontFamily = spec.font;
       }
@@ -417,7 +462,7 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
         element.textContent = spec.text;
       }
       applyBaseStimStyle(element, spec, stageRoot);
-      applyWrapWidth(element, spec);
+      applyWrapWidth(element, spec, stageRoot);
       if (spec.font) {
         element.style.fontFamily = spec.font;
       }
@@ -621,6 +666,90 @@ function speakStimuli(specs: StimSpec[]): (() => void) | null {
   return () => synth.cancel();
 }
 
+interface PointerTraceSurface {
+  clientToTask(clientX: number, clientY: number): TracePoint;
+  update(point: TracePoint, isError: boolean): void;
+}
+
+function createPointerTraceSurface(
+  stageRoot: HTMLElement,
+  config: NonNullable<ResolvedStageExecution["pointer_trace_cfg"]>
+): PointerTraceSurface {
+  const path = normalizeTracePath(config.path_points);
+  const bounds = stageRoot.getBoundingClientRect();
+  const width = Math.max(1, bounds.width || stageRoot.clientWidth || window.innerWidth);
+  const height = Math.max(1, bounds.height || stageRoot.clientHeight || window.innerHeight);
+  const unitPx = getDegLengthInPx(stageRoot, 1) ?? Math.max(1, Math.min(width, height) * 0.02);
+  const toScreen = ([x, y]: TracePoint): TracePoint => [width / 2 + x * unitPx, height / 2 - y * unitPx];
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("psyflow-pointer-trace");
+  svg.dataset.psyflowTraceSurface = "true";
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+  const points = path.map((point) => toScreen(point).join(",")).join(" ");
+  const corridor = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+  corridor.setAttribute("points", points);
+  corridor.setAttribute("fill", "none");
+  corridor.setAttribute("stroke", "#d1d5db");
+  corridor.setAttribute("stroke-width", String(Math.max(2, config.corridor_width * unitPx)));
+  corridor.setAttribute("stroke-linejoin", "round");
+  corridor.setAttribute("stroke-linecap", "round");
+
+  const centerline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+  centerline.setAttribute("points", points);
+  centerline.setAttribute("fill", "none");
+  centerline.setAttribute("stroke", "#4b5563");
+  centerline.setAttribute("stroke-width", "2");
+  centerline.setAttribute("stroke-linejoin", "round");
+
+  const trail = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+  trail.dataset.psyflowTraceTrail = "true";
+  trail.setAttribute("points", "");
+  trail.setAttribute("fill", "none");
+  trail.setAttribute("stroke", config.trail_color ?? "#facc15");
+  trail.setAttribute("stroke-width", String(Math.max(1, config.trail_line_width ?? 3)));
+  trail.setAttribute("stroke-linejoin", "round");
+  trail.setAttribute("stroke-linecap", "round");
+
+  const start = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  const [startX, startY] = toScreen(path[0]);
+  start.dataset.psyflowTraceStart = "true";
+  start.setAttribute("cx", String(startX));
+  start.setAttribute("cy", String(startY));
+  start.setAttribute("r", String(Math.max(5, config.finish_radius * unitPx)));
+  start.setAttribute("fill", "#22c55e");
+  start.setAttribute("stroke", "#ffffff");
+  start.setAttribute("stroke-width", "2");
+
+  const cursor = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  cursor.dataset.psyflowTraceCursor = "true";
+  cursor.setAttribute("cx", String(startX));
+  cursor.setAttribute("cy", String(startY));
+  cursor.setAttribute("r", String(Math.max(4, (config.cursor_radius ?? 0.16) * unitPx)));
+  cursor.setAttribute("fill", config.cursor_color ?? "#facc15");
+  cursor.setAttribute("stroke", "#ffffff");
+  cursor.setAttribute("stroke-width", "1");
+
+  svg.append(corridor, centerline, trail, start, cursor);
+  stageRoot.appendChild(svg);
+  stageRoot.style.touchAction = "none";
+  const trailPoints: string[] = [];
+  return {
+    clientToTask(clientX: number, clientY: number): TracePoint {
+      const current = stageRoot.getBoundingClientRect();
+      return [(clientX - current.left - width / 2) / unitPx, -(clientY - current.top - height / 2) / unitPx];
+    },
+    update(point: TracePoint, isError: boolean): void {
+      const [x, y] = toScreen(point);
+      trailPoints.push(`${x},${y}`);
+      trail.setAttribute("points", trailPoints.join(" "));
+      cursor.setAttribute("cx", String(x));
+      cursor.setAttribute("cy", String(y));
+      cursor.setAttribute("fill", isError ? config.error_cursor_color ?? "#ef4444" : config.cursor_color ?? "#facc15");
+    }
+  };
+}
+
 export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
   static info = info;
 
@@ -678,6 +807,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         rendered.dataset.psyflowStimId = stim.stim_id;
       }
     }
+    const pointerTraceSurface =
+      stage.op === "capture_pointer_trace" && execution.pointer_trace_cfg
+        ? createPointerTraceSurface(stageRoot, execution.pointer_trace_cfg)
+        : null;
     const stopSpeech = speakStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
     const stopSounds = playSoundStimuli(
       execution.stimuli
@@ -712,6 +845,20 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       const responsePositions: Array<[number, number]> = [];
       const selectionTriggers: Array<number | null> = [];
       let completionTrigger: number | null = null;
+      const traceSamples: TraceSample[] = [];
+      const errorTriggers: Array<number | null> = [];
+      let traceStartedAt: number | null = null;
+      let traceDrawing = false;
+      let tracePointerId: number | null = null;
+      let tracePointerLifts = 0;
+      let traceWasInside = true;
+      let traceCompleted = false;
+      let traceMaxProgress = 0;
+      let traceEvaluation = evaluatePointerTrace([], execution.pointer_trace_cfg?.path_points ?? [[0, 0], [1, 0]], {
+        corridor_width: execution.pointer_trace_cfg?.corridor_width ?? 1,
+        completion_progress: execution.pointer_trace_cfg?.completion_progress ?? 1,
+        finish_radius: execution.pointer_trace_cfg?.finish_radius ?? 1
+      });
       let rtSeconds: number | null = null;
       let hit: boolean | null = stage.op === "capture_response" ? false : null;
       let timeoutTriggered = false;
@@ -818,6 +965,80 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         }
       };
 
+      const recordTraceSample = (event: PointerEvent) => {
+        const config = execution.pointer_trace_cfg;
+        if (!config || !pointerTraceSurface || traceStartedAt === null) return;
+        const physical = pointerTraceSurface.clientToTask(event.clientX, event.clientY);
+        const display = transformTracePoint(physical, config.transform);
+        const t = Math.max(0, (performance.now() - traceStartedAt) / 1000);
+        const sample: TraceSample = { t, physical, display };
+        traceSamples.push(sample);
+        const position = nearestTracePathPosition(display, config.path_points);
+        const inside = position.distance <= config.corridor_width / 2;
+        if (!inside && traceWasInside) {
+          errorTriggers.push(config.error_trigger ?? null);
+        }
+        traceWasInside = inside;
+        traceMaxProgress = advanceOrderedTraceProgress(traceMaxProgress, position.progress);
+        pointerTraceSurface.update(display, !inside);
+        const finishDistance = Math.hypot(
+          display[0] - config.path_points[0][0],
+          display[1] - config.path_points[0][1]
+        );
+        if (
+          traceSamples.length >= 3 &&
+          t >= 0.05 &&
+          traceMaxProgress >= config.completion_progress &&
+          finishDistance <= config.finish_radius
+        ) {
+          traceCompleted = true;
+          traceEvaluation = evaluatePointerTrace(traceSamples, config.path_points, config);
+          completionTrigger = config.complete_trigger ?? null;
+          response = "trace_complete";
+          responseCount = 1;
+          rtSeconds = traceEvaluation.movement_time;
+          hit = true;
+          finish(t);
+        }
+      };
+
+      const pointerTraceDownListener = (event: PointerEvent) => {
+        if (finished || stage.op !== "capture_pointer_trace" || event.button !== 0) return;
+        const config = execution.pointer_trace_cfg;
+        if (!config || !pointerTraceSurface) return;
+        const physical = pointerTraceSurface.clientToTask(event.clientX, event.clientY);
+        const display = transformTracePoint(physical, config.transform);
+        if (traceStartedAt === null) {
+          const startDistance = Math.hypot(
+            display[0] - config.path_points[0][0],
+            display[1] - config.path_points[0][1]
+          );
+          if (startDistance > config.finish_radius) return;
+          traceStartedAt = performance.now();
+        }
+        event.preventDefault();
+        traceDrawing = true;
+        tracePointerId = event.pointerId;
+        stageRoot.setPointerCapture?.(event.pointerId);
+        recordTraceSample(event);
+      };
+
+      const pointerTraceMoveListener = (event: PointerEvent) => {
+        if (finished || !traceDrawing || event.pointerId !== tracePointerId) return;
+        event.preventDefault();
+        recordTraceSample(event);
+      };
+
+      const pointerTraceEndListener = (event: PointerEvent) => {
+        if (finished || event.pointerId !== tracePointerId) return;
+        if (traceDrawing && !traceCompleted) {
+          recordTraceSample(event);
+          if (!traceCompleted) tracePointerLifts += 1;
+        }
+        traceDrawing = false;
+        tracePointerId = null;
+      };
+
       const abortListener = () => {
         finish((performance.now() - stageStart) / 1000, true);
       };
@@ -843,6 +1064,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         display_element.removeEventListener("keydown", keydownListener, true);
         stageRoot.removeEventListener("keydown", keydownListener, true);
         stageRoot.removeEventListener("pointerdown", pointerListener, true);
+        stageRoot.removeEventListener("pointerdown", pointerTraceDownListener, true);
+        stageRoot.removeEventListener("pointermove", pointerTraceMoveListener, true);
+        stageRoot.removeEventListener("pointerup", pointerTraceEndListener, true);
+        stageRoot.removeEventListener("pointercancel", pointerTraceEndListener, true);
         display_element.removeEventListener(PSYFLOW_ABORT_EVENT, abortListener as EventListener);
       };
 
@@ -851,6 +1076,16 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           return;
         }
         finished = true;
+        if (stage.op === "capture_pointer_trace" && execution.pointer_trace_cfg) {
+          traceEvaluation = evaluatePointerTrace(
+            traceSamples,
+            execution.pointer_trace_cfg.path_points,
+            execution.pointer_trace_cfg
+          );
+          traceCompleted = traceCompleted && traceEvaluation.completed;
+          rtSeconds = traceEvaluation.movement_time;
+          hit = traceCompleted;
+        }
         cleanup();
         const duration =
           forceElapsed
@@ -866,15 +1101,32 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           duration,
           response,
           response_text: textEntry?.value ?? null,
-          key_press: responseCount > 0,
+          key_press: stage.op === "capture_pointer_trace" ? traceStartedAt !== null : responseCount > 0,
           response_count: responseCount,
           response_times: responseTimes,
           responses,
           response_positions: responsePositions,
           first_rt: responseTimes[0] ?? null,
-          completed: stage.op === "capture_pointer_sequence" ? responses.length >= (execution.pointer_cfg?.max_selections ?? 1) : undefined,
+          completed:
+            stage.op === "capture_pointer_sequence"
+              ? responses.length >= (execution.pointer_cfg?.max_selections ?? 1)
+              : stage.op === "capture_pointer_trace"
+                ? traceCompleted
+                : undefined,
           selection_triggers: selectionTriggers,
           completion_trigger: completionTrigger,
+          physical_positions: traceSamples.map((sample) => sample.physical),
+          display_positions: traceSamples.map((sample) => sample.display),
+          sample_times: traceSamples.map((sample) => sample.t),
+          start_trigger: stage.op === "capture_pointer_trace" ? execution.pointer_trace_cfg?.start_trigger ?? null : null,
+          error_triggers: errorTriggers,
+          error_excursions: traceEvaluation.error_excursions,
+          off_path_duration: traceEvaluation.off_path_duration,
+          off_path_proportion: traceEvaluation.off_path_proportion,
+          rms_path_error: traceEvaluation.rms_path_error,
+          pointer_lifts: tracePointerLifts,
+          max_progress: traceEvaluation.max_progress,
+          sample_count: traceEvaluation.sample_count,
           rt: rtSeconds,
           response_time: rtSeconds,
           response_time_global: rtSeconds == null ? null : onsetEpochSeconds + rtSeconds,
@@ -923,6 +1175,23 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           timerId = window.setTimeout(() => {
             timeoutTriggered = responses.length < (execution.pointer_cfg?.max_selections ?? 1);
             timeoutTime = timeoutTriggered ? execution.duration : null;
+            finish((performance.now() - stageStart) / 1000);
+          }, Math.max(0, execution.duration * 1000));
+        }
+        return;
+      }
+
+      if (stage.op === "capture_pointer_trace") {
+        stageRoot.addEventListener("pointerdown", pointerTraceDownListener, true);
+        stageRoot.addEventListener("pointermove", pointerTraceMoveListener, true);
+        stageRoot.addEventListener("pointerup", pointerTraceEndListener, true);
+        stageRoot.addEventListener("pointercancel", pointerTraceEndListener, true);
+        if (execution.duration != null) {
+          timerId = window.setTimeout(() => {
+            timeoutTriggered = !traceCompleted;
+            timeoutTime = timeoutTriggered ? execution.duration : null;
+            completionTrigger = timeoutTriggered ? execution.pointer_trace_cfg?.timeout_trigger ?? null : completionTrigger;
+            hit = false;
             finish((performance.now() - stageStart) / 1000);
           }, Math.max(0, execution.duration * 1000));
         }
