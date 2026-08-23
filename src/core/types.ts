@@ -72,6 +72,9 @@ export interface TextBoxStimSpec extends BaseStimSpec {
   letterHeight?: number;
   font?: string;
   alignment?: "left" | "center" | "right";
+  fillColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
 }
 
 export interface CircleStimSpec extends BaseStimSpec {

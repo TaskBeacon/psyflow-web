@@ -474,6 +474,13 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
         element.style.width = toLength(spec.size[0], spec.units, spec.size[0], stageRoot);
         element.style.minHeight = toLength(spec.size[1], spec.units, spec.size[1], stageRoot);
       }
+      if (spec.fillColor) {
+        element.style.background = normalizeCssColor(spec.fillColor) ?? spec.fillColor;
+      }
+      const borderWidth = Number(spec.borderWidth ?? 0);
+      if (spec.borderColor && borderWidth > 0) {
+        element.style.border = `${borderWidth}px solid ${normalizeCssColor(spec.borderColor) ?? spec.borderColor}`;
+      }
       stageRoot.appendChild(element);
       return;
     }
