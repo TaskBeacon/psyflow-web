@@ -91,6 +91,7 @@ describe("PsyflowStagePlugin", () => {
     expect(result.response).toBe("space");
     expect(result.key_press).toBe(true);
     expect(result.response_count).toBe(3);
+    expect(result.responses).toEqual(["space", "space", "space"]);
     expect(result.response_times).toHaveLength(3);
     expect(result.response_times?.every((value) => typeof value === "number" && value >= 0)).toBe(true);
   });

@@ -119,4 +119,26 @@ describe("ExecutionRecorder and authoring helpers", () => {
     expect(recorder.finalizeTrial(trial.build())).toEqual({});
     expect(recorder.getReducedRows()).toEqual([]);
   });
+
+  it("can retain raw setup stages while excluding their logical trial from reduced output", () => {
+    const trial = new TrialBuilder({
+      trial_id: "practice",
+      block_id: "practice",
+      trial_index: -1,
+      condition: "practice"
+    }).excludeFromReduced();
+    const compiled = trial.build();
+    const recorder = new ExecutionRecorder();
+    recorder.storeStageResult(
+      compiled,
+      "practice",
+      { response: "space" },
+      makeRawRow({ trial_id: "practice", block_id: "practice", trial_index: -1, condition: "practice", unit_label: "practice" }),
+      true
+    );
+
+    expect(recorder.finalizeTrial(compiled)).toEqual({});
+    expect(recorder.getRawRows()).toHaveLength(1);
+    expect(recorder.getReducedRows()).toEqual([]);
+  });
 });

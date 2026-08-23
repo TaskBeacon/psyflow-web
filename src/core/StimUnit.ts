@@ -174,12 +174,17 @@ export class StimUnit {
     return this;
   }
 
-  waitAndContinue(options: { keys?: string[]; min_wait?: number } = {}): this {
+  waitAndContinue(options: {
+    keys?: string[];
+    min_wait?: number;
+    onset_trigger?: Resolvable<number | null>;
+  } = {}): this {
     const minWait = options.min_wait ?? 0;
     this.stage = {
       unit_label: this.label,
       op: "wait_and_continue",
       phase: this.pendingContext.phase ?? null,
+      onset_trigger: options.onset_trigger ?? null,
       when: this.enabledWhen,
       stim_refs: [...this.stimRefs],
       response_cfg: {

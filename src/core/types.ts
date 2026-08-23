@@ -38,6 +38,7 @@ export type StimSpec =
   | ShapeStimSpec
   | ImageStimSpec
   | MovieStimSpec
+  | AnaglyphGratingStimSpec
   | SoundStimSpec
   | SpeechStimSpec;
 
@@ -127,6 +128,21 @@ export interface MovieStimSpec extends BaseStimSpec {
   loop?: boolean;
   autoplay?: boolean;
   volume?: number;
+}
+
+export interface AnaglyphGratingStimSpec extends BaseStimSpec {
+  type: "anaglyph_grating";
+  red_orientation_deg: number;
+  cyan_orientation_deg: number;
+  aperture_diameter_deg: number;
+  spatial_frequency_cpd: number;
+  contrast: number;
+  red_gain?: number;
+  cyan_gain?: number;
+  texture_resolution?: number;
+  fusion_frame_span_deg: number;
+  fusion_frame_width_deg: number;
+  fixation_diameter_deg: number;
 }
 
 export interface SoundStimSpec extends BaseStimSpec {
@@ -233,6 +249,7 @@ export interface CompiledTrial {
   trial_state: Record<string, unknown>;
   finalizers: TrialFinalizer[];
   omit_if_empty?: boolean;
+  exclude_from_reduced?: boolean;
 }
 
 export interface RawStageRow {
