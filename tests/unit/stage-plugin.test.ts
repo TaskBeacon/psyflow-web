@@ -95,6 +95,33 @@ describe("PsyflowStagePlugin", () => {
     expect(result.response_times?.every((value) => typeof value === "number" && value >= 0)).toBe(true);
   });
 
+  it("captures editable textbox content when Enter submits", async () => {
+    const display = document.createElement("div");
+    document.body.appendChild(display);
+    const plugin = new PsyflowStagePlugin({} as never);
+
+    const resultPromise = plugin.trial(display, {
+      stage: { unit_label: "recall", op: "capture_response", phase: "recall" },
+      resolve_stage: () => ({
+        context: { trial_id: "typed_1", phase: "recall", deadline_s: 0.2, valid_keys: ["return"] },
+        duration: 0.2,
+        min_wait: 0,
+        response_cfg: { keys: ["return"], terminate_on_response: true },
+        stimuli: [{ stim_id: "entry", spec: { type: "textbox", text: "", editable: true, size: [320, 48] } }]
+      })
+    } as never);
+
+    const input = display.querySelector<HTMLInputElement>('input[data-psyflow-text-entry="true"]');
+    expect(input).not.toBeNull();
+    input!.value = "苹果";
+    input!.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true }));
+    const result = await resultPromise;
+
+    expect(result.response).toBe("enter");
+    expect(result.response_text).toBe("苹果");
+    expect(result.timeout_triggered).toBe(false);
+  });
+
   it("captures an ordered pointer sequence and stops at the requested length", async () => {
     const display = document.createElement("div");
     document.body.appendChild(display);

@@ -65,6 +65,9 @@ export interface TextStimSpec extends BaseStimSpec {
 export interface TextBoxStimSpec extends BaseStimSpec {
   type: "textbox";
   text: string;
+  editable?: boolean;
+  placeholder?: string;
+  maxLength?: number;
   size?: [number, number];
   letterHeight?: number;
   font?: string;

@@ -45,6 +45,7 @@ export interface PsyflowStageResult {
   close_time_global: number;
   duration: number;
   response: string | null;
+  response_text?: string | null;
   key_press: boolean;
   response_count?: number;
   response_times?: number[];
@@ -92,6 +93,9 @@ const info = {
       type: ParameterType.FLOAT
     },
     response: {
+      type: ParameterType.STRING
+    },
+    response_text: {
       type: ParameterType.STRING
     },
     key_press: {
@@ -395,9 +399,23 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       return;
     }
     case "textbox": {
-      const element = document.createElement("div");
+      const element = spec.editable
+        ? document.createElement("input")
+        : document.createElement("div");
       element.className = "psyflow-stage-stim psyflow-stage-textbox";
-      element.textContent = spec.text;
+      if (element instanceof HTMLInputElement) {
+        element.type = "text";
+        element.value = spec.text;
+        element.placeholder = spec.placeholder ?? "";
+        element.autocomplete = "off";
+        element.spellcheck = false;
+        element.dataset.psyflowTextEntry = "true";
+        if (Number.isFinite(Number(spec.maxLength)) && Number(spec.maxLength) > 0) {
+          element.maxLength = Math.trunc(Number(spec.maxLength));
+        }
+      } else {
+        element.textContent = spec.text;
+      }
       applyBaseStimStyle(element, spec, stageRoot);
       applyWrapWidth(element, spec);
       if (spec.font) {
@@ -623,6 +641,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         close_time_global: Date.now() / 1000,
         duration: 0,
         response: null,
+        response_text: null,
         key_press: false,
         response_count: 0,
         response_times: [],
@@ -665,6 +684,13 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         .map((stim: ResolvedStageStimulus) => stim.spec)
         .filter((spec): spec is SoundStimSpec => spec.type === "sound")
     );
+    const textEntry = stageRoot.querySelector<HTMLInputElement>(
+      'input[data-psyflow-text-entry="true"]'
+    );
+    if (textEntry) {
+      textEntry.focus();
+      textEntry.setSelectionRange(textEntry.value.length, textEntry.value.length);
+    }
 
     const onsetEpochSeconds = Date.now() / 1000;
     const stageStart = performance.now();
@@ -691,7 +717,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       let timeoutTriggered = false;
       let timeoutTime: number | null = null;
       let keyboardListening = false;
-      const validKeys = (execution.response_cfg?.keys ?? ["space"]).map((key: string) => key.toLowerCase());
+      const validKeys = (execution.response_cfg?.keys ?? ["space"]).map((key: string) =>
+        normalizeRecordedKey(normalizeKeyForListener(key))
+      );
       const rawCorrectKeys = execution.response_cfg?.correct_keys ?? execution.response_cfg?.keys ?? [];
       const correctKeys = (Array.isArray(rawCorrectKeys) ? rawCorrectKeys : [rawCorrectKeys]).map((key) =>
         normalizeKeyForListener(String(key))
@@ -726,6 +754,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           return;
         }
         if (event.timeStamp < stageStart) {
+          return;
+        }
+        if (event.isComposing || event.keyCode === 229) {
           return;
         }
         const recordedKey = normalizeKeyboardEvent(event);
@@ -834,6 +865,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           close_time_global: onsetEpochSeconds + elapsedSeconds,
           duration,
           response,
+          response_text: textEntry?.value ?? null,
           key_press: responseCount > 0,
           response_count: responseCount,
           response_times: responseTimes,
