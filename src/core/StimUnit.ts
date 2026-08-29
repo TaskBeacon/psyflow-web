@@ -3,6 +3,7 @@ import type {
   Resolvable,
   PointerSequenceConfig,
   PointerTraceConfig,
+  PointerReachConfig,
   StateRef,
   StimRef,
   StimSpec,
@@ -168,6 +169,55 @@ export class StimUnit {
         cursor_radius: options.cursor_radius
       },
       context: this.buildContext(options.duration, ["trace"]),
+      state_patch: { ...this.statePatch },
+      export_to_reduced: false
+    };
+    return this;
+  }
+
+  capturePointerReach(options: PointerReachConfig & {
+    onset_trigger?: Resolvable<number | null>;
+  }): this {
+    const positive = [
+      options.target_distance,
+      options.start_radius,
+      options.target_radius,
+      options.search_visibility_radius,
+      options.start_hold_duration,
+      options.movement_deadline,
+      options.reaction_threshold
+    ];
+    if (positive.some((value) => !(Number(value) > 0))) {
+      throw new Error("capturePointerReach requires positive geometry and timing values.");
+    }
+    if (Number(options.reaction_threshold) >= Number(options.target_distance)) {
+      throw new Error("capturePointerReach reaction_threshold must be smaller than target_distance.");
+    }
+    if (!(["veridical", "rotated", "none"] as string[]).includes(options.feedback_mode)) {
+      throw new Error(`capturePointerReach received unsupported feedback mode '${String(options.feedback_mode)}'.`);
+    }
+    this.stage = {
+      unit_label: this.label,
+      op: "capture_pointer_reach",
+      phase: this.pendingContext.phase ?? null,
+      onset_trigger: options.onset_trigger ?? null,
+      when: this.enabledWhen,
+      stim_refs: [...this.stimRefs],
+      duration: null,
+      pointer_reach_cfg: {
+        ...options,
+        target_position: [Number(options.target_position[0]), Number(options.target_position[1])],
+        target_distance: Number(options.target_distance),
+        start_radius: Number(options.start_radius),
+        target_radius: Number(options.target_radius),
+        search_visibility_radius: Number(options.search_visibility_radius),
+        start_hold_duration: Number(options.start_hold_duration),
+        movement_deadline: Number(options.movement_deadline),
+        reaction_threshold: Number(options.reaction_threshold),
+        rotation_deg: Number(options.rotation_deg),
+        endpoint_freeze_duration: Math.max(0, Number(options.endpoint_freeze_duration))
+      },
+      context: this.buildContext(options.movement_deadline, ["pointer_reach"]),
       state_patch: { ...this.statePatch },
       export_to_reduced: false
     };

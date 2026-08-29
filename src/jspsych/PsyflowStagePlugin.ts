@@ -17,6 +17,13 @@ import {
   type TracePoint,
   type TraceSample
 } from "../core/pointerTrace";
+import {
+  evaluatePointerReach,
+  transformReachPoint,
+  type ReachEvaluation,
+  type ReachPoint,
+  type ReachSample
+} from "../core/pointerReach";
 import { playSoundStimuli } from "./audio";
 import { PSYFLOW_ABORT_EVENT } from "./sessionEvents";
 
@@ -56,6 +63,25 @@ export interface ResolvedStageExecution {
     error_cursor_color?: string;
     cursor_radius?: number;
   };
+  pointer_reach_cfg?: {
+    target_position: ReachPoint;
+    target_distance: number;
+    start_radius: number;
+    target_radius: number;
+    search_visibility_radius: number;
+    start_hold_duration: number;
+    movement_deadline: number;
+    reaction_threshold: number;
+    feedback_mode: "veridical" | "rotated" | "none";
+    rotation_deg: number;
+    endpoint_freeze_duration: number;
+    hold_trigger?: number | null;
+    target_trigger?: number | null;
+    movement_trigger?: number | null;
+    complete_trigger?: number | null;
+    hit_trigger?: number | null;
+    timeout_trigger?: number | null;
+  };
   stimuli: ResolvedStageStimulus[];
 }
 
@@ -92,6 +118,20 @@ export interface PsyflowStageResult {
   pointer_lifts?: number;
   max_progress?: number;
   sample_count?: number;
+  search_time?: number | null;
+  reaction_time?: number | null;
+  movement_time?: number | null;
+  physical_endpoint?: ReachPoint | null;
+  display_endpoint?: ReachPoint | null;
+  hand_angle_deg?: number | null;
+  cursor_angle_deg?: number | null;
+  cursor_error_deg?: number | null;
+  cursor_hit?: boolean;
+  timed_out?: boolean;
+  hold_trigger?: number | null;
+  target_trigger?: number | null;
+  movement_trigger?: number | null;
+  hit_trigger?: number | null;
   rt: number | null;
   response_time: number | null;
   response_time_global: number | null;
@@ -858,6 +898,57 @@ function createPointerTraceSurface(
   };
 }
 
+interface PointerReachSurface {
+  clientToTask(clientX: number, clientY: number): ReachPoint;
+  update(physical: ReachPoint, showTarget: boolean, moving: boolean): ReachPoint;
+}
+
+function createPointerReachSurface(
+  stageRoot: HTMLElement,
+  config: NonNullable<ResolvedStageExecution["pointer_reach_cfg"]>
+): PointerReachSurface {
+  const start = stageRoot.querySelector<HTMLElement>('[data-psyflow-stim-id="__pointer_reach_start"]');
+  const target = stageRoot.querySelector<HTMLElement>('[data-psyflow-stim-id="__pointer_reach_target"]');
+  const cursor = stageRoot.querySelector<HTMLElement>('[data-psyflow-stim-id="__pointer_reach_cursor"]');
+  if (!start || !target || !cursor) {
+    throw new Error("capture_pointer_reach requires start, target, and cursor stimuli.");
+  }
+  const bounds = stageRoot.getBoundingClientRect();
+  const width = Math.max(1, bounds.width || stageRoot.clientWidth || window.innerWidth);
+  const height = Math.max(1, bounds.height || stageRoot.clientHeight || window.innerHeight);
+  const unitPx = getDegLengthInPx(stageRoot, 1) ?? Math.max(1, Math.min(width, height) * 0.02);
+  const setPosition = (element: HTMLElement, [x, y]: ReachPoint) => {
+    element.style.left = `${width / 2 + x * unitPx}px`;
+    element.style.top = `${height / 2 - y * unitPx}px`;
+  };
+  setPosition(start, [0, 0]);
+  setPosition(target, config.target_position);
+  setPosition(cursor, [0, 0]);
+  target.style.visibility = "hidden";
+  cursor.style.visibility = "hidden";
+  stageRoot.style.cursor = "none";
+  stageRoot.style.touchAction = "none";
+  return {
+    clientToTask(clientX: number, clientY: number): ReachPoint {
+      const current = stageRoot.getBoundingClientRect();
+      return [(clientX - current.left - width / 2) / unitPx, -(clientY - current.top - height / 2) / unitPx];
+    },
+    update(physical: ReachPoint, showTarget: boolean, moving: boolean): ReachPoint {
+      const shown = moving
+        ? transformReachPoint(physical, config.feedback_mode, config.rotation_deg)
+        : ([...physical] as ReachPoint);
+      target.style.visibility = showTarget ? "visible" : "hidden";
+      const physicalRadius = Math.hypot(physical[0], physical[1]);
+      const cursorVisible = showTarget
+        ? (!moving || config.feedback_mode !== "none")
+        : physicalRadius <= config.search_visibility_radius;
+      cursor.style.visibility = cursorVisible ? "visible" : "hidden";
+      if (cursorVisible) setPosition(cursor, shown);
+      return shown;
+    }
+  };
+}
+
 export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
   static info = info;
 
@@ -919,6 +1010,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       stage.op === "capture_pointer_trace" && execution.pointer_trace_cfg
         ? createPointerTraceSurface(stageRoot, execution.pointer_trace_cfg)
         : null;
+    const pointerReachSurface =
+      stage.op === "capture_pointer_reach" && execution.pointer_reach_cfg
+        ? createPointerReachSurface(stageRoot, execution.pointer_reach_cfg)
+        : null;
     const stopSpeech = speakStimuli(execution.stimuli.map((stim: ResolvedStageStimulus) => stim.spec));
     const stopSounds = playSoundStimuli(
       execution.stimuli
@@ -967,6 +1062,28 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         completion_progress: execution.pointer_trace_cfg?.completion_progress ?? 1,
         finish_radius: execution.pointer_trace_cfg?.finish_radius ?? 1
       });
+      const reachSamples: ReachSample[] = [];
+      const reachConfig = execution.pointer_reach_cfg;
+      let reachEvaluation: ReachEvaluation = evaluatePointerReach([], {
+        target_position: reachConfig?.target_position ?? [0, 1],
+        target_distance: reachConfig?.target_distance ?? 1,
+        target_radius: reachConfig?.target_radius ?? 0.1,
+        reaction_threshold: reachConfig?.reaction_threshold ?? 0.1,
+        movement_deadline: reachConfig?.movement_deadline ?? 1
+      });
+      let reachPhysical: ReachPoint = [0, 0];
+      let reachDisplay: ReachPoint = [0, 0];
+      let reachTargetOnsetAt: number | null = null;
+      let reachMovementStartedAt: number | null = null;
+      let reachHoldTimerId: number | null = null;
+      let reachMovementTimerId: number | null = null;
+      let reachFreezeTimerId: number | null = null;
+      let reachSearchTime: number | null = null;
+      let reachHoldTrigger: number | null = null;
+      let reachTargetTrigger: number | null = null;
+      let reachMovementTrigger: number | null = null;
+      let reachHitTrigger: number | null = null;
+      let reachCompleted = false;
       let rtSeconds: number | null = null;
       let hit: boolean | null = stage.op === "capture_response" ? false : null;
       let timeoutTriggered = false;
@@ -1147,6 +1264,95 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         tracePointerId = null;
       };
 
+      const evaluateReach = () => {
+        if (!reachConfig) return;
+        reachEvaluation = evaluatePointerReach(reachSamples, {
+          target_position: reachConfig.target_position,
+          target_distance: reachConfig.target_distance,
+          target_radius: reachConfig.target_radius,
+          reaction_threshold: reachConfig.reaction_threshold,
+          movement_deadline: reachConfig.movement_deadline
+        });
+      };
+
+      const finishReachTimeout = () => {
+        if (finished || !reachConfig) return;
+        evaluateReach();
+        reachCompleted = false;
+        timeoutTriggered = true;
+        timeoutTime = reachConfig.movement_deadline;
+        completionTrigger = reachConfig.timeout_trigger ?? null;
+        hit = false;
+        finish((performance.now() - stageStart) / 1000);
+      };
+
+      const pointerReachMoveListener = (event: PointerEvent) => {
+        if (finished || stage.op !== "capture_pointer_reach" || !reachConfig || !pointerReachSurface) return;
+        event.preventDefault();
+        const now = performance.now();
+        reachPhysical = pointerReachSurface.clientToTask(event.clientX, event.clientY);
+        const radius = Math.hypot(reachPhysical[0], reachPhysical[1]);
+
+        if (reachTargetOnsetAt === null) {
+          reachDisplay = pointerReachSurface.update(reachPhysical, false, false);
+          if (radius <= reachConfig.start_radius) {
+            if (reachHoldTimerId === null) {
+              reachSearchTime = Math.max(0, (now - stageStart) / 1000);
+              reachHoldTrigger = reachConfig.hold_trigger ?? null;
+              reachHoldTimerId = window.setTimeout(() => {
+                reachHoldTimerId = null;
+                reachTargetOnsetAt = performance.now();
+                reachTargetTrigger = reachConfig.target_trigger ?? null;
+                reachDisplay = pointerReachSurface.update(reachPhysical, true, false);
+              }, reachConfig.start_hold_duration * 1000);
+            }
+          } else if (reachHoldTimerId !== null) {
+            window.clearTimeout(reachHoldTimerId);
+            reachHoldTimerId = null;
+          }
+          return;
+        }
+
+        if (reachMovementStartedAt === null && radius > reachConfig.start_radius) {
+          reachMovementStartedAt = now;
+          reachMovementTrigger = reachConfig.movement_trigger ?? null;
+          reachMovementTimerId = window.setTimeout(finishReachTimeout, reachConfig.movement_deadline * 1000);
+        }
+        const moving = reachMovementStartedAt !== null;
+        reachDisplay = pointerReachSurface.update(reachPhysical, true, moving);
+        if (!moving) return;
+
+        const sampleTime = Math.max(0, (now - reachTargetOnsetAt) / 1000);
+        reachSamples.push({
+          t: sampleTime,
+          physical: [...reachPhysical],
+          display: [...reachDisplay],
+          visible: reachConfig.feedback_mode !== "none"
+        });
+        if (radius < reachConfig.target_distance) return;
+
+        if (reachMovementTimerId !== null) {
+          window.clearTimeout(reachMovementTimerId);
+          reachMovementTimerId = null;
+        }
+        evaluateReach();
+        if (!reachEvaluation.completed) {
+          finishReachTimeout();
+          return;
+        }
+        reachCompleted = true;
+        completionTrigger = reachConfig.complete_trigger ?? null;
+        reachHitTrigger = reachEvaluation.cursor_hit ? reachConfig.hit_trigger ?? null : null;
+        response = "reach_complete";
+        responseCount = 1;
+        rtSeconds = reachEvaluation.reaction_time;
+        hit = reachEvaluation.cursor_hit;
+        reachFreezeTimerId = window.setTimeout(
+          () => finish((performance.now() - stageStart) / 1000),
+          reachConfig.endpoint_freeze_duration * 1000
+        );
+      };
+
       const abortListener = () => {
         finish((performance.now() - stageStart) / 1000, true);
       };
@@ -1157,6 +1363,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         }
         if (animationFrameId != null) {
           window.cancelAnimationFrame(animationFrameId);
+        }
+        for (const reachTimer of [reachHoldTimerId, reachMovementTimerId, reachFreezeTimerId]) {
+          if (reachTimer !== null) window.clearTimeout(reachTimer);
         }
         keyboardListening = false;
         stopSpeech?.();
@@ -1176,6 +1385,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         stageRoot.removeEventListener("pointermove", pointerTraceMoveListener, true);
         stageRoot.removeEventListener("pointerup", pointerTraceEndListener, true);
         stageRoot.removeEventListener("pointercancel", pointerTraceEndListener, true);
+        stageRoot.removeEventListener("pointermove", pointerReachMoveListener, true);
         display_element.removeEventListener(PSYFLOW_ABORT_EVENT, abortListener as EventListener);
       };
 
@@ -1194,11 +1404,16 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           rtSeconds = traceEvaluation.movement_time;
           hit = traceCompleted;
         }
+        if (stage.op === "capture_pointer_reach" && reachConfig) {
+          evaluateReach();
+          rtSeconds = reachEvaluation.reaction_time;
+          if (!reachCompleted) hit = false;
+        }
         cleanup();
         const duration =
           forceElapsed
             ? elapsedSeconds
-            : stage.op === "wait_and_continue"
+            : stage.op === "wait_and_continue" || stage.op === "capture_pointer_reach"
             ? elapsedSeconds
             : execution.duration ?? elapsedSeconds;
         resolve({
@@ -1209,7 +1424,12 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           duration,
           response,
           response_text: textEntry?.value ?? null,
-          key_press: stage.op === "capture_pointer_trace" ? traceStartedAt !== null : responseCount > 0,
+          key_press:
+            stage.op === "capture_pointer_trace"
+              ? traceStartedAt !== null
+              : stage.op === "capture_pointer_reach"
+                ? reachMovementStartedAt !== null
+                : responseCount > 0,
           response_count: responseCount,
           response_times: responseTimes,
           responses,
@@ -1220,12 +1440,14 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
               ? responses.length >= (execution.pointer_cfg?.max_selections ?? 1)
               : stage.op === "capture_pointer_trace"
                 ? traceCompleted
+                : stage.op === "capture_pointer_reach"
+                  ? reachCompleted
                 : undefined,
           selection_triggers: selectionTriggers,
           completion_trigger: completionTrigger,
-          physical_positions: traceSamples.map((sample) => sample.physical),
-          display_positions: traceSamples.map((sample) => sample.display),
-          sample_times: traceSamples.map((sample) => sample.t),
+          physical_positions: (stage.op === "capture_pointer_reach" ? reachSamples : traceSamples).map((sample) => sample.physical),
+          display_positions: (stage.op === "capture_pointer_reach" ? reachSamples : traceSamples).map((sample) => sample.display),
+          sample_times: (stage.op === "capture_pointer_reach" ? reachSamples : traceSamples).map((sample) => sample.t),
           start_trigger: stage.op === "capture_pointer_trace" ? execution.pointer_trace_cfg?.start_trigger ?? null : null,
           error_triggers: errorTriggers,
           error_excursions: traceEvaluation.error_excursions,
@@ -1234,7 +1456,21 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           rms_path_error: traceEvaluation.rms_path_error,
           pointer_lifts: tracePointerLifts,
           max_progress: traceEvaluation.max_progress,
-          sample_count: traceEvaluation.sample_count,
+          sample_count: stage.op === "capture_pointer_reach" ? reachEvaluation.sample_count : traceEvaluation.sample_count,
+          search_time: stage.op === "capture_pointer_reach" ? reachSearchTime : null,
+          reaction_time: stage.op === "capture_pointer_reach" ? reachEvaluation.reaction_time : null,
+          movement_time: stage.op === "capture_pointer_reach" ? reachEvaluation.movement_time : null,
+          physical_endpoint: stage.op === "capture_pointer_reach" ? reachEvaluation.physical_endpoint : null,
+          display_endpoint: stage.op === "capture_pointer_reach" ? reachEvaluation.display_endpoint : null,
+          hand_angle_deg: stage.op === "capture_pointer_reach" ? reachEvaluation.hand_angle_deg : null,
+          cursor_angle_deg: stage.op === "capture_pointer_reach" ? reachEvaluation.cursor_angle_deg : null,
+          cursor_error_deg: stage.op === "capture_pointer_reach" ? reachEvaluation.cursor_error_deg : null,
+          cursor_hit: stage.op === "capture_pointer_reach" ? reachEvaluation.cursor_hit : false,
+          timed_out: stage.op === "capture_pointer_reach" ? !reachCompleted : timeoutTriggered,
+          hold_trigger: stage.op === "capture_pointer_reach" ? reachHoldTrigger : null,
+          target_trigger: stage.op === "capture_pointer_reach" ? reachTargetTrigger : null,
+          movement_trigger: stage.op === "capture_pointer_reach" ? reachMovementTrigger : null,
+          hit_trigger: stage.op === "capture_pointer_reach" ? reachHitTrigger : null,
           rt: rtSeconds,
           response_time: rtSeconds,
           response_time_global: rtSeconds == null ? null : onsetEpochSeconds + rtSeconds,
@@ -1303,6 +1539,11 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
             finish((performance.now() - stageStart) / 1000);
           }, Math.max(0, execution.duration * 1000));
         }
+        return;
+      }
+
+      if (stage.op === "capture_pointer_reach") {
+        stageRoot.addEventListener("pointermove", pointerReachMoveListener, true);
         return;
       }
 

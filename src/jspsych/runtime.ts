@@ -140,7 +140,9 @@ function resolveStageExecution(
   }
   let pointerCfg: ResolvedStageExecution["pointer_cfg"];
   let pointerTraceCfg: ResolvedStageExecution["pointer_trace_cfg"];
+  let pointerReachCfg: ResolvedStageExecution["pointer_reach_cfg"];
   const pointerStimuli: ResolvedStageStimulus[] = [];
+  const pointerReachStimuli: ResolvedStageStimulus[] = [];
   if (stage.pointer_cfg) {
     const resolvePointerValue = <T>(value: Resolvable<T> | undefined): T | undefined =>
       value == null ? undefined : resolveValue(value, snapshot, recorder);
@@ -173,6 +175,29 @@ function resolveStageExecution(
       timeout_trigger: resolveTraceValue(stage.pointer_trace_cfg.timeout_trigger) ?? null
     };
   }
+  if (stage.pointer_reach_cfg) {
+    const resolveReachValue = <T>(value: Resolvable<T> | undefined): T | undefined =>
+      value == null ? undefined : resolveValue(value, snapshot, recorder);
+    const { start, target, cursor, ...reachConfig } = stage.pointer_reach_cfg;
+    pointerReachCfg = {
+      ...reachConfig,
+      target_position: [Number(reachConfig.target_position[0]), Number(reachConfig.target_position[1])],
+      hold_trigger: resolveReachValue(reachConfig.hold_trigger) ?? null,
+      target_trigger: resolveReachValue(reachConfig.target_trigger) ?? null,
+      movement_trigger: resolveReachValue(reachConfig.movement_trigger) ?? null,
+      complete_trigger: resolveReachValue(reachConfig.complete_trigger) ?? null,
+      hit_trigger: resolveReachValue(reachConfig.hit_trigger) ?? null,
+      timeout_trigger: resolveReachValue(reachConfig.timeout_trigger) ?? null
+    };
+    for (const [stimId, input] of [
+      ["__pointer_reach_start", start],
+      ["__pointer_reach_target", target],
+      ["__pointer_reach_cursor", cursor]
+    ] as const) {
+      const resolvedStimulus = resolveStimulusWithMeta(input, snapshot, recorder, stimBank);
+      if (resolvedStimulus) pointerReachStimuli.push({ stim_id: stimId, spec: resolvedStimulus.spec });
+    }
+  }
   const context: TrialContextSpec = {
     ...(stage.context ?? {})
   };
@@ -196,7 +221,7 @@ function resolveStageExecution(
   const stimuli = stage.stim_refs
     .map((stim) => resolveStimulusWithMeta(stim, snapshot, recorder, stimBank))
     .filter((stimulus): stimulus is ResolvedStageStimulus => stimulus !== null)
-    .concat(pointerStimuli);
+    .concat(pointerStimuli, pointerReachStimuli);
   return {
     context,
     duration: sampledDuration,
@@ -205,6 +230,7 @@ function resolveStageExecution(
     response_cfg: responseCfg,
     pointer_cfg: pointerCfg,
     pointer_trace_cfg: pointerTraceCfg,
+    pointer_reach_cfg: pointerReachCfg,
     stimuli
   };
 }
@@ -269,6 +295,20 @@ function toUnitState(
     pointer_lifts: result.pointer_lifts ?? 0,
     max_progress: result.max_progress ?? 0,
     sample_count: result.sample_count ?? 0,
+    search_time: result.search_time ?? null,
+    reaction_time: result.reaction_time ?? null,
+    movement_time: result.movement_time ?? null,
+    physical_endpoint: result.physical_endpoint ?? null,
+    display_endpoint: result.display_endpoint ?? null,
+    hand_angle_deg: result.hand_angle_deg ?? null,
+    cursor_angle_deg: result.cursor_angle_deg ?? null,
+    cursor_error_deg: result.cursor_error_deg ?? null,
+    cursor_hit: result.cursor_hit ?? false,
+    timed_out: result.timed_out ?? result.timeout_triggered,
+    hold_trigger: result.hold_trigger ?? null,
+    target_trigger: result.target_trigger ?? null,
+    movement_trigger: result.movement_trigger ?? null,
+    hit_trigger: result.hit_trigger ?? null,
     rt: result.rt,
     response_time: result.response_time,
     response_time_global: result.response_time_global,

@@ -162,4 +162,51 @@ describe("PsyflowStagePlugin", () => {
     expect(result.completed).toBe(true);
     expect(result.timeout_triggered).toBe(false);
   });
+
+  it("captures a click-free rotated reach and records endpoint geometry", async () => {
+    const display = document.createElement("div");
+    display.className = "psyflow-runtime-root";
+    display.dataset.psyflowDefaultUnits = "deg";
+    document.body.appendChild(display);
+    const plugin = new PsyflowStagePlugin({} as never);
+    const resultPromise = plugin.trial(display, {
+      stage: { unit_label: "reach", op: "capture_pointer_reach", phase: "reach" },
+      resolve_stage: () => ({
+        context: { trial_id: "reach_1", phase: "reach", deadline_s: 0.2, valid_keys: ["pointer_reach"] },
+        duration: null,
+        min_wait: 0,
+        pointer_reach_cfg: {
+          target_position: [0, 6], target_distance: 6, start_radius: 0.25, target_radius: 0.25,
+          search_visibility_radius: 2, start_hold_duration: 0.005, movement_deadline: 0.2,
+          reaction_threshold: 1, feedback_mode: "rotated", rotation_deg: -45,
+          endpoint_freeze_duration: 0.001, hold_trigger: 21, target_trigger: 31,
+          movement_trigger: 40, complete_trigger: 50, hit_trigger: 52, timeout_trigger: 51
+        },
+        stimuli: [
+          { stim_id: "__pointer_reach_start", spec: { type: "circle", radius: 0.25, lineColor: "white" } },
+          { stim_id: "__pointer_reach_target", spec: { type: "circle", radius: 0.25, fillColor: "blue", pos: [0, 6] } },
+          { stim_id: "__pointer_reach_cursor", spec: { type: "circle", radius: 0.16, fillColor: "white" } }
+        ]
+      })
+    } as never);
+    const stage = display.querySelector<HTMLElement>('[data-psyflow-unit-label="reach"]')!;
+    stage.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: 512, clientY: 384 }));
+    await new Promise((resolve) => window.setTimeout(resolve, 10));
+    stage.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: 500, clientY: 372 }));
+    stage.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: 446, clientY: 318 }));
+    const result = await resultPromise;
+    expect(result).toMatchObject({
+      completed: true,
+      cursor_hit: true,
+      timeout_triggered: false,
+      completion_trigger: 50,
+      hit_trigger: 52,
+      hold_trigger: 21,
+      target_trigger: 31,
+      movement_trigger: 40
+    });
+    expect(result.hand_angle_deg).toBeCloseTo(135, 0);
+    expect(result.cursor_angle_deg).toBeCloseTo(90, 0);
+    expect(result.physical_positions?.length).toBeGreaterThanOrEqual(2);
+  });
 });

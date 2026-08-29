@@ -16,6 +16,15 @@ export {
   normalizeTracePath,
   transformTracePoint
 } from "./core/pointerTrace";
+export {
+  angularDifferenceDeg,
+  evaluatePointerReach,
+  normalizeReachAngleDeg,
+  pointAngleDeg,
+  polarReachPoint,
+  rotateReachPoint,
+  transformReachPoint
+} from "./core/pointerReach";
 export { count_down } from "./core/display";
 export { parseCsvRows } from "./core/csv";
 export type { CountDownOptions } from "./core/display";

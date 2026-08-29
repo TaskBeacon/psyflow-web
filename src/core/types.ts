@@ -200,6 +200,29 @@ export interface PointerTraceConfig {
   cursor_radius?: number;
 }
 
+export interface PointerReachConfig {
+  start: Resolvable<StimRef | StimSpec>;
+  target: Resolvable<StimRef | StimSpec>;
+  cursor: Resolvable<StimRef | StimSpec>;
+  target_position: [number, number];
+  target_distance: number;
+  start_radius: number;
+  target_radius: number;
+  search_visibility_radius: number;
+  start_hold_duration: number;
+  movement_deadline: number;
+  reaction_threshold: number;
+  feedback_mode: "veridical" | "rotated" | "none";
+  rotation_deg: number;
+  endpoint_freeze_duration: number;
+  hold_trigger?: Resolvable<number | null>;
+  target_trigger?: Resolvable<number | null>;
+  movement_trigger?: Resolvable<number | null>;
+  complete_trigger?: Resolvable<number | null>;
+  hit_trigger?: Resolvable<number | null>;
+  timeout_trigger?: Resolvable<number | null>;
+}
+
 export interface TrialContextSpec {
   trial_id?: number | string;
   phase?: string;
@@ -214,7 +237,7 @@ export interface TrialContextSpec {
 
 export interface CompiledStage {
   unit_label: string;
-  op: "show" | "capture_response" | "capture_pointer_sequence" | "capture_pointer_trace" | "wait_and_continue";
+  op: "show" | "capture_response" | "capture_pointer_sequence" | "capture_pointer_trace" | "capture_pointer_reach" | "wait_and_continue";
   phase?: string | null;
   onset_trigger?: Resolvable<number | null>;
   when?: Resolvable<boolean>;
@@ -223,6 +246,7 @@ export interface CompiledStage {
   response_cfg?: ResponseConfig;
   pointer_cfg?: PointerSequenceConfig;
   pointer_trace_cfg?: PointerTraceConfig;
+  pointer_reach_cfg?: PointerReachConfig;
   context?: TrialContextSpec;
   state_patch?: Record<string, Resolvable<unknown>>;
   export_to_reduced: boolean;
