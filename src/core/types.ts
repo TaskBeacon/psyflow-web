@@ -67,6 +67,8 @@ export interface TextBoxStimSpec extends BaseStimSpec {
   type: "textbox";
   text: string;
   editable?: boolean;
+  /** Opt in to a wrapping textarea; editable textboxes remain single-line by default. */
+  multiline?: boolean;
   placeholder?: string;
   maxLength?: number;
   size?: [number, number];

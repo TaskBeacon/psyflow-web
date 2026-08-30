@@ -123,6 +123,42 @@ describe("PsyflowStagePlugin", () => {
     expect(result.timeout_triggered).toBe(false);
   });
 
+  it("opts into a focused wrapping textarea and preserves newlines on F2 submission", async () => {
+    const display = document.createElement("div");
+    document.body.appendChild(display);
+    const plugin = new PsyflowStagePlugin({} as never);
+    const resultPromise = plugin.trial(display, {
+      stage: { unit_label: "entry", op: "capture_response", phase: "entry" },
+      resolve_stage: () => ({
+        context: { trial_id: "multiline_1", phase: "entry", deadline_s: 1, valid_keys: ["f2", "f8"] },
+        duration: 1, min_wait: 0,
+        response_cfg: { keys: ["f2", "f8"], terminate_on_response: true },
+        stimuli: [{ stim_id: "editor", spec: {
+          type: "textbox", text: "", editable: true, multiline: true,
+          placeholder: "Synthetic text only", maxLength: 500, size: [320, 200], units: "pix"
+        } }]
+      })
+    } as never);
+    const editor = display.querySelector<HTMLTextAreaElement>('textarea[data-psyflow-text-entry="true"]')!;
+    expect(editor).not.toBeNull();
+    expect(document.activeElement).toBe(editor);
+    expect(editor.wrap).toBe("soft");
+    expect(editor.style.height).toBe("200px");
+    expect(editor.maxLength).toBe(500);
+    // jsdom does not implement native text editing; real browser validation covers Enter insertion.
+    editor.value = "合成第一行\n第二行";
+    const enter = new KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true, cancelable: true });
+    editor.dispatchEvent(enter);
+    expect(enter.defaultPrevented).toBe(false);
+    expect(display.contains(editor)).toBe(true);
+    editor.dispatchEvent(new KeyboardEvent("keydown", { key: "F2", code: "F2", bubbles: true }));
+    const result = await resultPromise;
+    expect(result.response).toBe("f2");
+    expect(result.response_text).toBe("合成第一行\n第二行");
+    expect(result.timeout_triggered).toBe(false);
+    display.remove();
+  });
+
   it("captures an ordered pointer sequence and stops at the requested length", async () => {
     const display = document.createElement("div");
     document.body.appendChild(display);

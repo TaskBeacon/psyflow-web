@@ -590,11 +590,17 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
     }
     case "textbox": {
       const element = spec.editable
-        ? document.createElement("input")
+        ? document.createElement(spec.multiline ? "textarea" : "input")
         : document.createElement("div");
       element.className = "psyflow-stage-stim psyflow-stage-textbox";
-      if (element instanceof HTMLInputElement) {
-        element.type = "text";
+      if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+        if (element instanceof HTMLInputElement) element.type = "text";
+        else {
+          element.wrap = "soft";
+          element.style.resize = "none";
+          element.style.overflowY = "auto";
+          element.style.whiteSpace = "pre-wrap";
+        }
         element.value = spec.text;
         element.placeholder = spec.placeholder ?? "";
         element.autocomplete = "off";
@@ -618,6 +624,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       if (spec.size) {
         element.style.width = toLength(spec.size[0], spec.units, spec.size[0], stageRoot);
         element.style.minHeight = toLength(spec.size[1], spec.units, spec.size[1], stageRoot);
+        if (element instanceof HTMLTextAreaElement) {
+          element.style.height = toLength(spec.size[1], spec.units, spec.size[1], stageRoot);
+        }
       }
       if (spec.fillColor) {
         element.style.background = normalizeCssColor(spec.fillColor) ?? spec.fillColor;
@@ -1028,8 +1037,8 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         .map((stim: ResolvedStageStimulus) => stim.spec)
         .filter((spec): spec is SoundStimSpec => spec.type === "sound")
     );
-    const textEntry = stageRoot.querySelector<HTMLInputElement>(
-      'input[data-psyflow-text-entry="true"]'
+    const textEntry = stageRoot.querySelector<HTMLInputElement | HTMLTextAreaElement>(
+      'input[data-psyflow-text-entry="true"], textarea[data-psyflow-text-entry="true"]'
     );
     if (textEntry) {
       textEntry.focus();
