@@ -92,6 +92,8 @@ export interface SkippedStageExecution {
 export interface PsyflowStageResult {
   onset_time: number;
   onset_time_global: number;
+  /** performance.now()/1000 at the RT origin; same-page cross-stage clock, not a physical display onset. */
+  onset_time_monotonic_s?: number;
   close_time: number;
   close_time_global: number;
   duration: number;
@@ -158,6 +160,9 @@ const info = {
       type: ParameterType.FLOAT
     },
     onset_time_global: {
+      type: ParameterType.FLOAT
+    },
+    onset_time_monotonic_s: {
       type: ParameterType.FLOAT
     },
     close_time: {
@@ -1422,6 +1427,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         resolve({
           onset_time: 0,
           onset_time_global: onsetEpochSeconds,
+          onset_time_monotonic_s: stageStart / 1000,
           close_time: elapsedSeconds,
           close_time_global: onsetEpochSeconds + elapsedSeconds,
           duration,

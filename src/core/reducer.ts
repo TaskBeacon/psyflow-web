@@ -24,6 +24,7 @@ const RAW_FIELDS = new Set([
   "valid_keys",
   "onset_time",
   "onset_time_global",
+  "onset_time_monotonic_s",
   "close_time",
   "close_time_global",
   "duration",

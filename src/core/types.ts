@@ -290,6 +290,8 @@ export interface RawStageRow {
   valid_keys: string[] | null;
   onset_time: number;
   onset_time_global: number;
+  /** Same-page performance clock seconds, absent from legacy/synthetic rows. */
+  onset_time_monotonic_s?: number;
   close_time: number;
   close_time_global: number;
   duration: number;
