@@ -119,6 +119,8 @@ export interface ImageStimSpec extends BaseStimSpec {
   type: "image";
   image: string;
   size?: [number, number];
+  /** Preserve aspect ratio by default; fill honors separately calibrated axes. */
+  objectFit?: "contain" | "fill";
 }
 
 export interface MovieStimSpec extends BaseStimSpec {

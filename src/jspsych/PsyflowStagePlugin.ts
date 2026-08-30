@@ -708,6 +708,9 @@ function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLV
       const element = document.createElement("img");
       element.className = "psyflow-stage-stim psyflow-stage-image";
       element.src = spec.image;
+      if (spec.objectFit !== undefined) {
+        element.style.objectFit = spec.objectFit;
+      }
       applyBaseStimStyle(element, spec, stageRoot);
       if (spec.size) {
         element.style.width = toLength(spec.size[0], spec.units, spec.size[0], stageRoot);
