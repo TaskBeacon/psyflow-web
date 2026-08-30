@@ -47,6 +47,23 @@ export async function primePsyflowAudio(): Promise<void> {
   }
 }
 
+/**
+ * Fetch and decode sound assets before a time-sensitive task starts.
+ * This does not play audio or resume its context; the existing user-gesture
+ * priming step is still required. Unlike best-effort playback, preparation
+ * rejects when Web Audio is unavailable or an asset cannot be decoded.
+ */
+export async function preloadPsyflowAudio(specs: readonly SoundStimSpec[]): Promise<void> {
+  if (specs.length === 0) {
+    return;
+  }
+  const context = getAudioContext();
+  if (!context) {
+    throw new Error("Web Audio is required to preload sound stimuli.");
+  }
+  await Promise.all(specs.map((spec) => loadBuffer(context, spec.file)));
+}
+
 function playWithHtmlAudio(specs: SoundStimSpec[]): () => void {
   const audios = specs.map((spec) => {
     const audio = new Audio(spec.file);

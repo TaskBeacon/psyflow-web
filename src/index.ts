@@ -29,6 +29,7 @@ export { count_down } from "./core/display";
 export { parseCsvRows } from "./core/csv";
 export type { CountDownOptions } from "./core/display";
 export { runPsyflowExperiment } from "./jspsych/runtime";
+export { preloadPsyflowAudio } from "./jspsych/audio";
 export { default as PsyflowStagePlugin } from "./jspsych/PsyflowStagePlugin";
 export { mountTaskApp } from "./app/TaskApp";
 export type {
