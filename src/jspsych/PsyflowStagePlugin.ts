@@ -406,7 +406,10 @@ function normalizeCssColor(value: unknown): string | undefined {
 function applyWrapWidth(element: HTMLElement, spec: StimSpec, stageRoot: HTMLElement): void {
   const wrapWidth = (spec as { wrapWidth?: unknown }).wrapWidth;
   if (typeof wrapWidth === "number" && Number.isFinite(wrapWidth) && wrapWidth > 0) {
-    element.style.maxWidth = toLength(wrapWidth, spec.units, wrapWidth, stageRoot);
+    // Centered absolute text otherwise shrink-fits the half-stage space to
+    // its right before translateX(-50%); retain configured unit conversion.
+    element.style.width = "max-content";
+    element.style.maxWidth = `min(${toLength(wrapWidth, spec.units, wrapWidth, stageRoot)}, 90%)`;
     return;
   }
   element.style.maxWidth = "min(70ch, 90vw)";
