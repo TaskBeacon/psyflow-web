@@ -451,7 +451,19 @@ async function bootstrap(): Promise<void> {
     normalizeTaskKey(requestedTask) || (taskEntries.length === 1 ? taskEntries[0].directory : "");
   const activeTask = resolveManifestEntry(effectiveTask);
   const { taskRoot, formCard, errorCard } = mountRunnerShell(root);
-  renderLauncher(formCard, effectiveTask, activeTask);
+  if (query.get("participant") === "1") {
+    // Prepared participant links must not reveal researcher-facing task names
+    // or catalogue handles, even while the selected module is still loading.
+    formCard.remove();
+    document.title = "Task";
+    if (!requestedTask.trim() || !activeTask) {
+      errorCard.hidden = false;
+      errorCard.textContent = "Unable to open this task. Please ask the researcher for a valid participant link.";
+      return;
+    }
+  } else {
+    renderLauncher(formCard, effectiveTask, activeTask);
+  }
 
   if (!effectiveTask) {
     return;
@@ -474,6 +486,10 @@ async function bootstrap(): Promise<void> {
     await entry(taskRoot);
   } catch (error) {
     errorCard.hidden = false;
+    if (query.get("participant") === "1") {
+      errorCard.textContent = "Unable to start this task. Please contact the researcher.";
+      throw error;
+    }
     errorCard.innerHTML = `
       <h2>Task Load Error</h2>
       <div class="psyflow-runner-error">${String(error instanceof Error ? error.stack ?? error.message : error)}</div>
