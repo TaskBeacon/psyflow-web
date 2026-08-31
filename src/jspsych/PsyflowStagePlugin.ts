@@ -2,6 +2,7 @@ import { ParameterType, type JsPsych, type JsPsychPlugin, type TrialType } from 
 
 import type {
   CompiledStage,
+  PointerPursuitConfig,
   ResponseConfig,
   SoundStimSpec,
   SpeechStimSpec,
@@ -26,6 +27,7 @@ import {
 } from "../core/pointerReach";
 import { playSoundStimuli } from "./audio";
 import { PSYFLOW_ABORT_EVENT } from "./sessionEvents";
+import { startPointerPursuit, type PursuitSurfaceResult } from "./pointerPursuitSurface";
 
 export interface ResolvedStageStimulus {
   stim_id: string | null;
@@ -33,6 +35,7 @@ export interface ResolvedStageStimulus {
 }
 
 export interface ResolvedStageExecution {
+  pointer_pursuit_cfg?: PointerPursuitConfig;
   context: TrialContextSpec;
   duration: number | null;
   min_wait: number;
@@ -90,6 +93,7 @@ export interface SkippedStageExecution {
 }
 
 export interface PsyflowStageResult {
+  pursuit?: PursuitSurfaceResult & {aborted:boolean;completed:boolean};
   onset_time: number;
   onset_time_global: number;
   /** performance.now()/1000 at the RT origin; same-page cross-stage clock, not a physical display onset. */
@@ -1057,8 +1061,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         ? execution.duration
         : Number(execution.context.deadline_s);
 
-    return new Promise<PsyflowStageResult>((resolve) => {
+    return new Promise<PsyflowStageResult>((resolve, reject) => {
       let finished = false;
+      let pursuitSurface: ReturnType<typeof startPointerPursuit> | null = null;
       let timerId: number | null = null;
       let animationFrameId: number | null = null;
       let response: string | null = null;
@@ -1414,6 +1419,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
           return;
         }
         finished = true;
+        const pursuit = pursuitSurface?.stop();
         if (stage.op === "capture_pointer_trace" && execution.pointer_trace_cfg) {
           traceEvaluation = evaluatePointerTrace(
             traceSamples,
@@ -1437,6 +1443,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
             ? elapsedSeconds
             : execution.duration ?? elapsedSeconds;
         resolve({
+          ...(pursuit ? {pursuit:{...pursuit,aborted:forceElapsed,completed:!forceElapsed}} : {}),
           onset_time: 0,
           onset_time_global: onsetEpochSeconds,
           onset_time_monotonic_s: stageStart / 1000,
@@ -1515,6 +1522,14 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
         display_element.addEventListener("keydown", keydownListener, true);
         stageRoot.addEventListener("keydown", keydownListener, true);
       };
+
+      if (stage.op === "capture_pointer_pursuit" && execution.pointer_pursuit_cfg) {
+        try {
+          pursuitSurface=startPointerPursuit(stageRoot,execution.pointer_pursuit_cfg,execution.duration ?? 0,stageStart,
+            ()=>finish((performance.now()-stageStart)/1000));
+        } catch(error) { cleanup(); reject(error); }
+        return;
+      }
 
       if (stage.op === "show") {
         timerId = window.setTimeout(() => finish(execution.duration ?? 0), (execution.duration ?? 0) * 1000);

@@ -187,6 +187,17 @@ export interface PointerSequenceConfig {
 
 export type PointerTraceTransform = "identity" | "mirror_x";
 
+export interface PointerPursuitConfig {
+  orbit_radius: number;
+  target_radius: number;
+  rotations_per_second: number;
+  max_gap_s: number;
+  target_color?: string;
+  cursor_color?: string;
+  cursor_radius?: number;
+  offset_trigger?: number | null;
+}
+
 export interface PointerTraceConfig {
   path_points: Array<[number, number]>;
   corridor_width: number;
@@ -241,7 +252,7 @@ export interface TrialContextSpec {
 
 export interface CompiledStage {
   unit_label: string;
-  op: "show" | "capture_response" | "capture_pointer_sequence" | "capture_pointer_trace" | "capture_pointer_reach" | "wait_and_continue";
+  op: "show" | "capture_response" | "capture_pointer_sequence" | "capture_pointer_trace" | "capture_pointer_reach" | "capture_pointer_pursuit" | "wait_and_continue";
   phase?: string | null;
   onset_trigger?: Resolvable<number | null>;
   when?: Resolvable<boolean>;
@@ -251,6 +262,7 @@ export interface CompiledStage {
   pointer_cfg?: PointerSequenceConfig;
   pointer_trace_cfg?: PointerTraceConfig;
   pointer_reach_cfg?: PointerReachConfig;
+  pointer_pursuit_cfg?: PointerPursuitConfig;
   context?: TrialContextSpec;
   state_patch?: Record<string, Resolvable<unknown>>;
   export_to_reduced: boolean;

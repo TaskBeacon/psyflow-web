@@ -4,6 +4,7 @@ import type {
   PointerSequenceConfig,
   PointerTraceConfig,
   PointerReachConfig,
+  PointerPursuitConfig,
   StateRef,
   StimRef,
   StimSpec,
@@ -11,6 +12,7 @@ import type {
 } from "./types";
 import { resolve_deadline } from "./trials";
 import { TrialBuilder } from "./TrialBuilder";
+import { validatePursuit } from "./pointerPursuit";
 
 type StageStatePatch = Record<string, Resolvable<unknown>>;
 
@@ -127,6 +129,15 @@ export class StimUnit {
       state_patch: { ...this.statePatch },
       export_to_reduced: false
     };
+    return this;
+  }
+
+  capturePointerPursuit(options: PointerPursuitConfig & {duration: number; onset_trigger?: Resolvable<number | null>}): this {
+    validatePursuit(options,options.duration);
+    const {duration,onset_trigger,...config}=options;
+    this.stage={unit_label:this.label,op:"capture_pointer_pursuit",phase:this.pendingContext.phase ?? null,
+      onset_trigger:onset_trigger ?? null,when:this.enabledWhen,stim_refs:[...this.stimRefs],duration,
+      pointer_pursuit_cfg:config,context:this.buildContext(duration,["pursuit"]),state_patch:{...this.statePatch},export_to_reduced:false};
     return this;
   }
 

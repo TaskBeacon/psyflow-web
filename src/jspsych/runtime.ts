@@ -231,6 +231,7 @@ function resolveStageExecution(
     pointer_cfg: pointerCfg,
     pointer_trace_cfg: pointerTraceCfg,
     pointer_reach_cfg: pointerReachCfg,
+    pointer_pursuit_cfg: stage.pointer_pursuit_cfg ? {...stage.pointer_pursuit_cfg} : undefined,
     stimuli
   };
 }
@@ -322,6 +323,17 @@ function toUnitState(
   if (resolvedStage.context.stim_features != null) {
     baseUnitState.stim_features = structuredClone(resolvedStage.context.stim_features);
   }
+
+  // Add pursuit-only fields without altering legacy stage output defaults.
+  if (result.pursuit) Object.assign(baseUnitState,result.pursuit,{
+    capture_status:result.pursuit.observed_duration>0?"recorded":"no_observation",
+    completed:result.pursuit.completed,
+    orbit_radius:resolvedStage.pointer_pursuit_cfg?.orbit_radius,
+    target_radius:resolvedStage.pointer_pursuit_cfg?.target_radius,
+    rotations_per_second:resolvedStage.pointer_pursuit_cfg?.rotations_per_second,
+    max_gap_s:resolvedStage.pointer_pursuit_cfg?.max_gap_s,
+    offset_trigger:resolvedStage.pointer_pursuit_cfg?.offset_trigger ?? null
+  });
 
   if (stage.state_patch && Object.keys(stage.state_patch).length > 0) {
     const snapshotBefore = recorder.buildSnapshot(compiledTrial.trial_id);

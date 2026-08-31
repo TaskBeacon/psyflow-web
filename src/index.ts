@@ -1,5 +1,7 @@
 export { parsePsyflowConfig } from "./core/config";
 export { PythonRandom } from "./core/pythonRandom";
+export { pursuitPosition, evaluatePointerPursuit } from "./core/pointerPursuit";
+export type { PursuitPoint, PursuitSample, PursuitMetrics } from "./core/pointerPursuit";
 export { TaskSettings } from "./core/TaskSettings";
 export { BlockUnit } from "./core/BlockUnit";
 export { StimBank } from "./core/StimBank";
@@ -37,6 +39,7 @@ export type {
   CompiledTrial,
   ParsedConfig,
   PointerSequenceConfig,
+  PointerPursuitConfig,
   PointerTraceConfig,
   PointerTraceTransform,
   RawStageRow,
