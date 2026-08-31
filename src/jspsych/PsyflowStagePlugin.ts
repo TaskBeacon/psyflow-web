@@ -1072,6 +1072,11 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     const driftTimes: number[] = [0];
     const driftShifts: number[] = [0];
     let driftAnimationFrame: number | null = null;
+    const driftInitialViewport = [window.innerWidth,window.innerHeight];
+    let driftViewportChanged = false;
+    let driftVisibilityChanged = document.hidden;
+    const driftResizeListener = () => { driftViewportChanged = true; };
+    const driftVisibilityListener = () => { driftVisibilityChanged = true; };
     const primaryStimId =
       typeof execution.context.stim_id === "string" ? execution.context.stim_id : execution.stimuli[0]?.stim_id ?? null;
     const deadlineSeconds =
@@ -1408,6 +1413,8 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       };
 
       const cleanup = () => {
+        window.removeEventListener('resize',driftResizeListener);
+        document.removeEventListener('visibilitychange',driftVisibilityListener);
         window.removeEventListener(PSYFLOW_ABORT_EVENT, gratingAbortCapture, true);
         if(driftAnimationFrame != null) window.cancelAnimationFrame(driftAnimationFrame);
         if (timerId != null) {
@@ -1481,6 +1488,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
             drift_stage_close_elapsed_s: (performance.now()-stageStart)/1000,
             drift_last_sample_to_close_s: Math.max(0,(performance.now()-stageStart)/1000-driftTimes[driftTimes.length-1]),
             drift_clock: 'performance.now shared stage clock; RAF submission times, not physical onset',
+            drift_initial_viewport: driftInitialViewport,
+            drift_final_viewport: [window.innerWidth,window.innerHeight],
+            drift_viewport_changed: driftViewportChanged,
+            drift_visibility_changed: driftVisibilityChanged,
           },
           onset_time: 0,
           onset_time_global: onsetEpochSeconds,
@@ -1551,6 +1562,8 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       display_element.addEventListener(PSYFLOW_ABORT_EVENT, abortListener as EventListener);
       if (stage.phase_drift_hz != null) {
         window.addEventListener(PSYFLOW_ABORT_EVENT, gratingAbortCapture, true);
+        window.addEventListener('resize',driftResizeListener);
+        document.addEventListener('visibilitychange',driftVisibilityListener);
       }
 
       const startKeyboardListener = () => {

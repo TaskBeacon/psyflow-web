@@ -113,4 +113,18 @@ describe('pixel Gabor stimulus',()=>{
     const result=await pending;expect(result.drift_evidence!.drift_frame_count).toBeGreaterThan(1);
     expect(remove.mock.calls.some(call=>call[0]===PSYFLOW_ABORT_EVENT && call[2]===true)).toBe(true);
   });
+  it('records resize/visibility changes even with no RAF and cleans both listeners',async()=>{
+    vi.spyOn(window,'requestAnimationFrame').mockReturnValue(1);
+    const winRemove=vi.spyOn(window,'removeEventListener'),docRemove=vi.spyOn(document,'removeEventListener');
+    const display=document.createElement('div');document.body.appendChild(display);
+    const pending=new PsyflowStagePlugin({} as never).trial(display,{stage:{unit_label:'adapt',op:'show',phase_drift_hz:4},resolve_stage:()=>({context:{},duration:.02,min_wait:0,stimuli:[{stim_id:'a',spec}]})} as never);
+    window.dispatchEvent(new Event('resize'));window.dispatchEvent(new Event('resize'));
+    document.dispatchEvent(new Event('visibilitychange'));
+    const evidence=(await pending).drift_evidence!;
+    expect(evidence.drift_frame_count).toBe(1);
+    expect(evidence.drift_viewport_changed).toBe(true);expect(evidence.drift_visibility_changed).toBe(true);
+    expect(evidence.drift_initial_viewport).toEqual(evidence.drift_final_viewport);
+    expect(winRemove.mock.calls.some(c=>c[0]==='resize')).toBe(true);
+    expect(docRemove.mock.calls.some(c=>c[0]==='visibilitychange')).toBe(true);
+  });
 });
