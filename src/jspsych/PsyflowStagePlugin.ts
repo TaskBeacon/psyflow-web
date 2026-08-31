@@ -1399,8 +1399,16 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       const abortListener = () => {
         finish((performance.now() - stageStart) / 1000, true);
       };
+      // Runtime abort originates on its outer display; jsPsych gives this
+      // plugin an inner element. Capture handles that non-bubbling ancestor
+      // event, scoped to opted-in gratings in this mounted experiment.
+      const gratingAbortCapture = (event: Event) => {
+        if (display_element.isConnected && event.target instanceof Node &&
+            event.target.contains(display_element)) abortListener();
+      };
 
       const cleanup = () => {
+        window.removeEventListener(PSYFLOW_ABORT_EVENT, gratingAbortCapture, true);
         if(driftAnimationFrame != null) window.cancelAnimationFrame(driftAnimationFrame);
         if (timerId != null) {
           window.clearTimeout(timerId);
@@ -1541,6 +1549,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       };
 
       display_element.addEventListener(PSYFLOW_ABORT_EVENT, abortListener as EventListener);
+      if (stage.phase_drift_hz != null) {
+        window.addEventListener(PSYFLOW_ABORT_EVENT, gratingAbortCapture, true);
+      }
 
       const startKeyboardListener = () => {
         if (keyboardListening) {

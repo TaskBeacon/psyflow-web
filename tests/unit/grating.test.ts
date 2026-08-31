@@ -99,4 +99,18 @@ describe('pixel Gabor stimulus',()=>{
     await new Promise(resolve=>window.setTimeout(resolve,40));
     expect(drawn.length).toBe(drawCount);
   });
+  it('ignores abort from another display and removes capture listener on normal finish',async()=>{
+    const display=document.createElement('div');document.body.appendChild(display);
+    const other=document.createElement('div');document.body.appendChild(other);
+    const remove=vi.spyOn(window,'removeEventListener');
+    const plugin=new PsyflowStagePlugin({} as never);
+    let finished=false;
+    const pending=plugin.trial(display,{stage:{unit_label:'adapt',op:'show',phase_drift_hz:4},resolve_stage:()=>({
+      context:{},duration:.05,min_wait:0,stimuli:[{stim_id:'a',spec}]
+    })} as never).then(value=>{finished=true;return value;});
+    other.dispatchEvent(new CustomEvent(PSYFLOW_ABORT_EVENT));
+    await Promise.resolve();expect(finished).toBe(false);
+    const result=await pending;expect(result.drift_evidence!.drift_frame_count).toBeGreaterThan(1);
+    expect(remove.mock.calls.some(call=>call[0]===PSYFLOW_ABORT_EVENT && call[2]===true)).toBe(true);
+  });
 });
