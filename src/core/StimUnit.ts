@@ -38,10 +38,12 @@ export class StimUnit {
   show(options: {
     duration?: Resolvable<number | number[] | null>;
     onset_trigger?: Resolvable<number | null>;
+    phase_drift_hz?: number;
   } = {}): this {
     this.stage = {
       unit_label: this.label,
       op: "show",
+      phase_drift_hz: options.phase_drift_hz,
       phase: this.pendingContext.phase ?? null,
       onset_trigger: options.onset_trigger ?? null,
       when: this.enabledWhen,

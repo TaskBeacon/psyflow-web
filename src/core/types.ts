@@ -38,6 +38,7 @@ export type StimSpec =
   | ShapeStimSpec
   | ImageStimSpec
   | MovieStimSpec
+  | GratingStimSpec
   | AnaglyphGratingStimSpec
   | SoundStimSpec
   | SpeechStimSpec;
@@ -48,6 +49,12 @@ interface BaseStimSpec {
   color?: string;
   units?: string;
   ori?: number;
+}
+
+export interface GratingStimSpec extends BaseStimSpec {
+  type: 'grating'; units: 'pix'; tex: 'sin'; mask: 'gauss';
+  size: [number, number]; sf: number; phase: number | [number, number];
+  contrast: number; maskParams: {sd: number};
 }
 
 export interface TextStimSpec extends BaseStimSpec {
@@ -258,6 +265,7 @@ export interface CompiledStage {
   when?: Resolvable<boolean>;
   stim_refs: Array<Resolvable<StimRef | StimSpec | null>>;
   duration?: Resolvable<number | number[] | null>;
+  phase_drift_hz?: number;
   response_cfg?: ResponseConfig;
   pointer_cfg?: PointerSequenceConfig;
   pointer_trace_cfg?: PointerTraceConfig;

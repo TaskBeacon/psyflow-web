@@ -26,6 +26,7 @@ import {
   type ReachSample
 } from "../core/pointerReach";
 import { playSoundStimuli } from "./audio";
+import { createGrating, type GratingSurface } from './grating';
 import { PSYFLOW_ABORT_EVENT } from "./sessionEvents";
 import { startPointerPursuit, type PursuitSurfaceResult } from "./pointerPursuitSurface";
 
@@ -94,6 +95,7 @@ export interface SkippedStageExecution {
 
 export interface PsyflowStageResult {
   pursuit?: PursuitSurfaceResult & {aborted:boolean;completed:boolean};
+  drift_evidence?: Record<string, unknown>;
   onset_time: number;
   onset_time_global: number;
   /** performance.now()/1000 at the RT origin; same-page cross-stage clock, not a physical display onset. */
@@ -566,8 +568,15 @@ function renderAnaglyphGrating(
   context.fill();
 }
 
-function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLVideoElement[]): void {
+function renderStimulus(stageRoot: HTMLElement, spec: StimSpec, movieSink: HTMLVideoElement[], gratingSink: GratingSurface[]): void {
   switch (spec.type) {
+    case 'grating': {
+      const canvas=document.createElement('canvas');
+      canvas.className='psyflow-stage-stim psyflow-stage-grating';
+      applyBaseStimStyle(canvas,spec,stageRoot);
+      canvas.style.width=`${spec.size[0]}px`; canvas.style.height=`${spec.size[1]}px`;
+      stageRoot.appendChild(canvas); gratingSink.push(createGrating(canvas,spec)); return;
+    }
     case "text": {
       const element = document.createElement("div");
       element.className = "psyflow-stage-stim psyflow-stage-text";
@@ -1008,6 +1017,11 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       });
     }
     const execution: ResolvedStageExecution = resolved;
+    if (stage.phase_drift_hz != null && (stage.op !== 'show' || !Number.isFinite(stage.phase_drift_hz) ||
+        !execution.stimuli.some(s=>s.spec.type==='grating') ||
+        execution.stimuli.some(s=>['movie','sound','speech'].includes(s.spec.type)))) {
+      throw new Error('phase_drift_hz requires show, finite frequency, gratings and no audio/video.');
+    }
 
     display_element.innerHTML = "";
     display_element.tabIndex = 0;
@@ -1022,9 +1036,10 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
     display_element.appendChild(stageRoot);
     display_element.focus();
     const activeMovies: HTMLVideoElement[] = [];
+    const gratingSurfaces: GratingSurface[] = [];
     for (const stim of execution.stimuli) {
       const childCount = stageRoot.children.length;
-      renderStimulus(stageRoot, stim.spec, activeMovies);
+      renderStimulus(stageRoot, stim.spec, activeMovies, gratingSurfaces);
       const rendered = stageRoot.children.item(childCount);
       if (rendered instanceof HTMLElement && stim.stim_id) {
         rendered.dataset.psyflowStimId = stim.stim_id;
@@ -1054,6 +1069,9 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
 
     const onsetEpochSeconds = Date.now() / 1000;
     const stageStart = performance.now();
+    const driftTimes: number[] = [0];
+    const driftShifts: number[] = [0];
+    let driftAnimationFrame: number | null = null;
     const primaryStimId =
       typeof execution.context.stim_id === "string" ? execution.context.stim_id : execution.stimuli[0]?.stim_id ?? null;
     const deadlineSeconds =
@@ -1383,6 +1401,7 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       };
 
       const cleanup = () => {
+        if(driftAnimationFrame != null) window.cancelAnimationFrame(driftAnimationFrame);
         if (timerId != null) {
           window.clearTimeout(timerId);
         }
@@ -1444,6 +1463,17 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
             : execution.duration ?? elapsedSeconds;
         resolve({
           ...(pursuit ? {pursuit:{...pursuit,aborted:forceElapsed,completed:!forceElapsed}} : {}),
+          drift_evidence: stage.phase_drift_hz == null ? undefined : {
+            drift_frequency_hz: stage.phase_drift_hz,
+            drift_initial_phases: gratingSurfaces.map(s=>s.initialPhase),
+            drift_final_phases: gratingSurfaces.map(s=>s.phase),
+            drift_sample_times_s: driftTimes, drift_phase_shifts_cycles: driftShifts,
+            drift_frame_count: driftTimes.length,
+            drift_max_frame_interval_s: Math.max(0,...driftTimes.slice(1).map((t,i)=>t-driftTimes[i])),
+            drift_stage_close_elapsed_s: (performance.now()-stageStart)/1000,
+            drift_last_sample_to_close_s: Math.max(0,(performance.now()-stageStart)/1000-driftTimes[driftTimes.length-1]),
+            drift_clock: 'performance.now shared stage clock; RAF submission times, not physical onset',
+          },
           onset_time: 0,
           onset_time_global: onsetEpochSeconds,
           onset_time_monotonic_s: stageStart / 1000,
@@ -1532,6 +1562,18 @@ export class PsyflowStagePlugin implements JsPsychPlugin<Info> {
       }
 
       if (stage.op === "show") {
+        if(stage.phase_drift_hz != null) {
+          const animate=()=>{
+            if(finished) return;
+            const t=Math.max(driftTimes[driftTimes.length-1],(performance.now()-stageStart)/1000);
+            if(t >= (execution.duration ?? 0)) return;
+            const shift=stage.phase_drift_hz!*t;
+            for(const surface of gratingSurfaces) surface.draw([surface.initialPhase[0]+shift,surface.initialPhase[1]]);
+            driftTimes.push(t); driftShifts.push(shift);
+            driftAnimationFrame=window.requestAnimationFrame(animate);
+          };
+          driftAnimationFrame=window.requestAnimationFrame(animate);
+        }
         timerId = window.setTimeout(() => finish(execution.duration ?? 0), (execution.duration ?? 0) * 1000);
         return;
       }

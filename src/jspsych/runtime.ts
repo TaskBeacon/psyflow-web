@@ -320,6 +320,7 @@ function toUnitState(
     onset_trigger: resolvedStage.onset_trigger,
     task_factors: taskFactors
   };
+  if (result.drift_evidence) Object.assign(baseUnitState, result.drift_evidence);
   if (resolvedStage.context.stim_features != null) {
     baseUnitState.stim_features = structuredClone(resolvedStage.context.stim_features);
   }
