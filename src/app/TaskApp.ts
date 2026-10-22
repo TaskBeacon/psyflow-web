@@ -556,7 +556,7 @@ async function waitForPreflightStart(
   const wrapper = document.createElement("div");
   wrapper.className = "psyflow-task-preflight";
   wrapper.innerHTML = `
-    <p>The task is ready. The shared runner will enter fullscreen before starting.</p>
+    <p>${subjectData.preview_mode === "demo" ? "Demo walkthrough · fictional participant details. " : ""}${options.settings.fullscreen === false ? "The task will start in this window." : "The task will enter fullscreen when you start."}</p>
     <dl>
       <div>
         <dt>Participant</dt>
@@ -587,6 +587,7 @@ async function waitForPreflightStart(
     options.settings.fullscreen === false ? "Start Task" : "Enter Fullscreen and Start";
   wrapper.appendChild(button);
   elements.preflightPanel.appendChild(wrapper);
+  button.focus();
 
   await new Promise<void>((resolve) => {
     button.addEventListener("click", async () => {
@@ -733,7 +734,9 @@ export async function mountTaskApp(options: MountTaskAppOptions): Promise<Psyflo
   };
 
   try {
-    const subjectData = await options.subInfo.collect(elements.formPanel);
+    const subjectData = await options.subInfo.collect(elements.formPanel, {
+      allowDemo: new URLSearchParams(window.location.search).get("participant") !== "1"
+    });
     options.settings.add_subinfo(subjectData);
     elements.formPanel.hidden = true;
 
@@ -764,7 +767,7 @@ export async function mountTaskApp(options: MountTaskAppOptions): Promise<Psyflo
     await cleanupRuntimePresentation();
     window.__PSYFLOW_WEB_LAST_RESULT__ = result;
     elements.taskPanel.hidden = true;
-    renderResultPanel(elements.resultPanel, options.task_id, result);
+    renderResultPanel(elements.resultPanel, subjectData.preview_mode === "demo" ? `demo_${options.task_id}` : options.task_id, result);
     options.onResults?.(result);
     return result;
   } catch (error) {

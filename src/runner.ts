@@ -68,6 +68,11 @@ function ensureRunnerStyles(): void {
       padding: 24px 26px;
       overflow: hidden;
     }
+    .psyflow-runner-back { float: right; color: var(--pf-ink); font-size: .85rem; line-height: 2.5; }
+    .psyflow-runner-switch { margin-top: 16px; }
+    .psyflow-runner-switch summary { cursor: pointer; font-weight: 700; border-radius: 8px; }
+    .psyflow-runner-switch summary:focus-visible, .psyflow-runner-back:focus-visible { outline: 2px solid var(--pf-ink); outline-offset: 4px; }
+    @media (max-width: 540px) { .psyflow-runner-back { float: none; display: block; margin-top: 10px; } }
     .psyflow-runner-card h1,
     .psyflow-runner-card h2,
     .psyflow-runner-card p {
@@ -379,8 +384,8 @@ function renderLauncher(
 
   formCard.innerHTML = `
     <div class="psyflow-runner-kicker">TaskBeacon preview</div>
-    <h1>Preview</h1>
-    <p>Launch a browser preview for an HTML task companion without scanning a long task list.</p>
+    <a class="psyflow-runner-back" href="https://taskbeacon.github.io/tasks/">← Back to task catalog</a>
+    ${activeTask ? '<details class="psyflow-runner-switch"><summary>Switch task</summary>' : '<h1>Explore a task</h1><p>Choose a task to try its procedure in your browser.</p>'}
     <form class="psyflow-runner-form">
       <label class="psyflow-runner-field">
         Filter tasks
@@ -402,6 +407,7 @@ function renderLauncher(
         <div class="psyflow-runner-current" data-role="current-task"></div>
       </div>
     </div>
+    ${activeTask ? '</details>' : ''}
   `;
 
   const form = formCard.querySelector<HTMLFormElement>(".psyflow-runner-form");
@@ -418,6 +424,8 @@ function renderLauncher(
   function syncCatalog(nextRequested: string): void {
     const filteredEntries = populateTaskSelect(taskSelect, catalogInput.value, nextRequested);
     updateLauncherMeta(formCard, filteredEntries, taskSelect.value || nextRequested);
+    const submit = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+    if (submit) submit.disabled = filteredEntries.length === 0;
   }
 
   syncCatalog(requestedDirectory);
